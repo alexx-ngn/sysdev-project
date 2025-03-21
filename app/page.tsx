@@ -24,6 +24,9 @@ export default function Home() {
               <Link href="#run" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Charity Run
               </Link>
+              <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
+                FAQ
+              </Link>
               <Link href="#contact" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Contact
               </Link>
@@ -318,6 +321,11 @@ export default function Home() {
                 <li>
                   <Link href="#run" className="text-sm text-muted-foreground hover:text-gray-800">
                     Charity Run
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
+                    FAQ
                   </Link>
                 </li>
                 <li>
