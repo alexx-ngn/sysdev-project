@@ -27,6 +27,9 @@ export default function Home() {
               <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
                 FAQ
               </Link>
+              <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
+                Sponsors
+              </Link>
               <Link href="#contact" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Contact
               </Link>
@@ -329,6 +332,11 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
+                    Sponsors
+                  </Link>
+                </li>
+                <li>
                   <Link href="#contact" className="text-sm text-muted-foreground hover:text-gray-800">
                     Contact
                   </Link>
@@ -339,7 +347,7 @@ export default function Home() {
               <h4 className="text-sm font-semibold">Resources</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
+                  <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
                     Donate
                   </Link>
                 </li>
