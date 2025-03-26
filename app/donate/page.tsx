@@ -28,6 +28,9 @@ export default function DonatePage() {
               <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Sponsors
               </Link>
+              <Link href="/donate" className="text-sm font-medium transition-colors hover:text-gray-600">
+                Donate
+              </Link>
               <Link href="/#contact" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Contact
               </Link>
@@ -35,7 +38,7 @@ export default function DonatePage() {
           </div>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/#register">Register Now</Link>
+              <Link href="/register">Register Now</Link>
             </Button>
           </div>
         </div>
@@ -331,3 +334,4 @@ export default function DonatePage() {
     </div>
   )
 }
+

@@ -80,3 +80,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Open Peeps Illustrations */
+.open-peeps-illustration {
+  width: 200px;
+  height: 200px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Add more specific classes for different illustrations as needed */
+.standing-figure-1 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b6beb045293_Standing%20Figure%2001.svg");
+}
+.standing-figure-23 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b1a5f045294_Standing%20Figure%2023.svg");
+}
+.standing-figure-24 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b7a8b045295_Standing%20Figure%2024.svg");
+}
+.sitting-figure-1 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b0f7e045291_Sitting%20Figure%2001.svg");
+}
+.sitting-figure-2 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b2beb045292_Sitting%20Figure%2002.svg");
+}
+.standing-figure-5 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b7d6d045297_Standing%20Figure%2005.svg");
+}
+.standing-figure-12 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b3f7e045298_Standing%20Figure%2012.svg");
+}
+.standing-figure-19 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b0d1b045299_Standing%20Figure%2019.svg");
+}
+.standing-figure-15 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b3beb04529a_Standing%20Figure%2015.svg");
+}
+.standing-figure-21 {
+  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b1d1b04529b_Standing%20Figure%2021.svg");
+}
+

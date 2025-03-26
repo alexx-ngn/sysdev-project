@@ -14,23 +14,29 @@ export default function FAQPage() {
               <span className="inline-block font-bold">MilesForHope Run</span>
             </Link>
             <nav className="hidden md:flex gap-6">
-              <Link href="/#about" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link href="/about" className="text-sm font-medium transition-colors hover:text-gray-600">
                 About
               </Link>
-              <Link href="/#run" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link href="/run" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Charity Run
               </Link>
               <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
                 FAQ
               </Link>
-              <Link href="/#contact" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
+                Sponsors
+              </Link>
+              <Link href="/donate" className="text-sm font-medium transition-colors hover:text-gray-600">
+                Donate
+              </Link>
+              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-gray-600">
                 Contact
               </Link>
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/#register">Register Now</Link>
+              <Link href="/register">Register Now</Link>
             </Button>
           </div>
         </div>
@@ -64,17 +70,16 @@ export default function FAQPage() {
                   <AccordionTrigger className="text-left">How do I register for the run?</AccordionTrigger>
                   <AccordionContent>
                     You can register for the run by filling out the registration form on our website. Simply click the
-                    "Register Now" button at the top of the page, or scroll down to the registration section on the
-                    homepage. You'll need to provide your first name, last name, phone number, and email address.
+                    "Register Now" button at the top of the page, or visit our registration page. You'll need to provide
+                    your first name, last name, phone number, and email address.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-3">
                   <AccordionTrigger className="text-left">Is there a registration fee?</AccordionTrigger>
                   <AccordionContent>
-                    Yes, there is a registration fee of $30 for adults and $15 for children under 18. The fee includes a
-                    t-shirt, race bib, and refreshments. All proceeds go directly to supporting our charitable
-                    initiatives.
+                    No, registration for the MilesForHope Run is completely free. All participants will receive a
+                    t-shirt, race bib, and refreshments.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -152,7 +157,7 @@ export default function FAQPage() {
                   Don't see your question answered here? Feel free to contact us.
                 </p>
                 <Button asChild>
-                  <Link href="/#contact">Contact Us</Link>
+                  <Link href="/contact">Contact Us</Link>
                 </Button>
               </div>
             </div>
@@ -177,12 +182,12 @@ export default function FAQPage() {
               <h4 className="text-sm font-semibold">Quick Links</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/#about" className="text-sm text-muted-foreground hover:text-gray-800">
+                  <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#run" className="text-sm text-muted-foreground hover:text-gray-800">
+                  <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
                     Charity Run
                   </Link>
                 </li>
@@ -192,8 +197,8 @@ export default function FAQPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Contact
+                  <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
+                    Sponsors
                   </Link>
                 </li>
               </ul>
@@ -202,18 +207,18 @@ export default function FAQPage() {
               <h4 className="text-sm font-semibold">Resources</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/#donate" className="text-sm text-muted-foreground hover:text-gray-800">
+                  <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
                     Donate
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Blog
+                  <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
+                    Register
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Events
+                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
+                    Contact
                   </Link>
                 </li>
               </ul>

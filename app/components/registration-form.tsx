@@ -5,7 +5,6 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -13,16 +12,11 @@ export function RegistrationForm() {
     lastName: "",
     phoneNumber: "",
     email: "",
-    agreeTerms: false,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, agreeTerms: checked }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -72,18 +66,10 @@ export function RegistrationForm() {
         </label>
         <Input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
       </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="agreeTerms" checked={formData.agreeTerms} onCheckedChange={handleCheckboxChange} />
-        <label
-          htmlFor="agreeTerms"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          I agree to the terms and conditions
-        </label>
-      </div>
       <Button type="submit" className="w-full">
         Register for the Run
       </Button>
     </form>
   )
 }
+
