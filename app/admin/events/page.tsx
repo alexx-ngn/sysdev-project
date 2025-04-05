@@ -24,7 +24,7 @@ export default function EventsPage() {
           <CardDescription>Saturday, October 15, 2023 at City Park</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             <div className="flex items-center space-x-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
                 <Calendar className="h-5 w-5 text-gray-600" />
@@ -86,7 +86,7 @@ export default function EventsPage() {
               <CardDescription>Track and manage tasks for the charity run.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -346,7 +346,7 @@ export default function EventsPage() {
                 </Button>
               </div>
 
-              <div className="rounded-md border">
+              <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -449,7 +449,7 @@ export default function EventsPage() {
 
               <div className="mt-6">
                 <h3 className="text-lg font-medium mb-4">Volunteer Roles</h3>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                   <Card>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base">Registration</CardTitle>

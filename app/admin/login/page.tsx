@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [code, setCode] = useState("")
+  const router = useRouter()
 
   const handleCredentialsSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,8 +37,18 @@ export default function LoginPage() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
-      window.location.href = "/admin"
+      // Set authentication flag in localStorage
+      localStorage.setItem("milesforhope-admin-auth", "true")
+      console.log("Auth flag set after 2FA:", localStorage.getItem("milesforhope-admin-auth"))
+      router.replace("/admin")
     }, 1000)
+  }
+
+  const handleSkipAuth = () => {
+    // Set auth flag and redirect immediately
+    localStorage.setItem("milesforhope-admin-auth", "true")
+    console.log("Auth flag set:", localStorage.getItem("milesforhope-admin-auth"))
+    router.replace("/admin")
   }
 
   return (
@@ -161,6 +173,12 @@ export default function LoginPage() {
             </form>
           )}
         </Card>
+
+        <div className="mt-4 text-center">
+          <Button onClick={handleSkipAuth} variant="outline">
+            Skip Authentication (Dev Mode)
+          </Button>
+        </div>
 
         <div className="mt-6 text-center">
           <div className="text-sm text-muted-foreground mb-2">

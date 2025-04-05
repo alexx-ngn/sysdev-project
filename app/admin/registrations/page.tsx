@@ -12,7 +12,7 @@ export default function RegistrationsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Registrations</h2>
           <p className="text-muted-foreground">Manage and view all participant registrations for the charity run.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
           <Button variant="outline" className="flex items-center gap-2">
             <Download className="h-4 w-4" />
             Export
@@ -27,12 +27,12 @@ export default function RegistrationsPage() {
           <CardDescription>A total of 245 participants have registered for the event.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search participants..." className="pl-8" />
             </div>
-            <div className="flex items-center gap-2">
+            <div>
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 Filter
@@ -41,7 +41,7 @@ export default function RegistrationsPage() {
             </div>
           </div>
 
-          <div className="rounded-md border">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -150,7 +150,7 @@ export default function RegistrationsPage() {
             </Table>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
             <div className="text-sm text-muted-foreground">Showing 1-10 of 245 participants</div>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" disabled>
@@ -170,7 +170,7 @@ export default function RegistrationsPage() {
           <CardDescription>Overview of registration trends and demographics.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Registration by Day</p>
               <div className="h-[180px] bg-gray-100 rounded-md flex items-center justify-center">

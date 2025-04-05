@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 export default function AdminLayout({
   children,
@@ -15,7 +15,9 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
   const pathname = usePathname()
+  const router = useRouter()
 
   // Check if we're on the login page
   const isLoginPage = pathname === "/admin/login"
@@ -23,25 +25,44 @@ export default function AdminLayout({
   // Check authentication status when component mounts
   useEffect(() => {
     const checkAuth = () => {
-      // For demo purposes, check if we have the auth flag in localStorage
-      // In a real app, this would verify a token with the server
-      const isAuth = localStorage.getItem("milesforhope-admin-auth") === "true"
-      console.log("Auth check in admin layout:", isAuth, localStorage.getItem("milesforhope-admin-auth"))
-
-      // For development, you can force authentication to be true
-      setIsAuthenticated(true) // Always authenticate for now
+      try {
+        const authValue = localStorage.getItem("milesforhope-admin-auth")
+        const isAuth = authValue === "true"
+        console.log("Auth check in admin layout:", {
+          isAuth,
+          authValue,
+          pathname,
+          isLoginPage
+        })
+        setIsAuthenticated(isAuth)
+      } catch (error) {
+        console.error("Error checking auth:", error)
+        setIsAuthenticated(false)
+      } finally {
+        setIsChecking(false)
+      }
     }
 
     checkAuth()
-  }, [])
+  }, [pathname, isLoginPage])
 
   // If not authenticated and not on the login page, redirect to login
   useEffect(() => {
-    if (!isAuthenticated && typeof window !== "undefined" && !isLoginPage) {
-      console.log("Redirecting to login. Auth state:", isAuthenticated, "Current path:", pathname)
-      window.location.href = "/admin/login"
+    if (!isChecking && !isAuthenticated && !isLoginPage) {
+      console.log("Redirecting to login:", {
+        isChecking,
+        isAuthenticated,
+        isLoginPage,
+        pathname
+      })
+      router.replace("/admin/login")
     }
-  }, [isAuthenticated, isLoginPage, pathname])
+  }, [isChecking, isAuthenticated, isLoginPage, pathname, router])
+
+  // Show loading state while checking auth
+  if (isChecking) {
+    return <div>Loading...</div>
+  }
 
   // If we're on the login page, just render the children without the admin layout
   if (isLoginPage) {
@@ -197,3 +218,4 @@ export default function AdminLayout({
     </div>
   )
 }
+

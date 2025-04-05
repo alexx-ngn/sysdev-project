@@ -17,7 +17,7 @@ export default function SponsorsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Sponsors</CardTitle>
@@ -55,7 +55,7 @@ export default function SponsorsPage() {
           <CardDescription>Our highest tier sponsors contributing $5,000 or more.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 name: "Acme Corporation",
@@ -112,7 +112,7 @@ export default function SponsorsPage() {
           <CardDescription>Complete list of all sponsors across all tiers.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -235,7 +235,7 @@ export default function SponsorsPage() {
           <CardDescription>Available sponsorship tiers and benefits.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader>
                 <CardTitle>Platinum</CardTitle>

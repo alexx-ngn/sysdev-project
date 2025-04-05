@@ -12,7 +12,7 @@ export default function DonationsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Donations</h2>
           <p className="text-muted-foreground">Manage and track all donations for the charity run.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
           <Button variant="outline" className="flex items-center gap-2">
             <Download className="h-4 w-4" />
             Export
@@ -21,7 +21,7 @@ export default function DonationsPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
@@ -72,12 +72,12 @@ export default function DonationsPage() {
           <CardDescription>A total of 83 donations have been received.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search donations..." className="pl-8" />
             </div>
-            <div className="flex items-center gap-2">
+            <div>
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 Filter
@@ -86,7 +86,7 @@ export default function DonationsPage() {
             </div>
           </div>
 
-          <div className="rounded-md border">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -195,7 +195,7 @@ export default function DonationsPage() {
             </Table>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
             <div className="text-sm text-muted-foreground">Showing 1-10 of 83 donations</div>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" disabled>
@@ -215,7 +215,7 @@ export default function DonationsPage() {
           <CardDescription>Insights into donation patterns and trends.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Donations Over Time</p>
               <div className="h-[200px] bg-gray-100 rounded-md flex items-center justify-center">

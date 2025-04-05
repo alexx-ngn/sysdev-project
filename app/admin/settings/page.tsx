@@ -17,7 +17,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -106,7 +106,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label>Primary Color</Label>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <div className="h-10 w-10 rounded-md bg-primary"></div>
                   <Input defaultValue="#A5D8FF" className="w-32" />
                   <Button variant="outline" size="sm">
@@ -254,7 +254,7 @@ export default function SettingsPage() {
               <CardDescription>Manage users who have access to the admin panel.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -331,7 +331,7 @@ export default function SettingsPage() {
               <div>
                 <h3 className="text-lg font-medium mb-2">Administrator</h3>
                 <p className="text-sm text-muted-foreground mb-2">Full access to all features and settings</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <span className="text-sm">Manage Users</span>
@@ -354,7 +354,7 @@ export default function SettingsPage() {
               <div>
                 <h3 className="text-lg font-medium mb-2">Editor</h3>
                 <p className="text-sm text-muted-foreground mb-2">Can edit content and manage registrations</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
                     <X className="h-4 w-4 text-red-500" />
                     <span className="text-sm">Manage Users</span>
@@ -377,7 +377,7 @@ export default function SettingsPage() {
               <div>
                 <h3 className="text-lg font-medium mb-2">Viewer</h3>
                 <p className="text-sm text-muted-foreground mb-2">Read-only access to data</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
                     <X className="h-4 w-4 text-red-500" />
                     <span className="text-sm">Manage Users</span>
