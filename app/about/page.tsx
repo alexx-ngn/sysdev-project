@@ -1,40 +1,63 @@
-import Link from "next/link"
-import { Heart } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-40 w-full border-b bg-background">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
+        <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
           <div className="flex gap-6 md:gap-10">
+            <MobileNav />
             <Link href="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-gray-800" />
-              <span className="inline-block font-bold">MilesForHope Run</span>
+              <Heart className="h-6 w-6 text-pink-500" />
+              <span className="inline-block font-bold">MilesForHope</span>
             </Link>
             <nav className="hidden md:flex gap-6">
-              <Link href="/about" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/about"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 About
               </Link>
-              <Link href="/run" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/run"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Charity Run
               </Link>
-              <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/faq"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 FAQ
               </Link>
-              <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/sponsors"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Sponsors
               </Link>
-              <Link href="/donate" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/donate"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Donate
               </Link>
-              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/contact"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Contact
               </Link>
             </nav>
           </div>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <div>
+            <Button
+              asChild
+              className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90"
+            >
               <Link href="/register">Register Now</Link>
             </Button>
           </div>
@@ -43,22 +66,28 @@ export default function AboutPage() {
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">About MilesForHope Run</h1>
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                  About Miles For Hope
+                </h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Our annual charity run brings together runners of all levels to support vital community initiatives.
-                  Every kilometer run contributes to positive change.
+                  Our student-led charity run brings together runners of all levels
+                  to support children's hospitals in Montréal. Every kilometer run
+                  contributes to positive change for children in need.
                 </p>
               </div>
             </div>
 
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <div className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full">
+              <div className="mx-auto w-full h-auto overflow-hidden rounded-xl">
                 <div className="w-full h-full flex items-center justify-center">
-                  <div className="open-peeps-illustration sitting-figure-1"></div>
-                  <div className="open-peeps-illustration sitting-figure-2"></div>
+                  <img
+                    src="/images/illustrations/openpeeps2.png"
+                    alt="Open Peeps Illustration"
+                    className="w-auto h-auto max-w-full"
+                  />
                 </div>
               </div>
               <div className="flex flex-col justify-center space-y-4">
@@ -67,7 +96,7 @@ export default function AboutPage() {
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Our Mission</h3>
                       <p className="text-muted-foreground">
-                        To empower communities through sustainable development, education, and healthcare initiatives.
+                        To support children's hospitals in Montréal (CHU Sainte-Justine and Montreal Children's Hospital) through raising awareness and funds.
                       </p>
                     </div>
                   </li>
@@ -75,8 +104,7 @@ export default function AboutPage() {
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Our Vision</h3>
                       <p className="text-muted-foreground">
-                        A world where every individual has access to basic necessities, quality education, and
-                        healthcare.
+                        A world where every child has access to quality healthcare.
                       </p>
                     </div>
                   </li>
@@ -84,7 +112,7 @@ export default function AboutPage() {
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Our Values</h3>
                       <p className="text-muted-foreground">
-                        Integrity, compassion, inclusivity, and sustainability guide all our actions and decisions.
+                        We believe in the power of unity and collaboration to make a difference.
                       </p>
                     </div>
                   </li>
@@ -96,25 +124,34 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold mb-8 text-center">Our Story</h2>
               <div className="prose max-w-none text-muted-foreground">
                 <p className="mb-4">
-                  MilesForHope began in 2015 when a small group of passionate runners decided to combine their love for
-                  running with their desire to make a positive impact in their community. What started as a local 5K
-                  with just 50 participants has grown into an annual event that attracts hundreds of runners from across
+                  MilesForHope began in 2015 when a small group of passionate
+                  runners decided to combine their love for running with their
+                  desire to make a positive impact in their community. What
+                  started as a local 5K with just 50 participants has grown into
+                  an annual event that attracts hundreds of runners from across
                   the region.
                 </p>
                 <p className="mb-4">
-                  Our founders believed that physical activity could be a powerful catalyst for social change. By
-                  bringing people together through running, we create a community of individuals committed to supporting
-                  important causes and making a difference in the lives of others.
+                  Our founders believed that physical activity could be a
+                  powerful catalyst for social change. By bringing people
+                  together through running, we create a community of individuals
+                  committed to supporting important causes and making a
+                  difference in the lives of others.
                 </p>
                 <p className="mb-4">
-                  Over the years, MilesForHope has raised over $500,000 for various community initiatives, focusing on
-                  education, healthcare, and sustainable development. We've funded scholarships for underprivileged
-                  students, supported local health clinics, and contributed to environmental conservation projects.
+                  Over the years, MilesForHope has raised over $500,000 for
+                  various community initiatives, focusing on education,
+                  healthcare, and sustainable development. We've funded
+                  scholarships for underprivileged students, supported local
+                  health clinics, and contributed to environmental conservation
+                  projects.
                 </p>
                 <p>
-                  Today, MilesForHope continues to grow, but our core mission remains the same: to harness the
-                  collective energy and goodwill of runners to create positive change in our communities. Every step
-                  taken in our charity run is a step toward a better, more equitable world.
+                  Today, MilesForHope continues to grow, but our core mission
+                  remains the same: to harness the collective energy and
+                  goodwill of runners to create positive change in our
+                  communities. Every step taken in our charity run is a step
+                  toward a better, more equitable world.
                 </p>
               </div>
             </div>
@@ -127,9 +164,12 @@ export default function AboutPage() {
                     <div className="open-peeps-illustration standing-figure-5 w-full h-full"></div>
                   </div>
                   <h3 className="text-lg font-bold">Sarah Johnson</h3>
-                  <p className="text-sm text-muted-foreground">Founder & Executive Director</p>
+                  <p className="text-sm text-muted-foreground">
+                    Founder & Executive Director
+                  </p>
                   <p className="mt-2 text-muted-foreground">
-                    Marathon runner and community advocate with 15 years of nonprofit experience.
+                    Marathon runner and community advocate with 15 years of
+                    nonprofit experience.
                   </p>
                 </div>
 
@@ -138,9 +178,12 @@ export default function AboutPage() {
                     <div className="open-peeps-illustration standing-figure-12 w-full h-full"></div>
                   </div>
                   <h3 className="text-lg font-bold">Michael Chen</h3>
-                  <p className="text-sm text-muted-foreground">Event Director</p>
+                  <p className="text-sm text-muted-foreground">
+                    Event Director
+                  </p>
                   <p className="mt-2 text-muted-foreground">
-                    Former Olympic athlete dedicated to creating inclusive sporting events.
+                    Former Olympic athlete dedicated to creating inclusive
+                    sporting events.
                   </p>
                 </div>
 
@@ -149,16 +192,23 @@ export default function AboutPage() {
                     <div className="open-peeps-illustration standing-figure-19 w-full h-full"></div>
                   </div>
                   <h3 className="text-lg font-bold">Aisha Patel</h3>
-                  <p className="text-sm text-muted-foreground">Community Outreach Coordinator</p>
+                  <p className="text-sm text-muted-foreground">
+                    Community Outreach Coordinator
+                  </p>
                   <p className="mt-2 text-muted-foreground">
-                    Social worker and running coach passionate about empowering communities.
+                    Social worker and running coach passionate about empowering
+                    communities.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="mx-auto max-w-5xl mt-12 text-center">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button
+                asChild
+                size="lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
                 <Link href="/register">Join Our Mission - Register Today</Link>
               </Button>
             </div>
@@ -167,11 +217,11 @@ export default function AboutPage() {
       </main>
 
       <footer className="w-full border-t bg-background">
-        <div className="container flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+        <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-gray-800" />
+                <Heart className="h-6 w-6 text-pink-500" />
                 <span className="text-lg font-bold">MilesForHope Run</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -224,38 +274,14 @@ export default function AboutPage() {
                 </li>
               </ul>
             </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} MilesForHope. All rights reserved.
             </p>
-            <p className="text-sm text-muted-foreground">
-              MilesForHope is a registered 501(c)(3) nonprofit organization.
-            </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
-

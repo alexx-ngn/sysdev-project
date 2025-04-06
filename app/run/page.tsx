@@ -2,40 +2,60 @@ import Link from "next/link"
 import { Heart, MapPin, Calendar, Clock, Trophy, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { MobileNav } from "@/components/mobile-nav"
 
 export default function RunPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-40 w-full border-b bg-background">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
+        <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
           <div className="flex gap-6 md:gap-10">
+            <MobileNav />
             <Link href="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-gray-800" />
-              <span className="inline-block font-bold">MilesForHope Run</span>
+              <Heart className="h-6 w-6 text-pink-500" />
+              <span className="inline-block font-bold">MilesForHope</span>
             </Link>
             <nav className="hidden md:flex gap-6">
-              <Link href="/about" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/about"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 About
               </Link>
-              <Link href="/run" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/run"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Charity Run
               </Link>
-              <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/faq"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 FAQ
               </Link>
-              <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/sponsors"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Sponsors
               </Link>
-              <Link href="/donate" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/donate"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Donate
               </Link>
-              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/contact"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Contact
               </Link>
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-4">
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
               <Link href="/register">Register Now</Link>
             </Button>
           </div>
@@ -44,13 +64,12 @@ export default function RunPage() {
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Charity Run Details</h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Join us for a day of running, community, and making a difference. Every step you take helps us reach
-                  our fundraising goal.
+                  Join our student-led charity run for a day of running, community, and making a difference. Every step you take helps us raise funds for CHU Sainte-Justine and Montreal Children's Hospital.
                 </p>
               </div>
             </div>
@@ -304,11 +323,11 @@ export default function RunPage() {
       </main>
 
       <footer className="w-full border-t bg-background">
-        <div className="container flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+        <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-gray-800" />
+                <Heart className="h-6 w-6 text-pink-500" />
                 <span className="text-lg font-bold">MilesForHope Run</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -361,33 +380,10 @@ export default function RunPage() {
                 </li>
               </ul>
             </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} MilesForHope. All rights reserved.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              MilesForHope is a registered 501(c)(3) nonprofit organization.
             </p>
           </div>
         </div>

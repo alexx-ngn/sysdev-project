@@ -3,40 +3,60 @@ import { Heart } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { MobileNav } from "@/components/mobile-nav"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-40 w-full border-b bg-background">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
+        <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
           <div className="flex gap-6 md:gap-10">
+            <MobileNav />
             <Link href="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-gray-800" />
-              <span className="inline-block font-bold">MilesForHope Run</span>
+              <Heart className="h-6 w-6 text-pink-500" />
+              <span className="inline-block font-bold">MilesForHope</span>
             </Link>
             <nav className="hidden md:flex gap-6">
-              <Link href="/about" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/about"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 About
               </Link>
-              <Link href="/run" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/run"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Charity Run
               </Link>
-              <Link href="/faq" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/faq"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 FAQ
               </Link>
-              <Link href="/sponsors" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/sponsors"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Sponsors
               </Link>
-              <Link href="/donate" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/donate"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Donate
               </Link>
-              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-gray-600">
+              <Link
+                href="/contact"
+                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
+              >
                 Contact
               </Link>
             </nav>
           </div>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <div>
+            <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
               <Link href="/register">Register Now</Link>
             </Button>
           </div>
@@ -45,31 +65,29 @@ export default function Home() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gray-50">
-          <div className="container px-4 md:px-6">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:grid-cols-2">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Run for Hope: Annual Charity Marathon
+                    Miles For Hope: Supporting children's hospitals in Montréal.
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Join us in our mission to create positive change. Every step you take helps build a better future.
+                    A student-led charity run raising funds for CHU Sainte-Justine and Montreal Children's Hospital. Every step you take helps build a better future for children in need.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
                     <Link href="/register">Register Now</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline">
+                  <Button asChild size="lg" variant="outline" className="border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
                     <Link href="/run">Learn More</Link>
                   </Button>
                 </div>
               </div>
-              <div className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last">
+              <div className="mx-auto aspect-[4/3] overflow-hidden rounded-xl object-cover sm:w-[100%] lg:order-last">
                 <div className="w-full h-full flex items-center justify-center">
-                  <div className="open-peeps-illustration standing-figure-1"></div>
-                  <div className="open-peeps-illustration standing-figure-23"></div>
-                  <div className="open-peeps-illustration standing-figure-24"></div>
+                  <img src="/images/illustrations/openpeeps1.png" alt="Open Peeps Illustration" className="w-[100%] h-[100%] object-contain scale-125" />
                 </div>
               </div>
             </div>
@@ -78,45 +96,43 @@ export default function Home() {
 
         {/* Featured Sections */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="flex flex-col">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
+              <Card className="flex flex-col border-pastel-blue">
                 <CardHeader>
                   <CardTitle>About Us</CardTitle>
                   <CardDescription>Learn about our mission and impact</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground">
-                    MilesForHope is dedicated to empowering communities through sustainable development, education, and
-                    healthcare initiatives.
+                    MilesForHope is a student-led charity run dedicated to raising funds for children's hospitals in Montréal, specifically supporting CHU Sainte-Justine and Montreal Children's Hospital.
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full">
+                  <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
                     <Link href="/about">Read More</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card className="flex flex-col">
+              <Card className="flex flex-col border-pastel-yellow">
                 <CardHeader>
                   <CardTitle>Charity Run</CardTitle>
                   <CardDescription>Event details and schedule</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground">
-                    Join us on October 15, 2023 for a day of running, community, and making a difference. Every step
-                    counts!
+                    Join us for a day of running, community, and making a difference. Participants can win medals, merchandise, and other goods while supporting a great cause. Every step counts!
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full">
+                  <Button asChild variant="outline" className="w-full border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
                     <Link href="/run">View Details</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card className="flex flex-col">
+              <Card className="flex flex-col border-pastel-blue">
                 <CardHeader>
                   <CardTitle>Get Involved</CardTitle>
                   <CardDescription>Ways to support our cause</CardDescription>
@@ -128,7 +144,7 @@ export default function Home() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full">
+                  <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
                     <Link href="/donate">Support Us</Link>
                   </Button>
                 </CardFooter>
@@ -139,11 +155,11 @@ export default function Home() {
 
         {/* Registration CTA Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
+            <div className="mx-auto flex max-w-[980px] flex-col items-center gap-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Ready to <span className="text-primary">Join Us</span>?
+                  Ready to <span className="text-pastel-blue-foreground underline decoration-pastel-blue">Join Us</span>?
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Register today for the MilesForHope Run and be part of something meaningful. Every participant makes a
@@ -151,7 +167,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-6">
-                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
                   <Link href="/register">Register Now</Link>
                 </Button>
               </div>
@@ -161,10 +177,10 @@ export default function Home() {
 
         {/* Sponsors Highlight */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our Sponsors</h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our <span className="text-pastel-yellow-foreground underline decoration-pastel-yellow">Sponsors</span></h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   We're grateful to the organizations that make our charity run possible.
                 </p>
@@ -181,7 +197,7 @@ export default function Home() {
               </div>
 
               <div className="mt-12 text-center">
-                <Button asChild>
+                <Button asChild className="bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
                   <Link href="/sponsors">View All Sponsors</Link>
                 </Button>
               </div>
@@ -190,11 +206,11 @@ export default function Home() {
         </section>
       </main>
       <footer className="w-full border-t bg-background">
-        <div className="container flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+        <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-gray-800" />
+                <Heart className="h-6 w-6 text-pink-500" />
                 <span className="text-lg font-bold">MilesForHope Run</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -247,33 +263,10 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} MilesForHope. All rights reserved.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              MilesForHope is a registered 501(c)(3) nonprofit organization.
             </p>
           </div>
         </div>

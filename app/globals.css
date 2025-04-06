@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -23,6 +21,12 @@
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
 
+    /* New pastel accent colors */
+    --pastel-blue: 210 70% 85%;
+    --pastel-blue-foreground: 210 30% 30%;
+    --pastel-yellow: 45 100% 85%;
+    --pastel-yellow-foreground: 45 30% 30%;
+
     /* Neutral card backgrounds */
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -44,7 +48,7 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
-    --primary: 199 70% 80%;
+    --primary: 199 70% 80%; /* #A6D8F2 */
     --primary-foreground: 240 5.9% 10%;
 
     --secondary: 47 100% 85%;
@@ -55,6 +59,12 @@
 
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
+
+    /* New pastel accent colors for dark mode */
+    --pastel-blue: 210 70% 75%;
+    --pastel-blue-foreground: 210 30% 20%;
+    --pastel-yellow: 45 100% 75%;
+    --pastel-yellow-foreground: 45 30% 20%;
 
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -74,51 +84,120 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  .bg-pastel-blue {
+    background-color: hsl(var(--pastel-blue));
+  }
+  .text-pastel-blue {
+    color: hsl(var(--pastel-blue-foreground));
+  }
+  .bg-pastel-yellow {
+    background-color: hsl(var(--pastel-yellow));
+  }
+  .text-pastel-yellow {
+    color: hsl(var(--pastel-yellow-foreground));
+  }
+  
+  /* Primary color utilities */
+  .bg-primary {
+    background-color: hsl(var(--primary));
+  }
+  .text-primary {
+    color: hsl(var(--primary-foreground));
+  }
+  
+  /* Secondary color utilities */
+  .bg-secondary {
+    background-color: hsl(var(--secondary));
+  }
+  .text-secondary {
+    color: hsl(var(--secondary-foreground));
+  }
+  
+  /* Muted color utilities */
+  .bg-muted {
+    background-color: hsl(var(--muted));
+  }
+  .text-muted {
+    color: hsl(var(--muted-foreground));
+  }
+  
+  /* Accent color utilities */
+  .bg-accent {
+    background-color: hsl(var(--accent));
+  }
+  .text-accent {
+    color: hsl(var(--accent-foreground));
+  }
+  
+  /* Card color utilities */
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+  .text-card {
+    color: hsl(var(--card-foreground));
+  }
+  
+  /* Popover color utilities */
+  .bg-popover {
+    background-color: hsl(var(--popover));
+  }
+  .text-popover {
+    color: hsl(var(--popover-foreground));
+  }
+  
+  /* Destructive color utilities */
+  .bg-destructive {
+    background-color: hsl(var(--destructive));
+  }
+  .text-destructive {
+    color: hsl(var(--destructive-foreground));
+  }
+  
+  /* Ring color utility */
+  .ring {
+    --tw-ring-color: hsl(var(--ring));
+  }
+  
+  /* Border color utilities */
+  .border-input {
+    border-color: hsl(var(--input));
+  }
+  .decoration-pastel-blue {
+    text-decoration-color: hsl(var(--pastel-blue));
+  }
+  .decoration-pastel-yellow {
+    text-decoration-color: hsl(var(--pastel-yellow));
   }
 }
 
-/* Open Peeps Illustrations */
-.open-peeps-illustration {
-  width: 200px;
-  height: 200px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+/* Navigation hover animation */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-/* Add more specific classes for different illustrations as needed */
-.standing-figure-1 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b6beb045293_Standing%20Figure%2001.svg");
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: hsl(var(--foreground));
+  transition: width 0.3s ease;
 }
-.standing-figure-23 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b1a5f045294_Standing%20Figure%2023.svg");
+
+.nav-link:hover {
+  color: hsl(var(--foreground));
 }
-.standing-figure-24 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b7a8b045295_Standing%20Figure%2024.svg");
-}
-.sitting-figure-1 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b0f7e045291_Sitting%20Figure%2001.svg");
-}
-.sitting-figure-2 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b2beb045292_Sitting%20Figure%2002.svg");
-}
-.standing-figure-5 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b7d6d045297_Standing%20Figure%2005.svg");
-}
-.standing-figure-12 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b3f7e045298_Standing%20Figure%2012.svg");
-}
-.standing-figure-19 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b0d1b045299_Standing%20Figure%2019.svg");
-}
-.standing-figure-15 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b3beb04529a_Standing%20Figure%2015.svg");
-}
-.standing-figure-21 {
-  background-image: url("https://uploads-ssl.webflow.com/5e8c338ed1df992297f0ab78/5e8c35c1f1ff6b1d1b04529b_Standing%20Figure%2021.svg");
+
+.nav-link:hover::after {
+  width: 100%;
 }
 
