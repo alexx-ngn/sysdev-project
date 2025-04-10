@@ -217,6 +217,40 @@ const translations: Record<Language, Translations> = {
     
     'faq.q10.question': 'What happens if it rains?',
     'faq.q10.answer': 'The event will take place rain or shine. In case of severe weather conditions that might compromise participants\' safety, we may reschedule the event. Any changes will be communicated via email to registered participants and posted on our website and social media channels.',
+
+    // Sponsors Page
+    'sponsors.platinum.title': 'Platinum Sponsors',
+    'sponsors.platinum.techcorp.description': 'Supporting our mission since 2018, TechCorp has been instrumental in providing technology solutions.',
+    'sponsors.platinum.healthfirst.description': 'HealthFirst provides essential healthcare support for our initiatives and medical assistance during events.',
+    'sponsors.platinum.sportsfit.description': 'SportsFit empowers our runners with top-quality training programs and athletic equipment.',
+    'sponsors.gold.title': 'Gold Sponsors',
+    'sponsors.silver.title': 'Silver Sponsors',
+    'sponsors.silver.sponsor': 'Sponsor',
+    'sponsors.sponsor': 'Partner',
+    'sponsors.visitWebsite': 'Visit Website',
+    'sponsors.contactUs': 'Contact Us',
+    'sponsors.become.title': 'Become a Sponsor',
+    'sponsors.become.description': 'Join our community of sponsors and help make a difference. We offer various sponsorship packages designed to provide visibility for your organization while supporting our charitable mission.',
+    'sponsors.become.contact': 'Interested in becoming a sponsor? Contact our sponsorship team to discuss options.',
+    'sponsors.become.contactTeam': 'Contact Sponsorship Team',
+    'sponsors.packages.platinum.title': 'Platinum',
+    'sponsors.packages.platinum.price': '$5,000+',
+    'sponsors.packages.platinum.benefit1': 'Premium logo placement',
+    'sponsors.packages.platinum.benefit2': 'Speaking opportunity',
+    'sponsors.packages.platinum.benefit3': '10 free registrations',
+    'sponsors.packages.platinum.benefit4': 'Social media promotion',
+    'sponsors.packages.platinum.benefit5': 'Booth at the event',
+    'sponsors.packages.gold.title': 'Gold',
+    'sponsors.packages.gold.price': '$2,500+',
+    'sponsors.packages.gold.benefit1': 'Logo on event materials',
+    'sponsors.packages.gold.benefit2': '5 free registrations',
+    'sponsors.packages.gold.benefit3': 'Social media mention',
+    'sponsors.packages.gold.benefit4': 'Booth at the event',
+    'sponsors.packages.silver.title': 'Silver',
+    'sponsors.packages.silver.price': '$1,000+',
+    'sponsors.packages.silver.benefit1': 'Logo on event website',
+    'sponsors.packages.silver.benefit2': '2 free registrations',
+    'sponsors.packages.silver.benefit3': 'Social media mention'
   },
   fr: {
     // Navigation
@@ -266,7 +300,7 @@ const translations: Record<Language, Translations> = {
     
     // Sponsors
     'sponsors.title': 'Nos commanditaires',
-    'sponsors.description': 'Nous sommes reconnaissants aux organisations qui rendent notre course caritative possible.',
+    'sponsors.description': 'Nous sommes reconnaissants envers les organisations qui rendent notre course caritative possible.',
     'sponsors.viewAll': 'Voir tous les commanditaires',
     
     // Footer
@@ -416,6 +450,40 @@ const translations: Record<Language, Translations> = {
     
     'faq.q10.question': 'Que se passe-t-il s\'il pleut ?',
     'faq.q10.answer': 'L\'événement se déroulera qu\'il pleuve ou qu\'il fasse beau. En cas de conditions météorologiques graves qui pourraient compromettre la sécurité des participants, nous pourrions reporter l\'événement. Tout changement sera communiqué par e-mail aux participants inscrits et publié sur notre site web et nos réseaux sociaux.',
+
+    // Sponsors Page
+    'sponsors.platinum.title': 'Commanditaires Platine',
+    'sponsors.platinum.techcorp.description': 'Soutenant notre mission depuis 2018, TechCorp a joué un rôle déterminant dans la fourniture de solutions technologiques.',
+    'sponsors.platinum.healthfirst.description': 'HealthFirst fournit un soutien essentiel en matière de soins de santé pour nos initiatives et une assistance médicale lors des événements.',
+    'sponsors.platinum.sportsfit.description': 'SportsFit donne à nos coureurs les moyens de réussir avec des programmes d\'entraînement et des équipements sportifs de haute qualité.',
+    'sponsors.gold.title': 'Commanditaires Or',
+    'sponsors.silver.title': 'Commanditaires Argent',
+    'sponsors.silver.sponsor': 'Commanditaire',
+    'sponsors.sponsor': 'Partenaire',
+    'sponsors.visitWebsite': 'Visiter le site',
+    'sponsors.contactUs': 'Contactez-nous',
+    'sponsors.become.title': 'Devenez Commanditaire',
+    'sponsors.become.description': 'Rejoignez notre communauté de commanditaires et aidez à faire une différence. Nous proposons différents forfaits de parrainage conçus pour donner de la visibilité à votre organisation tout en soutenant notre mission caritative.',
+    'sponsors.become.contact': 'Intéressé à devenir commanditaire? Contactez notre équipe de parrainage pour discuter des options.',
+    'sponsors.become.contactTeam': 'Contacter l\'équipe de parrainage',
+    'sponsors.packages.platinum.title': 'Platine',
+    'sponsors.packages.platinum.price': '5 000$+',
+    'sponsors.packages.platinum.benefit1': 'Placement premium du logo',
+    'sponsors.packages.platinum.benefit2': 'Opportunité de présentation',
+    'sponsors.packages.platinum.benefit3': '10 inscriptions gratuites',
+    'sponsors.packages.platinum.benefit4': 'Promotion sur les réseaux sociaux',
+    'sponsors.packages.platinum.benefit5': 'Stand à l\'événement',
+    'sponsors.packages.gold.title': 'Or',
+    'sponsors.packages.gold.price': '2 500$+',
+    'sponsors.packages.gold.benefit1': 'Logo sur les supports événementiels',
+    'sponsors.packages.gold.benefit2': '5 inscriptions gratuites',
+    'sponsors.packages.gold.benefit3': 'Mention sur les réseaux sociaux',
+    'sponsors.packages.gold.benefit4': 'Stand à l\'événement',
+    'sponsors.packages.silver.title': 'Argent',
+    'sponsors.packages.silver.price': '1 000$+',
+    'sponsors.packages.silver.benefit1': 'Logo sur le site web',
+    'sponsors.packages.silver.benefit2': '2 inscriptions gratuites',
+    'sponsors.packages.silver.benefit3': 'Mention sur les réseaux sociaux'
   }
 };
 
