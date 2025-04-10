@@ -1,68 +1,20 @@
+"use client";
+
 import Link from "next/link"
-import { Heart, DollarSign, Award, Users } from "lucide-react"
+import { Heart, DollarSign, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { MobileNav } from "@/components/mobile-nav"
+import { Navbar } from "@/components/navbar"
+import { useLanguage } from "@/app/context/language-context"
 
 export default function DonatePage() {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
-        <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
-          <div className="flex gap-6 md:gap-10">
-            <MobileNav />
-            <Link href="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-pink-500" />
-              <span className="inline-block font-bold">MilesForHope</span>
-            </Link>
-            <nav className="hidden md:flex gap-6">
-              <Link
-                href="/about"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                About
-              </Link>
-              <Link
-                href="/run"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Charity Run
-              </Link>
-              <Link
-                href="/faq"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                FAQ
-              </Link>
-              <Link
-                href="/sponsors"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Sponsors
-              </Link>
-              <Link
-                href="/donate"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Donate
-              </Link>
-              <Link
-                href="/contact"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Contact
-              </Link>
-            </nav>
-          </div>
-          <div>
-            <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-              <Link href="/register">Register Now</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
@@ -70,10 +22,10 @@ export default function DonatePage() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Support Our <span className="text-primary">Mission</span>
+                  {t('donate.title')} <span className="text-primary">{t('donate.titleHighlight')}</span>
                 </h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Your donation helps us support CHU Sainte-Justine and Montreal Children's Hospital, making a difference in children's healthcare in Montréal.
+                  {t('donate.description')}
                 </p>
               </div>
             </div>
@@ -85,12 +37,12 @@ export default function DonatePage() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-4">
                       <DollarSign className="h-6 w-6 text-gray-600" />
                     </div>
-                    <CardTitle>One-Time Donation</CardTitle>
-                    <CardDescription>Support children's healthcare with a single contribution</CardDescription>
+                    <CardTitle>{t('donate.oneTime.title')}</CardTitle>
+                    <CardDescription>{t('donate.oneTime.subtitle')}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
                     <p className="text-muted-foreground mb-4">
-                      Your one-time donation directly supports medical care, research, and equipment for children at CHU Sainte-Justine and Montreal Children's Hospital. Every dollar makes a difference in a child's life.
+                      {t('donate.oneTime.description')}
                     </p>
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       <Button variant="outline">$25</Button>
@@ -102,13 +54,18 @@ export default function DonatePage() {
                         htmlFor="custom-amount"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Custom Amount
+                        {t('donate.oneTime.customAmount')}
                       </label>
-                      <Input id="custom-amount" type="number" placeholder="Enter amount" min="1" />
+                      <Input 
+                        id="custom-amount" 
+                        type="number" 
+                        placeholder={t('donate.oneTime.enterAmount')} 
+                        min="1" 
+                      />
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full">Donate Now</Button>
+                    <Button className="w-full">{t('donate.oneTime.button')}</Button>
                   </CardFooter>
                 </Card>
 
@@ -117,46 +74,46 @@ export default function DonatePage() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 mb-4">
                       <Award className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle>Become a Sponsor</CardTitle>
-                    <CardDescription>Support as an organization or business</CardDescription>
+                    <CardTitle>{t('donate.sponsor.title')}</CardTitle>
+                    <CardDescription>{t('donate.sponsor.subtitle')}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
                     <p className="text-muted-foreground mb-4">
-                      Sponsorship opportunities provide visibility for your organization while supporting children's healthcare. Various levels are available to match your organization's goals.
+                      {t('donate.sponsor.description')}
                     </p>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center">
                         <span className="mr-2">•</span>
-                        <span>Logo on event materials</span>
+                        <span>{t('donate.sponsor.benefit1')}</span>
                       </li>
                       <li className="flex items-center">
                         <span className="mr-2">•</span>
-                        <span>Recognition at the event</span>
+                        <span>{t('donate.sponsor.benefit2')}</span>
                       </li>
                       <li className="flex items-center">
                         <span className="mr-2">•</span>
-                        <span>Social media mentions</span>
+                        <span>{t('donate.sponsor.benefit3')}</span>
                       </li>
                     </ul>
                   </CardContent>
                   <CardFooter>
                     <Button className="w-full bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90" asChild>
-                      <Link href="/sponsors">Learn More</Link>
+                      <Link href="/sponsors">{t('donate.sponsor.button')}</Link>
                     </Button>
                   </CardFooter>
                 </Card>
               </div>
 
               <div className="border-t pt-12">
-                <h2 className="text-2xl font-bold mb-6 text-center">How Your Donation Helps</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.impact.title')}</h2>
                 <div className="grid gap-8 md:grid-cols-3">
                   <div className="flex flex-col items-center text-center">
                     <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                       <span className="text-2xl font-bold">$25</span>
                     </div>
-                    <h3 className="text-lg font-medium mb-2">Medical Supplies</h3>
+                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.supplies.title')}</h3>
                     <p className="text-muted-foreground">
-                      Provides essential medical supplies for pediatric care at the hospitals.
+                      {t('donate.impact.supplies.description')}
                     </p>
                   </div>
 
@@ -164,9 +121,9 @@ export default function DonatePage() {
                     <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                       <span className="text-2xl font-bold">$50</span>
                     </div>
-                    <h3 className="text-lg font-medium mb-2">Research Support</h3>
+                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.research.title')}</h3>
                     <p className="text-muted-foreground">
-                      Helps fund pediatric medical research and innovative treatments.
+                      {t('donate.impact.research.description')}
                     </p>
                   </div>
 
@@ -174,18 +131,18 @@ export default function DonatePage() {
                     <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                       <span className="text-2xl font-bold">$100</span>
                     </div>
-                    <h3 className="text-lg font-medium mb-2">Equipment Fund</h3>
+                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.equipment.title')}</h3>
                     <p className="text-muted-foreground">
-                      Contributes to specialized medical equipment for children's care.
+                      {t('donate.impact.equipment.description')}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-16 bg-gray-50 p-8 rounded-lg">
-                <h2 className="text-2xl font-bold mb-6 text-center">Contact Our Donation Team</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.contact.title')}</h2>
                 <p className="text-center text-muted-foreground mb-8">
-                  Have questions about donating or want to discuss other ways to support children's healthcare? Our team is here to help.
+                  {t('donate.contact.description')}
                 </p>
                 <form className="max-w-2xl mx-auto grid gap-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,18 +151,18 @@ export default function DonatePage() {
                         htmlFor="name"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Name
+                        {t('donate.contact.name')}
                       </label>
-                      <Input id="name" placeholder="Your Name" />
+                      <Input id="name" placeholder={t('donate.contact.namePlaceholder')} />
                     </div>
                     <div className="grid gap-2">
                       <label
                         htmlFor="email"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Email
+                        {t('donate.contact.email')}
                       </label>
-                      <Input id="email" type="email" placeholder="Your Email" />
+                      <Input id="email" type="email" placeholder={t('donate.contact.emailPlaceholder')} />
                     </div>
                   </div>
                   <div className="grid gap-2">
@@ -213,11 +170,11 @@ export default function DonatePage() {
                       htmlFor="message"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      Message
+                      {t('donate.contact.message')}
                     </label>
-                    <Textarea id="message" placeholder="Your Message" />
+                    <Textarea id="message" placeholder={t('donate.contact.messagePlaceholder')} />
                   </div>
-                  <Button type="submit">Send Message</Button>
+                  <Button type="submit">{t('donate.contact.button')}</Button>
                 </form>
               </div>
             </div>
@@ -231,54 +188,53 @@ export default function DonatePage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Heart className="h-6 w-6 text-pink-500" />
-                <span className="text-lg font-bold">MilesForHope Run</span>
+                <span className="text-lg font-bold">{t('footer.milesForHope')}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Making a difference in communities worldwide through sustainable development, education, and healthcare
-                initiatives.
+                {t('footer.description')}
               </p>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Quick Links</h4>
+              <h4 className="text-sm font-semibold">{t('footer.quickLinks')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
-                    About Us
+                    {t('nav.about')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Charity Run
+                    {t('nav.charityRun')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
-                    FAQ
+                    {t('nav.faq')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Sponsors
+                    {t('nav.sponsors')}
                   </Link>
                 </li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Resources</h4>
+              <h4 className="text-sm font-semibold">{t('footer.resources')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Donate
+                    {t('nav.donate')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Register
+                    {t('nav.register')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Contact
+                    {t('nav.contact')}
                   </Link>
                 </li>
               </ul>
@@ -286,12 +242,12 @@ export default function DonatePage() {
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} MilesForHope. All rights reserved.
+              {t('footer.copyright').replace('{year}', new Date().getFullYear().toString())}
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
