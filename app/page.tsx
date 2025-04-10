@@ -1,11 +1,17 @@
+"use client";
+
 import Link from "next/link"
 import { Heart } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { MobileNav } from "@/components/mobile-nav"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useLanguage } from "@/app/context/language-context"
 
 export default function Home() {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
@@ -21,43 +27,44 @@ export default function Home() {
                 href="/about"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                About
+                {t('nav.about')}
               </Link>
               <Link
                 href="/run"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                Charity Run
+                {t('nav.charityRun')}
               </Link>
               <Link
                 href="/faq"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                FAQ
+                {t('nav.faq')}
               </Link>
               <Link
                 href="/sponsors"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                Sponsors
+                {t('nav.sponsors')}
               </Link>
               <Link
                 href="/donate"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                Donate
+                {t('nav.donate')}
               </Link>
               <Link
                 href="/contact"
                 className="flex items-center text-sm font-medium text-muted-foreground nav-link"
               >
-                Contact
+                {t('nav.contact')}
               </Link>
             </nav>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-              <Link href="/register">Register Now</Link>
+              <Link href="/register">{t('nav.register')}</Link>
             </Button>
           </div>
         </div>
@@ -70,18 +77,18 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Miles For Hope: Supporting children's hospitals in Montréal.
+                    {t('hero.title')}
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    A student-led charity run raising funds for CHU Sainte-Justine and Montreal Children's Hospital. Every step you take helps build a better future for children in need.
+                    {t('hero.description')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-                    <Link href="/register">Register Now</Link>
+                    <Link href="/register">{t('hero.register')}</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
-                    <Link href="/run">Learn More</Link>
+                    <Link href="/run">{t('hero.learnMore')}</Link>
                   </Button>
                 </div>
               </div>
@@ -100,52 +107,51 @@ export default function Home() {
             <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
               <Card className="flex flex-col border-pastel-blue">
                 <CardHeader>
-                  <CardTitle>About Us</CardTitle>
-                  <CardDescription>Learn about our mission and impact</CardDescription>
+                  <CardTitle>{t('featured.about.title')}</CardTitle>
+                  <CardDescription>{t('featured.about.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground">
-                    MilesForHope is a student-led charity run dedicated to raising funds for children's hospitals in Montréal, specifically supporting CHU Sainte-Justine and Montreal Children's Hospital.
+                    {t('featured.about.content')}
                   </p>
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
-                    <Link href="/about">Read More</Link>
+                    <Link href="/about">{t('featured.about.readMore')}</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
               <Card className="flex flex-col border-pastel-yellow">
                 <CardHeader>
-                  <CardTitle>Charity Run</CardTitle>
-                  <CardDescription>Event details and schedule</CardDescription>
+                  <CardTitle>{t('featured.run.title')}</CardTitle>
+                  <CardDescription>{t('featured.run.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground">
-                    Join us for a day of running, community, and making a difference. Participants can win medals, merchandise, and other goods while supporting a great cause. Every step counts!
+                    {t('featured.run.content')}
                   </p>
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="outline" className="w-full border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
-                    <Link href="/run">View Details</Link>
+                    <Link href="/run">{t('featured.run.viewDetails')}</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
               <Card className="flex flex-col border-pastel-blue">
                 <CardHeader>
-                  <CardTitle>Get Involved</CardTitle>
-                  <CardDescription>Ways to support our cause</CardDescription>
+                  <CardTitle>{t('featured.involved.title')}</CardTitle>
+                  <CardDescription>{t('featured.involved.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground">
-                    There are many ways to support MilesForHope - register for the run, make a donation, or become a
-                    sponsor.
+                    {t('featured.involved.content')}
                   </p>
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
-                    <Link href="/donate">Support Us</Link>
+                    <Link href="/donate">{t('featured.involved.support')}</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -159,16 +165,15 @@ export default function Home() {
             <div className="mx-auto flex max-w-[980px] flex-col items-center gap-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Ready to <span className="text-pastel-blue-foreground underline decoration-pastel-blue">Join Us</span>?
+                  {t('cta.title')}
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Register today for the MilesForHope Run and be part of something meaningful. Every participant makes a
-                  difference.
+                  {t('cta.description')}
                 </p>
               </div>
               <div className="mt-6">
                 <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-                  <Link href="/register">Register Now</Link>
+                  <Link href="/register">{t('cta.register')}</Link>
                 </Button>
               </div>
             </div>
@@ -180,9 +185,9 @@ export default function Home() {
           <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our <span className="text-pastel-yellow-foreground underline decoration-pastel-yellow">Sponsors</span></h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">{t('sponsors.title')}</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  We're grateful to the organizations that make our charity run possible.
+                  {t('sponsors.description')}
                 </p>
               </div>
             </div>
@@ -198,7 +203,7 @@ export default function Home() {
 
               <div className="mt-12 text-center">
                 <Button asChild className="bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
-                  <Link href="/sponsors">View All Sponsors</Link>
+                  <Link href="/sponsors">{t('sponsors.viewAll')}</Link>
                 </Button>
               </div>
             </div>
@@ -214,51 +219,50 @@ export default function Home() {
                 <span className="text-lg font-bold">MilesForHope Run</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Making a difference in communities worldwide through sustainable development, education, and healthcare
-                initiatives.
+                {t('footer.description')}
               </p>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Quick Links</h4>
+              <h4 className="text-sm font-semibold">{t('footer.quickLinks')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
-                    About Us
+                    {t('nav.about')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Charity Run
+                    {t('nav.charityRun')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
-                    FAQ
+                    {t('nav.faq')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Sponsors
+                    {t('nav.sponsors')}
                   </Link>
                 </li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Resources</h4>
+              <h4 className="text-sm font-semibold">{t('footer.resources')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Donate
+                    {t('nav.donate')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Register
+                    {t('nav.register')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Contact
+                    {t('nav.contact')}
                   </Link>
                 </li>
               </ul>
@@ -266,7 +270,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} MilesForHope. All rights reserved.
+              {t('footer.copyright').replace('{year}', new Date().getFullYear().toString())}
             </p>
           </div>
         </div>

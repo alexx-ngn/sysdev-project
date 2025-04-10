@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link"
 import { Menu } from "lucide-react"
 
@@ -9,8 +11,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useLanguage } from "@/app/context/language-context"
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 export function MobileNav() {
+  const { t } = useLanguage();
+  
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -31,41 +37,44 @@ export function MobileNav() {
             href="/about"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            About
+            {t('nav.about')}
           </Link>
           <Link
             href="/run"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            Charity Run
+            {t('nav.charityRun')}
           </Link>
           <Link
             href="/faq"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            FAQ
+            {t('nav.faq')}
           </Link>
           <Link
             href="/sponsors"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            Sponsors
+            {t('nav.sponsors')}
           </Link>
           <Link
             href="/donate"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            Donate
+            {t('nav.donate')}
           </Link>
           <Link
             href="/contact"
             className="text-sm font-medium text-gray-900 nav-link"
           >
-            Contact
+            {t('nav.contact')}
           </Link>
-          <div className="pt-4">
+          <div className="flex flex-col gap-4 pt-4">
+            <div className="flex justify-center">
+              <LanguageSwitcher />
+            </div>
             <Button asChild className="w-full bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-              <Link href="/register">Register Now</Link>
+              <Link href="/register">{t('nav.register')}</Link>
             </Button>
           </div>
         </div>
