@@ -29,6 +29,15 @@ const translations: Record<Language, Translations> = {
     'nav.contact': 'Contact',
     'nav.register': 'Register Now',
     
+    // About Page
+    'about.mission.title': 'Our Mission',
+    'about.mission.description': 'To support children\'s hospitals in Montréal (CHU Sainte-Justine and Montreal Children\'s Hospital) through raising awareness and funds.',
+    'about.vision.title': 'Our Vision',
+    'about.vision.description': 'A world where every child has access to quality healthcare.',
+    'about.values.title': 'Our Values',
+    'about.values.description': 'We believe in the power of unity and collaboration to make a difference.',
+    'about.illustrationAlt': 'Open Peeps Illustration',
+    
     // Hero Section
     'hero.title': 'Miles For Hope: Supporting children\'s hospitals in Montréal.',
     'hero.description': 'A student-led charity run raising funds for CHU Sainte-Justine and Montreal Children\'s Hospital. Every step you take helps build a better future for children in need.',
@@ -62,6 +71,7 @@ const translations: Record<Language, Translations> = {
     'sponsors.viewAll': 'View All Sponsors',
     
     // Footer
+    'footer.milesForHope': 'MilesForHope Run',
     'footer.description': 'Making a difference in communities worldwide through sustainable development, education, and healthcare initiatives.',
     'footer.quickLinks': 'Quick Links',
     'footer.resources': 'Resources',
@@ -70,6 +80,25 @@ const translations: Record<Language, Translations> = {
     // Language switcher
     'language.en': 'English',
     'language.fr': 'Français',
+    
+    // About Page Story Section
+    'about.story.title': 'Our Story',
+    'about.story.paragraph1': 'MilesForHope began in 2015 when a small group of passionate runners decided to combine their love for running with their desire to make a positive impact in their community. What started as a local 5K with just 50 participants has grown into an annual event that attracts hundreds of runners from across the region.',
+    'about.story.paragraph2': 'Our founders believed that physical activity could be a powerful catalyst for social change. By bringing people together through running, we create a community of individuals committed to supporting important causes and making a difference in the lives of others.',
+    'about.story.paragraph3': 'Over the years, MilesForHope has raised over $500,000 for various community initiatives, focusing on education, healthcare, and sustainable development. We\'ve funded scholarships for underprivileged students, supported local health clinics, and contributed to environmental conservation projects.',
+    'about.story.paragraph4': 'Today, MilesForHope continues to grow, but our core mission remains the same: to harness the collective energy and goodwill of runners to create positive change in our communities. Every step taken in our charity run is a step toward a better, more equitable world.',
+    
+    // About Page Team Section
+    'about.team.title': 'Our Team',
+    'about.team.sarah.name': 'Sarah Johnson',
+    'about.team.sarah.role': 'Founder & Executive Director',
+    'about.team.sarah.description': 'Marathon runner and community advocate with 15 years of nonprofit experience.',
+    'about.team.michael.name': 'Michael Chen',
+    'about.team.michael.role': 'Event Director',
+    'about.team.michael.description': 'Former Olympic athlete dedicated to creating inclusive sporting events.',
+    'about.team.aisha.name': 'Aisha Patel',
+    'about.team.aisha.role': 'Community Outreach Coordinator',
+    'about.team.aisha.description': 'Social worker and running coach passionate about empowering communities.',
   },
   fr: {
     // Navigation
@@ -79,12 +108,21 @@ const translations: Record<Language, Translations> = {
     'nav.sponsors': 'Commanditaires',
     'nav.donate': 'Faire un don',
     'nav.contact': 'Contact',
-    'nav.register': 'S\'inscrire maintenant',
+    'nav.register': 'S\'inscrire',
+    
+    // About Page
+    'about.mission.title': 'Notre Mission',
+    'about.mission.description': 'Soutenir les hôpitaux pour enfants de Montréal (CHU Sainte-Justine et Hôpital de Montréal pour enfants) en sensibilisant et en recueillant des fonds.',
+    'about.vision.title': 'Notre Vision',
+    'about.vision.description': 'Un monde où chaque enfant a accès à des soins de santé de qualité.',
+    'about.values.title': 'Nos Valeurs',
+    'about.values.description': 'Nous croyons en la puissance de l\'unité et de la collaboration pour faire une différence.',
+    'about.illustrationAlt': 'Illustration Open Peeps',
     
     // Hero Section
     'hero.title': 'Miles For Hope : Soutenir les hôpitaux pour enfants à Montréal.',
     'hero.description': 'Une course caritative dirigée par des étudiants pour amasser des fonds pour le CHU Sainte-Justine et l\'Hôpital de Montréal pour enfants. Chaque pas que vous faites aide à construire un avenir meilleur pour les enfants dans le besoin.',
-    'hero.register': 'S\'inscrire maintenant',
+    'hero.register': 'S\'inscrire',
     'hero.learnMore': 'En savoir plus',
     
     // Featured Sections
@@ -114,14 +152,34 @@ const translations: Record<Language, Translations> = {
     'sponsors.viewAll': 'Voir tous les commanditaires',
     
     // Footer
+    'footer.milesForHope': 'Course MilesForHope',
     'footer.description': 'Faire une différence dans les communautés du monde entier grâce à des initiatives de développement durable, d\'éducation et de soins de santé.',
-    'footer.quickLinks': 'Liens rapides',
+    'footer.quickLinks': 'Liens Rapides',
     'footer.resources': 'Ressources',
     'footer.copyright': '© {year} MilesForHope. Tous droits réservés.',
     
     // Language switcher
     'language.en': 'English',
     'language.fr': 'Français',
+    
+    // About Page Story Section
+    'about.story.title': 'Notre Histoire',
+    'about.story.paragraph1': 'MilesForHope a débuté en 2015 lorsqu\'un petit groupe de coureurs passionnés a décidé de combiner leur amour de la course avec leur désir d\'avoir un impact positif dans leur communauté. Ce qui a commencé comme un 5K local avec seulement 50 participants est devenu un événement annuel qui attire des centaines de coureurs de toute la région.',
+    'about.story.paragraph2': 'Nos fondateurs croyaient que l\'activité physique pouvait être un puissant catalyseur de changement social. En rassemblant les gens par la course, nous créons une communauté d\'individus engagés à soutenir des causes importantes et à faire une différence dans la vie des autres.',
+    'about.story.paragraph3': 'Au fil des années, MilesForHope a amassé plus de 500 000 $ pour diverses initiatives communautaires, se concentrant sur l\'éducation, les soins de santé et le développement durable. Nous avons financé des bourses pour des étudiants défavorisés, soutenu des cliniques de santé locales et contribué à des projets de conservation de l\'environnement.',
+    'about.story.paragraph4': 'Aujourd\'hui, MilesForHope continue de croître, mais notre mission fondamentale reste la même : exploiter l\'énergie collective et la bonne volonté des coureurs pour créer un changement positif dans nos communautés. Chaque pas franchi dans notre course caritative est un pas vers un monde meilleur et plus équitable.',
+    
+    // About Page Team Section
+    'about.team.title': 'Notre Équipe',
+    'about.team.sarah.name': 'Sarah Johnson',
+    'about.team.sarah.role': 'Fondatrice et Directrice Exécutive',
+    'about.team.sarah.description': 'Marathonienne et défenseure communautaire avec 15 ans d\'expérience dans le secteur sans but lucratif.',
+    'about.team.michael.name': 'Michael Chen',
+    'about.team.michael.role': 'Directeur de l\'Événement',
+    'about.team.michael.description': 'Ancien athlète olympique dédié à la création d\'événements sportifs inclusifs.',
+    'about.team.aisha.name': 'Aisha Patel',
+    'about.team.aisha.role': 'Coordinatrice de l\'Engagement Communautaire',
+    'about.team.aisha.description': 'Travailleuse sociale et entraîneuse de course passionnée par l\'autonomisation des communautés.',
   }
 };
 
