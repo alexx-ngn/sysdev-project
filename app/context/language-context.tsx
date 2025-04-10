@@ -174,6 +174,49 @@ const translations: Record<Language, Translations> = {
     'footer.register': 'Register',
     'footer.contact': 'Contact',
     'footer.rightsReserved': 'All rights reserved.',
+    
+    // FAQ Page
+    'faq.title': 'Frequently Asked Questions',
+    'faq.description': 'Find answers to common questions about the MilesForHope charity run.',
+    'faq.contactPrompt': 'Don\'t see your question answered here? Feel free to contact us.',
+    'faq.contactButton': 'Contact Us',
+    
+    // FAQ Questions and Answers
+    'faq.q1.question': 'When and where is the charity run taking place?',
+    'faq.q1.answer': 'The MilesForHope charity run will take place on Saturday, October 15, 2023, starting at 7:00 AM. The event will be held at City Park, 123 Runner\'s Lane, Hopeville, State 12345.',
+    
+    'faq.q2.question': 'How do I register for the run?',
+    'faq.q2.answer': 'You can register for the run by filling out the registration form on our website. Simply click the "Register Now" button at the top of the page, or visit our registration page. You\'ll need to provide your first name, last name, phone number, and email address.',
+    
+    'faq.q3.question': 'Is there a registration fee?',
+    'faq.q3.answer': 'No, registration for the MilesForHope Run is completely free. All participants will receive a t-shirt, race bib, and refreshments.',
+    
+    'faq.q4.question': 'What distance options are available?',
+    'faq.q4.answer': 'This year, we\'re offering a 5K run/walk that\'s suitable for participants of all fitness levels. The course is designed to be accessible and enjoyable for everyone, whether you\'re an experienced runner or a casual walker.',
+    
+    'faq.q5.question': 'What should I bring on the day of the run?',
+    'faq.q5.answer': 'We recommend bringing:',
+    'faq.q5.item1': 'Comfortable running/walking shoes',
+    'faq.q5.item2': 'Weather-appropriate clothing',
+    'faq.q5.item3': 'Water bottle (water stations will also be available)',
+    'faq.q5.item4': 'Sunscreen',
+    'faq.q5.item5': 'Your registration confirmation (digital or printed)',
+    'faq.q5.item6': 'A positive attitude!',
+    
+    'faq.q6.question': 'Can I participate if I\'m not a runner?',
+    'faq.q6.answer': 'The MilesForHope event welcomes participants of all fitness levels. You can walk, jog, or run at your own pace. The most important thing is participating and supporting the cause.',
+    
+    'faq.q7.question': 'Where does the money raised go?',
+    'faq.q7.answer': 'All proceeds from the MilesForHope run go directly to supporting our community initiatives in education, healthcare, and sustainable development. We\'re committed to transparency and publish an annual report detailing how funds are allocated.',
+    
+    'faq.q8.question': 'Can I volunteer instead of participating?',
+    'faq.q8.answer': 'Yes! We always need volunteers to help make the event a success. Volunteers can assist with registration, water stations, course marshaling, and more. Please contact us through the form on our website if you\'re interested in volunteering.',
+    
+    'faq.q9.question': 'Is the event family-friendly?',
+    'faq.q9.answer': 'Yes, the MilesForHope run is designed to be a family-friendly event. Children are welcome to participate with parental supervision. We\'ll also have activities and entertainment suitable for all ages.',
+    
+    'faq.q10.question': 'What happens if it rains?',
+    'faq.q10.answer': 'The event will take place rain or shine. In case of severe weather conditions that might compromise participants\' safety, we may reschedule the event. Any changes will be communicated via email to registered participants and posted on our website and social media channels.',
   },
   fr: {
     // Navigation
@@ -330,6 +373,49 @@ const translations: Record<Language, Translations> = {
     'footer.register': 'S\'inscrire',
     'footer.contact': 'Contact',
     'footer.rightsReserved': 'Tous droits réservés.',
+    
+    // FAQ Page
+    'faq.title': 'Questions Fréquemment Posées',
+    'faq.description': 'Trouvez des réponses aux questions courantes sur la course caritative MilesForHope.',
+    'faq.contactPrompt': 'Vous ne trouvez pas votre question ici ? N\'hésitez pas à nous contacter.',
+    'faq.contactButton': 'Contactez-nous',
+    
+    // FAQ Questions and Answers
+    'faq.q1.question': 'Quand et où se déroule la course caritative ?',
+    'faq.q1.answer': 'La course caritative MilesForHope se déroulera le samedi 15 octobre 2023, à partir de 7h00. L\'événement aura lieu au Parc de la Ville, 123 avenue des Coureurs, Hopeville, État 12345.',
+    
+    'faq.q2.question': 'Comment m\'inscrire à la course ?',
+    'faq.q2.answer': 'Vous pouvez vous inscrire à la course en remplissant le formulaire d\'inscription sur notre site web. Cliquez simplement sur le bouton "S\'inscrire" en haut de la page, ou visitez notre page d\'inscription. Vous devrez fournir votre prénom, nom, numéro de téléphone et adresse e-mail.',
+    
+    'faq.q3.question': 'Y a-t-il des frais d\'inscription ?',
+    'faq.q3.answer': 'Non, l\'inscription à la course MilesForHope est entièrement gratuite. Tous les participants recevront un t-shirt, un dossard et des rafraîchissements.',
+    
+    'faq.q4.question': 'Quelles options de distance sont disponibles ?',
+    'faq.q4.answer': 'Cette année, nous proposons une course/marche de 5K adaptée aux participants de tous niveaux de forme physique. Le parcours est conçu pour être accessible et agréable pour tous, que vous soyez un coureur expérimenté ou un marcheur occasionnel.',
+    
+    'faq.q5.question': 'Que dois-je apporter le jour de la course ?',
+    'faq.q5.answer': 'Nous recommandons d\'apporter :',
+    'faq.q5.item1': 'Des chaussures confortables pour courir/marcher',
+    'faq.q5.item2': 'Des vêtements adaptés à la météo',
+    'faq.q5.item3': 'Une gourde d\'eau (des points d\'eau seront également disponibles)',
+    'faq.q5.item4': 'De la crème solaire',
+    'faq.q5.item5': 'Votre confirmation d\'inscription (numérique ou imprimée)',
+    'faq.q5.item6': 'Une attitude positive !',
+    
+    'faq.q6.question': 'Puis-je participer si je ne suis pas un coureur ?',
+    'faq.q6.answer': 'L\'événement MilesForHope accueille les participants de tous niveaux de forme physique. Vous pouvez marcher, trottiner ou courir à votre propre rythme. L\'important est de participer et de soutenir la cause.',
+    
+    'faq.q7.question': 'Où va l\'argent collecté ?',
+    'faq.q7.answer': 'Tous les bénéfices de la course MilesForHope vont directement à nos initiatives communautaires en matière d\'éducation, de soins de santé et de développement durable. Nous nous engageons à la transparence et publions un rapport annuel détaillant l\'allocation des fonds.',
+    
+    'faq.q8.question': 'Puis-je être bénévole au lieu de participer ?',
+    'faq.q8.answer': 'Oui ! Nous avons toujours besoin de bénévoles pour faire de l\'événement un succès. Les bénévoles peuvent aider à l\'inscription, aux points d\'eau, à l\'encadrement du parcours, et plus encore. Veuillez nous contacter via le formulaire sur notre site web si vous êtes intéressé par le bénévolat.',
+    
+    'faq.q9.question': 'L\'événement est-il adapté aux familles ?',
+    'faq.q9.answer': 'Oui, la course MilesForHope est conçue pour être un événement adapté aux familles. Les enfants sont les bienvenus pour participer sous la supervision d\'un parent. Nous aurons également des activités et des divertissements adaptés à tous les âges.',
+    
+    'faq.q10.question': 'Que se passe-t-il s\'il pleut ?',
+    'faq.q10.answer': 'L\'événement se déroulera qu\'il pleuve ou qu\'il fasse beau. En cas de conditions météorologiques graves qui pourraient compromettre la sécurité des participants, nous pourrions reporter l\'événement. Tout changement sera communiqué par e-mail aux participants inscrits et publié sur notre site web et nos réseaux sociaux.',
   }
 };
 

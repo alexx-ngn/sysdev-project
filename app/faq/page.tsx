@@ -1,75 +1,27 @@
+"use client";
+
 import Link from "next/link"
 import { Heart } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
-import { MobileNav } from "@/components/mobile-nav"
+import { Navbar } from "@/components/navbar"
+import { useLanguage } from "@/app/context/language-context"
 
 export default function FAQPage() {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
-        <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
-          <div className="flex gap-6 md:gap-10">
-            <MobileNav />
-            <Link href="/" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-pink-500" />
-              <span className="inline-block font-bold">MilesForHope</span>
-            </Link>
-            <nav className="hidden md:flex gap-6">
-              <Link
-                href="/about"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                About
-              </Link>
-              <Link
-                href="/run"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Charity Run
-              </Link>
-              <Link
-                href="/faq"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                FAQ
-              </Link>
-              <Link
-                href="/sponsors"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Sponsors
-              </Link>
-              <Link
-                href="/donate"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Donate
-              </Link>
-              <Link
-                href="/contact"
-                className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-              >
-                Contact
-              </Link>
-            </nav>
-          </div>
-          <div>
-            <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
-              <Link href="/register">Register Now</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
           <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Frequently Asked Questions</h1>
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">{t('faq.title')}</h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Find answers to common questions about the MilesForHope charity run.
+                  {t('faq.description')}
                 </p>
               </div>
             </div>
@@ -78,106 +30,91 @@ export default function FAQPage() {
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-left">
-                    When and where is the charity run taking place?
+                    {t('faq.q1.question')}
                   </AccordionTrigger>
                   <AccordionContent>
-                    The MilesForHope charity run will take place on Saturday, October 15, 2023, starting at 7:00 AM. The
-                    event will be held at City Park, 123 Runner's Lane, Hopeville, State 12345.
+                    {t('faq.q1.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-left">How do I register for the run?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q2.question')}</AccordionTrigger>
                   <AccordionContent>
-                    You can register for the run by filling out the registration form on our website. Simply click the
-                    "Register Now" button at the top of the page, or visit our registration page. You'll need to provide
-                    your first name, last name, phone number, and email address.
+                    {t('faq.q2.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-left">Is there a registration fee?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q3.question')}</AccordionTrigger>
                   <AccordionContent>
-                    No, registration for the MilesForHope Run is completely free. All participants will receive a
-                    t-shirt, race bib, and refreshments.
+                    {t('faq.q3.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">What distance options are available?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q4.question')}</AccordionTrigger>
                   <AccordionContent>
-                    This year, we're offering a 5K run/walk that's suitable for participants of all fitness levels. The
-                    course is designed to be accessible and enjoyable for everyone, whether you're an experienced runner
-                    or a casual walker.
+                    {t('faq.q4.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-left">What should I bring on the day of the run?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q5.question')}</AccordionTrigger>
                   <AccordionContent>
-                    We recommend bringing:
+                    {t('faq.q5.answer')}
                     <ul className="list-disc pl-6 mt-2">
-                      <li>Comfortable running/walking shoes</li>
-                      <li>Weather-appropriate clothing</li>
-                      <li>Water bottle (water stations will also be available)</li>
-                      <li>Sunscreen</li>
-                      <li>Your registration confirmation (digital or printed)</li>
-                      <li>A positive attitude!</li>
+                      <li>{t('faq.q5.item1')}</li>
+                      <li>{t('faq.q5.item2')}</li>
+                      <li>{t('faq.q5.item3')}</li>
+                      <li>{t('faq.q5.item4')}</li>
+                      <li>{t('faq.q5.item5')}</li>
+                      <li>{t('faq.q5.item6')}</li>
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">Can I participate if I'm not a runner?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q6.question')}</AccordionTrigger>
                   <AccordionContent>
-                    The MilesForHope event welcomes participants of all fitness levels. You can walk, jog, or run at
-                    your own pace. The most important thing is participating and supporting the cause.
+                    {t('faq.q6.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-7">
-                  <AccordionTrigger className="text-left">Where does the money raised go?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q7.question')}</AccordionTrigger>
                   <AccordionContent>
-                    All proceeds from the MilesForHope run go directly to supporting our community initiatives in
-                    education, healthcare, and sustainable development. We're committed to transparency and publish an
-                    annual report detailing how funds are allocated.
+                    {t('faq.q7.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-8">
-                  <AccordionTrigger className="text-left">Can I volunteer instead of participating?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q8.question')}</AccordionTrigger>
                   <AccordionContent>
-                    Yes! We always need volunteers to help make the event a success. Volunteers can assist with
-                    registration, water stations, course marshaling, and more. Please contact us through the form on our
-                    website if you're interested in volunteering.
+                    {t('faq.q8.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-9">
-                  <AccordionTrigger className="text-left">Is the event family-friendly?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q9.question')}</AccordionTrigger>
                   <AccordionContent>
-                    Yes, the MilesForHope run is designed to be a family-friendly event. Children are welcome to
-                    participate with parental supervision. We'll also have activities and entertainment suitable for all
-                    ages.
+                    {t('faq.q9.answer')}
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-10">
-                  <AccordionTrigger className="text-left">What happens if it rains?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">{t('faq.q10.question')}</AccordionTrigger>
                   <AccordionContent>
-                    The event will take place rain or shine. In case of severe weather conditions that might compromise
-                    participants' safety, we may reschedule the event. Any changes will be communicated via email to
-                    registered participants and posted on our website and social media channels.
+                    {t('faq.q10.answer')}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
 
               <div className="mt-12 text-center">
                 <p className="text-muted-foreground mb-4">
-                  Don't see your question answered here? Feel free to contact us.
+                  {t('faq.contactPrompt')}
                 </p>
                 <Button asChild>
-                  <Link href="/contact">Contact Us</Link>
+                  <Link href="/contact">{t('faq.contactButton')}</Link>
                 </Button>
               </div>
             </div>
@@ -191,54 +128,53 @@ export default function FAQPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Heart className="h-6 w-6 text-pink-500" />
-                <span className="text-lg font-bold">MilesForHope Run</span>
+                <span className="text-lg font-bold">{t('footer.milesForHope')}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Making a difference in communities worldwide through sustainable development, education, and healthcare
-                initiatives.
+                {t('footer.description')}
               </p>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Quick Links</h4>
+              <h4 className="text-sm font-semibold">{t('footer.quickLinks')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
-                    About Us
+                    {t('footer.about')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Charity Run
+                    {t('footer.charityRun')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
-                    FAQ
+                    {t('footer.faq')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Sponsors
+                    {t('footer.sponsors')}
                   </Link>
                 </li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Resources</h4>
+              <h4 className="text-sm font-semibold">{t('footer.resources')}</h4>
               <ul className="space-y-2">
                 <li>
                   <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Donate
+                    {t('footer.donate')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Register
+                    {t('footer.register')}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    Contact
+                    {t('footer.contact')}
                   </Link>
                 </li>
               </ul>
@@ -246,12 +182,12 @@ export default function FAQPage() {
           </div>
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} MilesForHope. All rights reserved.
+              © {new Date().getFullYear()} MilesForHope. {t('footer.rightsReserved')}
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
