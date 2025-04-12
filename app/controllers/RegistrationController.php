@@ -19,7 +19,7 @@ class RegistrationController {
         $registration = new Registration();
         $registration->insert($name, $email);
 
-        header("Location: /simple-mvc-app/public/registrations");
+        header("Location: /ecommerce-project/public/registrations");
         exit;
     }
 }
