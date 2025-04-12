@@ -97,7 +97,7 @@ export default function DonatePage() {
                     </ul>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90" asChild>
+                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" asChild>
                       <Link href="/sponsors">{t('donate.sponsor.button')}</Link>
                     </Button>
                   </CardFooter>

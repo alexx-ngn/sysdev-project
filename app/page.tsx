@@ -210,7 +210,7 @@ export default function Home() {
               </div>
 
               <div className="mt-12 text-center">
-                <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                   <Link href="/sponsors">{t('sponsors.viewAll')}</Link>
                 </Button>
               </div>

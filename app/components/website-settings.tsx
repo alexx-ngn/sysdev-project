@@ -2,6 +2,7 @@
 
 import { useSettings } from "@/app/context/settings-context"
 import { useEffect } from "react"
+import { hexToCSSVariable } from "@/lib/color-utils"
 
 /**
  * This component applies website settings to the document
@@ -31,11 +32,11 @@ export function WebsiteSettings() {
 
     // Apply CSS variables for colors
     if (settings.primaryColor) {
-      document.documentElement.style.setProperty('--primary', settings.primaryColor)
+      document.documentElement.style.setProperty('--primary', hexToCSSVariable(settings.primaryColor))
     }
 
     if (settings.secondaryColor) {
-      document.documentElement.style.setProperty('--secondary', settings.secondaryColor)
+      document.documentElement.style.setProperty('--secondary', hexToCSSVariable(settings.secondaryColor))
     }
   }, [settings])
 

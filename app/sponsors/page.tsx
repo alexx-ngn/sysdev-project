@@ -128,7 +128,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -153,7 +153,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -178,7 +178,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -189,7 +189,7 @@ export default function SponsorsPage() {
                   <p className="text-muted-foreground mb-4">
                     {t('sponsors.become.contact')}
                   </p>
-                  <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                     <Link href="/#contact" className="inline-flex items-center">
                       {t('sponsors.become.contactTeam')} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
