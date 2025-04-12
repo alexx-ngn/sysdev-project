@@ -6,9 +6,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/navbar"
 import { useLanguage } from "@/app/context/language-context"
+import { useSettings } from "@/app/context/settings-context"
 
 export default function FAQPage() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
   
   return (
     <div className="flex min-h-screen flex-col">
@@ -113,8 +115,11 @@ export default function FAQPage() {
                 <p className="text-muted-foreground mb-4">
                   {t('faq.contactPrompt')}
                 </p>
-                <Button asChild>
-                  <Link href="/contact">{t('faq.contactButton')}</Link>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {t('faq.contactButton')}
                 </Button>
               </div>
             </div>

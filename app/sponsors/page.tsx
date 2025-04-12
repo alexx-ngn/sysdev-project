@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Building, Award, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useSettings } from "@/app/context/settings-context";
+import { useState } from "react";
 
 export default function SponsorsPage() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -123,7 +128,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -148,7 +153,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -173,7 +178,7 @@ export default function SponsorsPage() {
                       </ul>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                         {t('sponsors.contactUs')}
                       </Button>
                     </CardFooter>
@@ -184,7 +189,7 @@ export default function SponsorsPage() {
                   <p className="text-muted-foreground mb-4">
                     {t('sponsors.become.contact')}
                   </p>
-                  <Button asChild className="bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
+                  <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
                     <Link href="/#contact" className="inline-flex items-center">
                       {t('sponsors.become.contactTeam')} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

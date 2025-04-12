@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/sheet"
 import { useLanguage } from "@/app/context/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { useSettings } from "@/app/context/settings-context"
 
 export function MobileNav() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
   
   return (
     <Sheet>
@@ -30,7 +32,7 @@ export function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="pr-0 !bg-white border-r">
         <SheetHeader className="text-left">
-          <SheetTitle className="text-gray-900">MilesForHope Run</SheetTitle>
+          <SheetTitle className="text-gray-900">{settings.eventName}</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col space-y-4 mt-6">
           <Link
@@ -73,7 +75,7 @@ export function MobileNav() {
             <div className="flex justify-center">
               <LanguageSwitcher />
             </div>
-            <Button asChild className="w-full bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
+            <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/register">{t('nav.register')}</Link>
             </Button>
           </div>

@@ -2,25 +2,32 @@
 
 import Link from "next/link"
 import { Heart } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { MobileNav } from "@/components/mobile-nav"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useLanguage } from "@/app/context/language-context"
+import { useSettings } from "@/app/context/settings-context"
+import { WebsiteSettings } from "@/app/components/website-settings"
 
 export default function Home() {
   const { t } = useLanguage();
-  
+  const { settings } = useSettings();
+
   return (
     <div className="flex flex-col min-h-screen">
+      <WebsiteSettings />
       <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
         <div className="container max-w-[1400px] mx-auto flex h-16 items-center justify-between py-4 px-4 md:px-6">
           <div className="flex gap-6 md:gap-10">
             <MobileNav />
             <Link href="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-pink-500" />
-              <span className="inline-block font-bold">MilesForHope</span>
+              {settings.logo ? (
+                <img src={settings.logo} alt={settings.organizationName} className="h-6 w-6 object-contain" />
+              ) : (
+                <Heart className="h-6 w-6 text-primary" />
+              )}
+              <span className="inline-block font-bold">{settings.organizationName}</span>
             </Link>
             <nav className="hidden md:flex gap-6">
               <Link
@@ -63,12 +70,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            <Button asChild className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/register">{t('nav.register')}</Link>
             </Button>
           </div>
         </div>
       </header>
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gray-50">
@@ -84,10 +92,10 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
+                  <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                     <Link href="/register">{t('hero.register')}</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
+                  <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/20">
                     <Link href="/run">{t('hero.learnMore')}</Link>
                   </Button>
                 </div>
@@ -105,7 +113,7 @@ export default function Home() {
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
           <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
             <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
-              <Card className="flex flex-col border-pastel-blue">
+              <Card className="flex flex-col border-primary">
                 <CardHeader>
                   <CardTitle>{t('featured.about.title')}</CardTitle>
                   <CardDescription>{t('featured.about.description')}</CardDescription>
@@ -116,13 +124,13 @@ export default function Home() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
+                  <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/20">
                     <Link href="/about">{t('featured.about.readMore')}</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card className="flex flex-col border-pastel-yellow">
+              <Card className="flex flex-col border-primary">
                 <CardHeader>
                   <CardTitle>{t('featured.run.title')}</CardTitle>
                   <CardDescription>{t('featured.run.description')}</CardDescription>
@@ -133,13 +141,13 @@ export default function Home() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full border-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/20">
+                  <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/20">
                     <Link href="/run">{t('featured.run.viewDetails')}</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card className="flex flex-col border-pastel-blue">
+              <Card className="flex flex-col border-primary">
                 <CardHeader>
                   <CardTitle>{t('featured.involved.title')}</CardTitle>
                   <CardDescription>{t('featured.involved.description')}</CardDescription>
@@ -150,7 +158,7 @@ export default function Home() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild variant="outline" className="w-full border-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/20">
+                  <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/20">
                     <Link href="/donate">{t('featured.involved.support')}</Link>
                   </Button>
                 </CardFooter>
@@ -172,7 +180,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-6">
-                <Button asChild size="lg" className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90">
+                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link href="/register">{t('cta.register')}</Link>
                 </Button>
               </div>
@@ -202,7 +210,7 @@ export default function Home() {
               </div>
 
               <div className="mt-12 text-center">
-                <Button asChild className="bg-pastel-yellow text-pastel-yellow-foreground hover:bg-pastel-yellow/90">
+                <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link href="/sponsors">{t('sponsors.viewAll')}</Link>
                 </Button>
               </div>
@@ -210,13 +218,14 @@ export default function Home() {
           </div>
         </section>
       </main>
+
       <footer className="w-full border-t bg-background">
         <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-pink-500" />
-                <span className="text-lg font-bold">MilesForHope Run</span>
+                <Heart className="h-6 w-6 text-primary" />
+                <span className="text-lg font-bold">{settings.organizationName}</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {t('footer.description')}

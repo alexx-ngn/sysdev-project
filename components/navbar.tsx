@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/mobile-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useLanguage } from "@/app/context/language-context";
+import { useSettings } from "@/app/context/settings-context";
 
 export function Navbar() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
   
   return (
     <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-background/80">
@@ -16,8 +18,12 @@ export function Navbar() {
         <div className="flex gap-6 md:gap-10">
           <MobileNav />
           <Link href="/" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-pink-500" />
-            <span className="inline-block font-bold">MilesForHope</span>
+            {settings.logo ? (
+              <img src={settings.logo} alt={settings.organizationName} className="h-6 w-6 object-contain" />
+            ) : (
+              <Heart className="h-6 w-6 text-pink-500" />
+            )}
+            <span className="inline-block font-bold">{settings.organizationName}</span>
           </Link>
           <nav className="hidden md:flex gap-6">
             <Link
@@ -62,7 +68,7 @@ export function Navbar() {
           <LanguageSwitcher />
           <Button
             asChild
-            className="bg-pastel-blue text-pastel-blue-foreground hover:bg-pastel-blue/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Link href="/register">{t('nav.register')}</Link>
           </Button>
