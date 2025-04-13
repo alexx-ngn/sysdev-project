@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -5,10 +7,172 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Heart, Plus, CheckCircle, X } from "lucide-react"
+import { Heart, Plus, CheckCircle, X, Upload } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useSettings } from "@/app/context/settings-context"
+import { useState, useEffect, useRef } from "react"
+import { toast } from "sonner"
+import { handleFileUpload } from "@/lib/upload-utils"
+import { HexColorPicker } from "react-colorful"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export default function SettingsPage() {
+  const { settings, updateSettings, isLoading } = useSettings()
+  const [formData, setFormData] = useState(settings)
+  const [isSaving, setIsSaving] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const faviconInputRef = useRef<HTMLInputElement>(null)
+
+  // Update form data when settings change
+  useEffect(() => {
+    setFormData(settings)
+  }, [settings])
+
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    if (id === 'contactPhone') {
+      // Format phone number as user types
+      const formatted = formatPhoneNumber(value)
+      setFormData(prev => ({ ...prev, [id]: formatted }))
+    } else {
+      setFormData(prev => ({ ...prev, [id]: value }))
+    }
+  }
+
+  // Handle switch changes
+  const handleSwitchChange = (id: string, checked: boolean) => {
+    setFormData(prev => ({ ...prev, [id]: checked }))
+  }
+
+  // Handle color changes
+  const handleColorChange = (id: string, value: string) => {
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
+
+  // Handle file upload for logo
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await handleFileUpload(
+      e,
+      async (url) => {
+        const updatedSettings = { ...formData, logo: url }
+        setFormData(updatedSettings)
+        await updateSettings({ logo: url })
+        toast.success('Logo uploaded successfully')
+      },
+      (error) => {
+        toast.error(`Failed to upload logo: ${error}`)
+      }
+    )
+  }
+
+  // Handle file upload for favicon
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await handleFileUpload(
+      e,
+      async (url) => {
+        const updatedSettings = { ...formData, favicon: url }
+        setFormData(updatedSettings)
+        await updateSettings({ favicon: url })
+        toast.success('Favicon uploaded successfully')
+      },
+      (error) => {
+        toast.error(`Failed to upload favicon: ${error}`)
+      }
+    )
+  }
+
+  // Validation functions
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    return emailRegex.test(email)
+  }
+
+  const validatePhone = (phone: string) => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '')
+    // Check if it's exactly 10 digits
+    return digits.length === 10
+  }
+
+  // Format phone number as (XXX) XXX-XXXX
+  const formatPhoneNumber = (phone: string) => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '')
+    // Format as (XXX) XXX-XXXX
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+  }
+
+  // Handle save changes
+  const handleSaveChanges = async (section: string) => {
+    // Reset errors
+    setErrors({})
+
+    // Validate email and phone
+    const newErrors: Record<string, string> = {}
+    
+    if (formData.contactEmail && !validateEmail(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid email address'
+    }
+    
+    if (formData.contactPhone && !validatePhone(formData.contactPhone)) {
+      newErrors.contactPhone = 'Please enter a valid phone number in the format (XXX) XXX-XXXX'
+    }
+
+    // Validate admin email
+    if (!validateEmail(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid admin email address'
+    }
+
+    // Validate notification email if notifications are enabled
+    if (formData.sendAdminNotifications && !validateEmail(formData.notificationEmail)) {
+      newErrors.notificationEmail = 'Please enter a valid notification email address'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      toast.error('Please fix the validation errors before saving', {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+        },
+      })
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      await updateSettings(formData)
+      toast.success(`${section} settings saved successfully`, {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#22c55e',
+          color: 'white',
+          border: 'none',
+        },
+      })
+    } catch (error) {
+      toast.error(`Failed to save ${section} settings`, {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+        },
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -17,11 +181,11 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
+        <TabsList className="flex w-full overflow-x-auto space-x-2 p-1">
+          <TabsTrigger value="general" className="shrink-0">General</TabsTrigger>
+          <TabsTrigger value="appearance" className="shrink-0">Appearance</TabsTrigger>
+          <TabsTrigger value="notifications" className="shrink-0">Notifications</TabsTrigger>
+          <TabsTrigger value="users" className="shrink-0">Users</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="space-y-4">
           <Card>
@@ -31,41 +195,92 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="organization-name">Organization Name</Label>
-                <Input id="organization-name" defaultValue="MilesForHope" />
+                <Label htmlFor="organizationName">Organization Name</Label>
+                <Input 
+                  id="organizationName" 
+                  value={formData.organizationName} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="event-name">Event Name</Label>
-                <Input id="event-name" defaultValue="MilesForHope Charity Run 2023" />
+                <Label htmlFor="eventName">Event Name</Label>
+                <Input 
+                  id="eventName" 
+                  value={formData.eventName} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-email">Contact Email</Label>
-                <Input id="contact-email" type="email" defaultValue="info@milesforhope.org" />
+                <Label htmlFor="contactEmail">Admin Email</Label>
+                <Input 
+                  id="contactEmail" 
+                  type="email" 
+                  value={formData.contactEmail} 
+                  onChange={handleInputChange}
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  title="Please enter a valid email address (e.g., example@domain.com)"
+                  placeholder="example@domain.com"
+                  required
+                  className={errors.contactEmail ? "border-red-500" : ""}
+                />
+                {errors.contactEmail && (
+                  <p className="text-sm text-red-500">{errors.contactEmail}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  This email will be used for admin communications
+                </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-phone">Contact Phone</Label>
-                <Input id="contact-phone" type="tel" defaultValue="(555) 123-4567" />
+                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <Input 
+                  id="contactPhone" 
+                  type="tel" 
+                  value={formData.contactPhone} 
+                  onChange={handleInputChange}
+                  pattern="^\(\d{3}\) \d{3}-\d{4}$"
+                  title="Please enter a valid phone number in the format (XXX) XXX-XXXX"
+                  placeholder="(XXX) XXX-XXXX"
+                  maxLength={14}
+                  required
+                  className={errors.contactPhone ? "border-red-500" : ""}
+                />
+                {errors.contactPhone && (
+                  <p className="text-sm text-red-500">{errors.contactPhone}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Enter a valid phone number in the format (XXX) XXX-XXXX
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="address">Address</Label>
-                <Textarea id="address" defaultValue="456 Community Lane&#10;Hopeville, State 12345" />
+                <Textarea 
+                  id="address" 
+                  value={formData.address} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="about">About Organization</Label>
+                <Label htmlFor="aboutOrganization">About Organization</Label>
                 <Textarea
-                  id="about"
-                  defaultValue="MilesForHope is dedicated to empowering communities through sustainable development, education, and healthcare initiatives. Our annual charity run brings together participants of all levels to support vital community projects."
+                  id="aboutOrganization"
+                  value={formData.aboutOrganization}
+                  onChange={handleInputChange}
                   rows={4}
                 />
               </div>
 
               <div className="flex justify-end">
-                <Button>Save Changes</Button>
+                <Button 
+                  onClick={() => handleSaveChanges('General')} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -78,21 +293,38 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="facebook">Facebook</Label>
-                <Input id="facebook" defaultValue="https://facebook.com/milesforhope" />
+                <Input 
+                  id="facebook" 
+                  value={formData.facebook} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="instagram">Instagram</Label>
-                <Input id="instagram" defaultValue="https://instagram.com/milesforhope" />
+                <Input 
+                  id="instagram" 
+                  value={formData.instagram} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="twitter">Twitter</Label>
-                <Input id="twitter" defaultValue="https://twitter.com/milesforhope" />
+                <Input 
+                  id="twitter" 
+                  value={formData.twitter} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="flex justify-end">
-                <Button>Save Changes</Button>
+                <Button 
+                  onClick={() => handleSaveChanges('Social Media')} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -107,22 +339,50 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Primary Color</Label>
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="h-10 w-10 rounded-md bg-primary"></div>
-                  <Input defaultValue="#A5D8FF" className="w-32" />
-                  <Button variant="outline" size="sm">
-                    Change
-                  </Button>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div 
+                        className="h-10 w-10 rounded-md cursor-pointer border"
+                        style={{ backgroundColor: formData.primaryColor }}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border-none">
+                      <HexColorPicker 
+                        color={formData.primaryColor} 
+                        onChange={(color) => handleColorChange('primaryColor', color)} 
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Input 
+                    value={formData.primaryColor} 
+                    className="w-32" 
+                    onChange={(e) => handleColorChange('primaryColor', e.target.value)} 
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Secondary Color</Label>
-                <div className="flex items-center space-x-2">
-                  <div className="h-10 w-10 rounded-md bg-secondary"></div>
-                  <Input defaultValue="#FFF4CC" className="w-32" />
-                  <Button variant="outline" size="sm">
-                    Change
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div 
+                        className="h-10 w-10 rounded-md cursor-pointer border"
+                        style={{ backgroundColor: formData.secondaryColor }}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border-none">
+                      <HexColorPicker 
+                        color={formData.secondaryColor} 
+                        onChange={(color) => handleColorChange('secondaryColor', color)} 
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Input 
+                    value={formData.secondaryColor} 
+                    className="w-32" 
+                    onChange={(e) => handleColorChange('secondaryColor', e.target.value)} 
+                  />
                 </div>
               </div>
 
@@ -130,9 +390,29 @@ export default function SettingsPage() {
                 <Label htmlFor="logo">Logo</Label>
                 <div className="flex items-center space-x-4">
                   <div className="h-16 w-16 rounded-md bg-gray-100 flex items-center justify-center">
-                    <Heart className="h-8 w-8 text-gray-400" />
+                    {formData.logo ? (
+                      <img src={formData.logo} alt="Logo" className="h-12 w-12 object-contain" />
+                    ) : (
+                      <Heart className="h-8 w-8 text-gray-400" />
+                    )}
                   </div>
-                  <Button variant="outline">Upload New Logo</Button>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="file" 
+                      ref={logoInputRef}
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => logoInputRef.current?.click()}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload New Logo
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -140,14 +420,39 @@ export default function SettingsPage() {
                 <Label htmlFor="favicon">Favicon</Label>
                 <div className="flex items-center space-x-4">
                   <div className="h-8 w-8 rounded-md bg-gray-100 flex items-center justify-center">
-                    <Heart className="h-4 w-4 text-gray-400" />
+                    {formData.favicon ? (
+                      <img src={formData.favicon} alt="Favicon" className="h-6 w-6 object-contain" />
+                    ) : (
+                      <Heart className="h-4 w-4 text-gray-400" />
+                    )}
                   </div>
-                  <Button variant="outline">Upload New Favicon</Button>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="file" 
+                      ref={faviconInputRef}
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleFaviconUpload}
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => faviconInputRef.current?.click()}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload New Favicon
+                    </Button>
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-end">
-                <Button>Save Changes</Button>
+                <Button 
+                  onClick={() => handleSaveChanges('Appearance')} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -158,40 +463,77 @@ export default function SettingsPage() {
               <CardDescription>Configure which sections appear on your homepage.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Hero Section</Label>
-                  <p className="text-sm text-muted-foreground">Main banner at the top of the homepage</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showHeroSection"
+                      checked={formData.showHeroSection}
+                      onChange={(e) => handleSwitchChange('showHeroSection', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showHeroSection" className="text-base cursor-pointer">Hero Section</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Main banner at the top of the homepage</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Featured Sections</Label>
-                  <p className="text-sm text-muted-foreground">Cards highlighting key areas of the site</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showFeaturedSections"
+                      checked={formData.showFeaturedSections}
+                      onChange={(e) => handleSwitchChange('showFeaturedSections', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showFeaturedSections" className="text-base cursor-pointer">Featured Sections</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Cards highlighting key areas of the site</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Registration CTA</Label>
-                  <p className="text-sm text-muted-foreground">Call to action for event registration</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showRegistrationCTA"
+                      checked={formData.showRegistrationCTA}
+                      onChange={(e) => handleSwitchChange('showRegistrationCTA', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showRegistrationCTA" className="text-base cursor-pointer">Registration CTA</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Call to action for event registration</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Sponsors Highlight</Label>
-                  <p className="text-sm text-muted-foreground">Showcase of event sponsors</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showSponsorsHighlight"
+                      checked={formData.showSponsorsHighlight}
+                      onChange={(e) => handleSwitchChange('showSponsorsHighlight', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showSponsorsHighlight" className="text-base cursor-pointer">Sponsors Highlight</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Showcase of event sponsors</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
               <div className="flex justify-end">
-                <Button>Save Changes</Button>
+                <Button 
+                  onClick={() => handleSaveChanges('Homepage Layout')} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -203,46 +545,95 @@ export default function SettingsPage() {
               <CardDescription>Configure automated emails sent to participants and administrators.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Registration Confirmation</Label>
-                  <p className="text-sm text-muted-foreground">Send confirmation email when someone registers</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendRegistrationConfirmation"
+                      checked={formData.sendRegistrationConfirmation}
+                      onChange={(e) => handleSwitchChange('sendRegistrationConfirmation', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendRegistrationConfirmation" className="text-base cursor-pointer">Registration Confirmation</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send confirmation email when someone registers</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Donation Receipt</Label>
-                  <p className="text-sm text-muted-foreground">Send receipt email for donations</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendDonationReceipt"
+                      checked={formData.sendDonationReceipt}
+                      onChange={(e) => handleSwitchChange('sendDonationReceipt', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendDonationReceipt" className="text-base cursor-pointer">Donation Receipt</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send receipt email for donations</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Event Reminders</Label>
-                  <p className="text-sm text-muted-foreground">Send reminder emails before the event</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendEventReminders"
+                      checked={formData.sendEventReminders}
+                      onChange={(e) => handleSwitchChange('sendEventReminders', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendEventReminders" className="text-base cursor-pointer">Event Reminders</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send reminder emails before the event</p>
                 </div>
-                <Switch defaultChecked />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Admin Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Notify admins of new registrations and donations</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendAdminNotifications"
+                      checked={formData.sendAdminNotifications}
+                      onChange={(e) => handleSwitchChange('sendAdminNotifications', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendAdminNotifications" className="text-base cursor-pointer">Admin Notifications</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Notify admins of new registrations and donations</p>
                 </div>
-                <Switch defaultChecked />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notification-email">Notification Email</Label>
-                <Input id="notification-email" type="email" defaultValue="admin@milesforhope.org" />
-                <p className="text-sm text-muted-foreground">Admin notifications will be sent to this email</p>
+                {formData.sendAdminNotifications && (
+                  <div className="ml-4 w-72">
+                    <Input 
+                      id="notificationEmail" 
+                      type="email" 
+                      value={formData.notificationEmail} 
+                      onChange={handleInputChange}
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                      title="Please enter a valid email address (e.g., example@domain.com)"
+                      placeholder="Notification email"
+                      required
+                      className={errors.notificationEmail ? "border-red-500" : ""}
+                    />
+                    {errors.notificationEmail && (
+                      <p className="text-sm text-red-500 mt-1">{errors.notificationEmail}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">
-                <Button>Save Changes</Button>
+                <Button 
+                  onClick={() => handleSaveChanges('Notifications')} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </CardContent>
           </Card>

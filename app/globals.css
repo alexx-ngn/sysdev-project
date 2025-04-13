@@ -90,6 +90,9 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
   .bg-pastel-blue {
     background-color: hsl(var(--pastel-blue));
   }
