@@ -71,8 +71,10 @@ export default function SettingsPage() {
   const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     await handleFileUpload(
       e,
-      (url) => {
-        setFormData(prev => ({ ...prev, favicon: url }))
+      async (url) => {
+        const updatedSettings = { ...formData, favicon: url }
+        setFormData(updatedSettings)
+        await updateSettings({ favicon: url })
         toast.success('Favicon uploaded successfully')
       },
       (error) => {

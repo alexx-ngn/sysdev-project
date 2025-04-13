@@ -24,9 +24,22 @@ export function WebsiteSettings() {
 
     // Update favicon if available
     if (settings.favicon) {
+      // Update main favicon
       const favicon = document.querySelector('link[rel="icon"]')
       if (favicon) {
         favicon.setAttribute('href', settings.favicon)
+      }
+
+      // Update Apple touch icon
+      const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]')
+      if (appleTouchIcon) {
+        appleTouchIcon.setAttribute('href', settings.favicon)
+      }
+
+      // Update shortcut icon
+      const shortcutIcon = document.querySelector('link[rel="shortcut icon"]')
+      if (shortcutIcon) {
+        shortcutIcon.setAttribute('href', settings.favicon)
       }
     }
 
