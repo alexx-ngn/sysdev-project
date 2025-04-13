@@ -41,7 +41,7 @@ export default function ContactPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>{t('contact.form.title')}</CardTitle>
-                    <CardDescription>{t('contact.form.description')}</CardDescription>
+                    <CardDescription>{t('contact.description')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form className="space-y-4">
@@ -71,7 +71,7 @@ export default function ContactPage() {
                         type="submit" 
                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                       >
-                        {t('contact.send')}
+                        {t('contact.form.submit')}
                       </Button>
                     </form>
                   </CardContent>
@@ -81,29 +81,29 @@ export default function ContactPage() {
               <div className="space-y-8">
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('contact.info.title')}</CardTitle>
-                    <CardDescription>{t('contact.info.description')}</CardDescription>
+                    <CardTitle>{t('contact.getInTouch')}</CardTitle>
+                    <CardDescription>{t('contact.description')}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-4">
                       <Mail className="h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-medium">{t('contact.info.email')}</p>
-                        <p className="text-muted-foreground">{settings.contactEmail}</p>
+                        <p className="font-medium">{t('contact.email.title')}</p>
+                        <p className="text-muted-foreground">{settings.contactEmail || t('contact.email.value')}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
                       <Phone className="h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-medium">{t('contact.info.phone')}</p>
-                        <p className="text-muted-foreground">{settings.contactPhone}</p>
+                        <p className="font-medium">{t('contact.phone.title')}</p>
+                        <p className="text-muted-foreground">{settings.contactPhone || t('contact.phone.value')}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
                       <MapPin className="h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-medium">{t('contact.info.address')}</p>
-                        <p className="text-muted-foreground">{settings.address}</p>
+                        <p className="font-medium">{t('contact.address.title')}</p>
+                        <p className="text-muted-foreground">{settings.address || `${t('contact.address.line1')}, ${t('contact.address.line2')}`}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -129,14 +129,6 @@ export default function ContactPage() {
                           <Link href={settings.twitter}>
                             <Twitter className="h-5 w-5" />
                             <span className="sr-only">{t('contact.social.twitter')}</span>
-                          </Link>
-                        </Button>
-                      )}
-                      {settings.instagram && (
-                        <Button variant="outline" size="icon" asChild>
-                          <Link href={settings.instagram}>
-                            <Instagram className="h-5 w-5" />
-                            <span className="sr-only">{t('contact.social.instagram')}</span>
                           </Link>
                         </Button>
                       )}
