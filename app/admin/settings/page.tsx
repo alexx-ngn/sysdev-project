@@ -122,6 +122,16 @@ export default function SettingsPage() {
       newErrors.contactPhone = 'Please enter a valid phone number in the format (XXX) XXX-XXXX'
     }
 
+    // Validate admin email
+    if (!validateEmail(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid admin email address'
+    }
+
+    // Validate notification email if notifications are enabled
+    if (formData.sendAdminNotifications && !validateEmail(formData.notificationEmail)) {
+      newErrors.notificationEmail = 'Please enter a valid notification email address'
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       toast.error('Please fix the validation errors before saving', {
@@ -171,11 +181,11 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
+        <TabsList className="flex w-full overflow-x-auto space-x-2 p-1">
+          <TabsTrigger value="general" className="shrink-0">General</TabsTrigger>
+          <TabsTrigger value="appearance" className="shrink-0">Appearance</TabsTrigger>
+          <TabsTrigger value="notifications" className="shrink-0">Notifications</TabsTrigger>
+          <TabsTrigger value="users" className="shrink-0">Users</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="space-y-4">
           <Card>
@@ -203,7 +213,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Label htmlFor="contactEmail">Admin Email</Label>
                 <Input 
                   id="contactEmail" 
                   type="email" 
@@ -219,7 +229,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-red-500">{errors.contactEmail}</p>
                 )}
                 <p className="text-sm text-muted-foreground">
-                  Enter a valid email address
+                  This email will be used for admin communications
                 </p>
               </div>
 
@@ -453,48 +463,68 @@ export default function SettingsPage() {
               <CardDescription>Configure which sections appear on your homepage.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Hero Section</Label>
-                  <p className="text-sm text-muted-foreground">Main banner at the top of the homepage</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showHeroSection"
+                      checked={formData.showHeroSection}
+                      onChange={(e) => handleSwitchChange('showHeroSection', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showHeroSection" className="text-base cursor-pointer">Hero Section</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Main banner at the top of the homepage</p>
                 </div>
-                <Switch 
-                  checked={formData.showHeroSection} 
-                  onCheckedChange={(checked) => handleSwitchChange('showHeroSection', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Featured Sections</Label>
-                  <p className="text-sm text-muted-foreground">Cards highlighting key areas of the site</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showFeaturedSections"
+                      checked={formData.showFeaturedSections}
+                      onChange={(e) => handleSwitchChange('showFeaturedSections', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showFeaturedSections" className="text-base cursor-pointer">Featured Sections</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Cards highlighting key areas of the site</p>
                 </div>
-                <Switch 
-                  checked={formData.showFeaturedSections} 
-                  onCheckedChange={(checked) => handleSwitchChange('showFeaturedSections', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Registration CTA</Label>
-                  <p className="text-sm text-muted-foreground">Call to action for event registration</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showRegistrationCTA"
+                      checked={formData.showRegistrationCTA}
+                      onChange={(e) => handleSwitchChange('showRegistrationCTA', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showRegistrationCTA" className="text-base cursor-pointer">Registration CTA</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Call to action for event registration</p>
                 </div>
-                <Switch 
-                  checked={formData.showRegistrationCTA} 
-                  onCheckedChange={(checked) => handleSwitchChange('showRegistrationCTA', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Sponsors Highlight</Label>
-                  <p className="text-sm text-muted-foreground">Showcase of event sponsors</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="showSponsorsHighlight"
+                      checked={formData.showSponsorsHighlight}
+                      onChange={(e) => handleSwitchChange('showSponsorsHighlight', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="showSponsorsHighlight" className="text-base cursor-pointer">Sponsors Highlight</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Showcase of event sponsors</p>
                 </div>
-                <Switch 
-                  checked={formData.showSponsorsHighlight} 
-                  onCheckedChange={(checked) => handleSwitchChange('showSponsorsHighlight', checked)} 
-                />
               </div>
 
               <div className="flex justify-end">
@@ -515,59 +545,86 @@ export default function SettingsPage() {
               <CardDescription>Configure automated emails sent to participants and administrators.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Registration Confirmation</Label>
-                  <p className="text-sm text-muted-foreground">Send confirmation email when someone registers</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendRegistrationConfirmation"
+                      checked={formData.sendRegistrationConfirmation}
+                      onChange={(e) => handleSwitchChange('sendRegistrationConfirmation', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendRegistrationConfirmation" className="text-base cursor-pointer">Registration Confirmation</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send confirmation email when someone registers</p>
                 </div>
-                <Switch 
-                  checked={formData.sendRegistrationConfirmation} 
-                  onCheckedChange={(checked) => handleSwitchChange('sendRegistrationConfirmation', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Donation Receipt</Label>
-                  <p className="text-sm text-muted-foreground">Send receipt email for donations</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendDonationReceipt"
+                      checked={formData.sendDonationReceipt}
+                      onChange={(e) => handleSwitchChange('sendDonationReceipt', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendDonationReceipt" className="text-base cursor-pointer">Donation Receipt</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send receipt email for donations</p>
                 </div>
-                <Switch 
-                  checked={formData.sendDonationReceipt} 
-                  onCheckedChange={(checked) => handleSwitchChange('sendDonationReceipt', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Event Reminders</Label>
-                  <p className="text-sm text-muted-foreground">Send reminder emails before the event</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendEventReminders"
+                      checked={formData.sendEventReminders}
+                      onChange={(e) => handleSwitchChange('sendEventReminders', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendEventReminders" className="text-base cursor-pointer">Event Reminders</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Send reminder emails before the event</p>
                 </div>
-                <Switch 
-                  checked={formData.sendEventReminders} 
-                  onCheckedChange={(checked) => handleSwitchChange('sendEventReminders', checked)} 
-                />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
                 <div className="space-y-0.5">
-                  <Label>Admin Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Notify admins of new registrations and donations</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="sendAdminNotifications"
+                      checked={formData.sendAdminNotifications}
+                      onChange={(e) => handleSwitchChange('sendAdminNotifications', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="sendAdminNotifications" className="text-base cursor-pointer">Admin Notifications</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">Notify admins of new registrations and donations</p>
                 </div>
-                <Switch 
-                  checked={formData.sendAdminNotifications} 
-                  onCheckedChange={(checked) => handleSwitchChange('sendAdminNotifications', checked)} 
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notificationEmail">Notification Email</Label>
-                <Input 
-                  id="notificationEmail" 
-                  type="email" 
-                  value={formData.notificationEmail} 
-                  onChange={handleInputChange} 
-                />
-                <p className="text-sm text-muted-foreground">Admin notifications will be sent to this email</p>
+                {formData.sendAdminNotifications && (
+                  <div className="ml-4 w-72">
+                    <Input 
+                      id="notificationEmail" 
+                      type="email" 
+                      value={formData.notificationEmail} 
+                      onChange={handleInputChange}
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                      title="Please enter a valid email address (e.g., example@domain.com)"
+                      placeholder="Notification email"
+                      required
+                      className={errors.notificationEmail ? "border-red-500" : ""}
+                    />
+                    {errors.notificationEmail && (
+                      <p className="text-sm text-red-500 mt-1">{errors.notificationEmail}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">
