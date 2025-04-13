@@ -55,8 +55,10 @@ export default function SettingsPage() {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     await handleFileUpload(
       e,
-      (url) => {
-        setFormData(prev => ({ ...prev, logo: url }))
+      async (url) => {
+        const updatedSettings = { ...formData, logo: url }
+        setFormData(updatedSettings)
+        await updateSettings({ logo: url })
         toast.success('Logo uploaded successfully')
       },
       (error) => {

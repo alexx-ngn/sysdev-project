@@ -1,13 +1,25 @@
 "use client";
 
-import { Navbar } from "@/components/navbar";
 import { useLanguage } from "@/app/context/language-context";
+import { WebsiteSettings } from "@/app/components/website-settings";
+import { Header } from "@/app/components/header";
+import { Footer } from "@/app/components/footer";
+import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Building, Award, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useSettings } from "@/app/context/settings-context";
 import { useState } from "react";
+
+type Sponsor = {
+  id: string;
+  name: string;
+  description: string;
+  website: string;
+  logo: string;
+  tier: 'platinum' | 'gold' | 'silver';
+};
 
 export default function SponsorsPage() {
   const { t } = useLanguage();
@@ -16,8 +28,10 @@ export default function SponsorsPage() {
   const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
+    <div className="flex flex-col min-h-screen">
+      <WebsiteSettings />
+      <Header />
+
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
           <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
@@ -200,71 +214,8 @@ export default function SponsorsPage() {
           </div>
         </section>
       </main>
-      <footer className="w-full border-t bg-background">
-        <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-pink-500" />
-                <span className="text-lg font-bold">{t('footer.milesForHope')}</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {t('footer.description')}
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">{t('footer.quickLinks')}</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.about')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.charityRun')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.faq')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.sponsors')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">{t('footer.resources')}</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.donate')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.register')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('nav.contact')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {t('footer.copyright').replace('{year}', new Date().getFullYear().toString())}
-            </p>
-          </div>
-        </div>
-      </footer>
+
+      <Footer />
     </div>
   );
 }

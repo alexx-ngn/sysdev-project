@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
 import { useLanguage } from "@/app/context/language-context"
+import { WebsiteSettings } from "@/app/components/website-settings"
+import { Header } from "@/app/components/header"
+import { Footer } from "@/app/components/footer"
 
 export default function RunPage() {
   const { t } = useLanguage();
   
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <WebsiteSettings />
+      <Header />
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
@@ -265,71 +269,7 @@ export default function RunPage() {
         </section>
       </main>
 
-      <footer className="w-full border-t bg-background">
-        <div className="container max-w-[1400px] mx-auto flex flex-col gap-6 py-8 md:py-12 lg:py-16 px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-pink-500" />
-                <span className="text-lg font-bold">MilesForHope Run</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {t('footer.description')}
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">{t('footer.quickLinks')}</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/about" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.about')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/run" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.charityRun')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.faq')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.sponsors')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">{t('footer.resources')}</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/donate" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.donate')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/register" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.register')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-gray-800">
-                    {t('footer.contact')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} MilesForHope. {t('footer.rightsReserved')}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
