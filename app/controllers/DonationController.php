@@ -19,7 +19,7 @@ class DonationController {
         $donation = new Donation();
         $donation->insert($name, $amount);
 
-        header("Location: /simple-mvc-app/public/donations");
+        header("Location: /ecommerce-project/public/donations");
         exit;
     }
 }
