@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const { settings, updateSettings, isLoading } = useSettings()
   const [formData, setFormData] = useState(settings)
   const [isSaving, setIsSaving] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const logoInputRef = useRef<HTMLInputElement>(null)
   const faviconInputRef = useRef<HTMLInputElement>(null)
 
@@ -31,7 +32,13 @@ export default function SettingsPage() {
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
-    setFormData(prev => ({ ...prev, [id]: value }))
+    if (id === 'contactPhone') {
+      // Format phone number as user types
+      const formatted = formatPhoneNumber(value)
+      setFormData(prev => ({ ...prev, [id]: formatted }))
+    } else {
+      setFormData(prev => ({ ...prev, [id]: value }))
+    }
   }
 
   // Handle switch changes
@@ -72,14 +79,81 @@ export default function SettingsPage() {
     )
   }
 
+  // Validation functions
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    return emailRegex.test(email)
+  }
+
+  const validatePhone = (phone: string) => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '')
+    // Check if it's exactly 10 digits
+    return digits.length === 10
+  }
+
+  // Format phone number as (XXX) XXX-XXXX
+  const formatPhoneNumber = (phone: string) => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '')
+    // Format as (XXX) XXX-XXXX
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+  }
+
   // Handle save changes
   const handleSaveChanges = async (section: string) => {
+    // Reset errors
+    setErrors({})
+
+    // Validate email and phone
+    const newErrors: Record<string, string> = {}
+    
+    if (formData.contactEmail && !validateEmail(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid email address'
+    }
+    
+    if (formData.contactPhone && !validatePhone(formData.contactPhone)) {
+      newErrors.contactPhone = 'Please enter a valid phone number in the format (XXX) XXX-XXXX'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      toast.error('Please fix the validation errors before saving', {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+        },
+      })
+      return
+    }
+
     setIsSaving(true)
     try {
       await updateSettings(formData)
-      toast.success(`${section} settings saved successfully`)
+      toast.success(`${section} settings saved successfully`, {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#22c55e',
+          color: 'white',
+          border: 'none',
+        },
+      })
     } catch (error) {
-      toast.error(`Failed to save ${section} settings`)
+      toast.error(`Failed to save ${section} settings`, {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+        },
+      })
     } finally {
       setIsSaving(false)
     }
@@ -130,8 +204,19 @@ export default function SettingsPage() {
                   id="contactEmail" 
                   type="email" 
                   value={formData.contactEmail} 
-                  onChange={handleInputChange} 
+                  onChange={handleInputChange}
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  title="Please enter a valid email address (e.g., example@domain.com)"
+                  placeholder="example@domain.com"
+                  required
+                  className={errors.contactEmail ? "border-red-500" : ""}
                 />
+                {errors.contactEmail && (
+                  <p className="text-sm text-red-500">{errors.contactEmail}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Enter a valid email address
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -140,8 +225,20 @@ export default function SettingsPage() {
                   id="contactPhone" 
                   type="tel" 
                   value={formData.contactPhone} 
-                  onChange={handleInputChange} 
+                  onChange={handleInputChange}
+                  pattern="^\(\d{3}\) \d{3}-\d{4}$"
+                  title="Please enter a valid phone number in the format (XXX) XXX-XXXX"
+                  placeholder="(XXX) XXX-XXXX"
+                  maxLength={14}
+                  required
+                  className={errors.contactPhone ? "border-red-500" : ""}
                 />
+                {errors.contactPhone && (
+                  <p className="text-sm text-red-500">{errors.contactPhone}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Enter a valid phone number in the format (XXX) XXX-XXXX
+                </p>
               </div>
 
               <div className="space-y-2">

@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import type { Metadata } from "next"
 import { LanguageProvider } from "./context/language-context"
 import { SettingsProvider } from "./context/settings-context"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <LanguageProvider>
           <SettingsProvider>
             {children}
+            <Toaster position="top-center" />
           </SettingsProvider>
         </LanguageProvider>
       </body>
