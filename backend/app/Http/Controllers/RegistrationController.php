@@ -1,40 +1,43 @@
 <?php
-require_once __DIR__ . '/../Models/Registration.php';
 
-class RegistrationController {
-    public function index() {
-        $registration = new Registration();
-        $registrations = $registration->getAll();
-        require_once __DIR__ . '/../views/registrations/index.php';
+namespace App\Http\Controllers;
+
+use App\Models\Registration;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class RegistrationController extends Controller
+{
+    public function index()
+    {
+        $registrations = Registration::all();
+        return view('registrations.index', compact('registrations'));
     }
 
-    public function create() {
-        require_once __DIR__ . '/../views/registrations/create.php';
+    public function create()
+    {
+        return view('registrations.create');
     }
 
-    public function store() {
-        session_start(); 
-    
-        $name = $_POST['name'] ?? '';
-        $email = $_POST['email'] ?? '';
-    
-        if (!ctype_alpha(str_replace(' ', '', $name))) {
-            $_SESSION['error'] = "Invalid name. Please enter a valid name containing only letters and spaces.";
-            header("Location: /ecommerce-project/public/registrations/create");
-            exit;
-        }
-    
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['error'] = "Invalid email. Please enter a valid email address.";
-            header("Location: /ecommerce-project/public/registrations/create");
-            exit;
-        }
-    
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|regex:/^[\pL\s]+$/u',
+            'email' => 'required|email',
+        ]);
 
-        $registration = new Registration();
-        $registration->insert($name, $email);
-    
-        header("Location: /ecommerce-project/public/registrations");
-        exit;
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        Registration::create([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        return redirect()->route('registrations.index')
+            ->with('success', 'Registration created successfully.');
     }
 }

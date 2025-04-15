@@ -1,23 +1,12 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
 
-class Donation {
-    private $db;
+namespace App\Models;
 
-    public function __construct() {
-        $this->db = Database::connect();
-    }
+use Illuminate\Database\Eloquent\Model;
 
-    public function getAll() {
-        $stmt = $this->db->query("SELECT * FROM donations");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function insert($name, $amount) {
-        $stmt = $this->db->prepare("INSERT INTO donations (name, amount) VALUES (:name, :amount)");
-        $stmt->execute([
-            ':name' => $name,
-            ':amount' => $amount
-        ]);
-    }
+class Donation extends Model
+{
+    protected $fillable = ['name', 'amount'];
+    
+    protected $table = 'donations';
 }
