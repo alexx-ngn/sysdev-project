@@ -16,7 +16,7 @@ use App\Http\Controllers\DonationController;
 */
 
 Route::get('/', function () {
-    return view('home');
+    return redirect('http://localhost:3000');
 });
 
 // Registration Routes
