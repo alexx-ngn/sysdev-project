@@ -3,7 +3,7 @@
 <head><title>All Donations</title></head>
 <body>
 <h1>All Donations</h1>
-<a href="/ecommerce-project/public/donations/create">Add Donation</a>
+<a href="/ecommerce-project/backend/public/donations/create">Add Donation</a>
 
 <ul>
     <?php foreach ($donations as $don): ?>

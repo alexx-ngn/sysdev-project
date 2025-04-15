@@ -11,7 +11,7 @@ if (isset($_SESSION['error'])) {
 <head><title>Add Registration</title></head>
 <body>
 <h1>Add Registration</h1>
-<form method="POST" action="/ecommerce-project/public/registrations/store">
+<form method="POST" action="/ecommerce-project/backend/public/registrations/store">
     Name: <input type="text" name="name" required><br>
     Email: <input type="email" name="email" required><br>
     <button type="submit">Register</button>
