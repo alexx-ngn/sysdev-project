@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Donation.php';
+require_once __DIR__ . '/../Models/Donation.php';
 
 class DonationController {
     public function index() {

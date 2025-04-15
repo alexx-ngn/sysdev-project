@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Registration.php';
+require_once __DIR__ . '/../Models/Registration.php';
 
 class RegistrationController {
     public function index() {
