@@ -65,6 +65,7 @@ Set up the database and application key:
 cd backend
 php artisan migrate
 php artisan key:generate
+```
 
 ## Start the Application
 
@@ -76,7 +77,6 @@ You can start the application using the following command:
 cd frontend
 npm run dev
 ```
-
 
 ### Backend
 
