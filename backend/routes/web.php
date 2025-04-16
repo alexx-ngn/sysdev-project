@@ -15,12 +15,7 @@ use App\Http\Controllers\DonationController;
 |
 */
 
+// Only keep this if you really need to redirect from the API domain
 Route::get('/', function () {
-    return redirect('http://localhost:3000');
+    return redirect(env('FRONTEND_URL', 'http://localhost:3000'));
 });
-
-// Registration Routes
-Route::resource('registrations', RegistrationController::class);
-
-// Donation Routes
-Route::resource('donations', DonationController::class);
