@@ -4,17 +4,22 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
     public function up(): void {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id('RegistrationID');
-            $table->unsignedBigInteger('UserID');
-            $table->foreign('UserID')->references('UserID')->on('users')->onDelete('cascade');
-            $table->date('RegistrationDate');
+            $table->foreignId('ParticipantID')->constrained('participants', 'ParticipantID');
+            $table->timestamp('RegistrationDate');
             $table->string('RegistrationStatus');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void {
         Schema::dropIfExists('registrations');
     }

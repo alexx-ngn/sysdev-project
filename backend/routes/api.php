@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DonationController;
-
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,5 +17,10 @@ use App\Http\Controllers\DonationController;
 |
 */
 
-Route::resource('registrations', RegistrationController::class);
+// Registration routes
+Route::post('registrations', [RegistrationController::class, 'store']);
+Route::get('registrations', [RegistrationController::class, 'index']);
+Route::get('registrations/{id}', [RegistrationController::class, 'show']);
+
+// Other routes
 Route::resource('donations', DonationController::class);
