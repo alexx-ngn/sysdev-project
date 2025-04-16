@@ -7,10 +7,11 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('donations', function (Blueprint $table) {
             $table->id('DonationID');
-            $table->unsignedBigInteger('UserID');
-            $table->foreign('UserID')->references('UserID')->on('users')->onDelete('cascade');
+            $table->string('name');
+            $table->string('email');
             $table->decimal('Amount', 8, 2);
-            $table->date('DonationDate');
+            $table->timestamp('DonationDate');
+            $table->string('type');
             $table->string('ConfirmationID');
             $table->timestamps();
         });

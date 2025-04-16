@@ -1,10 +1,64 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, Search, Filter, ChevronDown } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface Donation {
+  DonationID: number;
+  name: string;
+  email: string;
+  Amount: number;
+  DonationDate: string;
+  type: string;
+}
 
 export default function DonationsPage() {
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/donations');
+        if (!response.ok) {
+          throw new Error('Failed to fetch donations');
+        }
+        const data = await response.json();
+        setDonations(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonations();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-lg">Loading donations...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-lg text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
+  const totalDonations = donations.reduce((sum, donation) => sum + (donation.Amount || 0), 0);
+  const averageDonation = donations.length > 0 ? totalDonations / donations.length : 0;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -69,7 +123,7 @@ export default function DonationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Donation History</CardTitle>
-          <CardDescription>A total of 83 donations have been received.</CardDescription>
+          <CardDescription>A total of {donations.length} donations have been received.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
@@ -86,101 +140,26 @@ export default function DonationsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-md border">
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Donor</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  {
-                    donor: "Robert Wilson",
-                    type: "One-time donation",
-                    amount: "$100.00",
-                    date: "Sep 24, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Amanda Lee",
-                    type: "One-time donation",
-                    amount: "$50.00",
-                    date: "Sep 24, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Global Health Inc.",
-                    type: "Corporate sponsorship",
-                    amount: "$2,500.00",
-                    date: "Sep 23, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Thomas Brown",
-                    type: "One-time donation",
-                    amount: "$25.00",
-                    date: "Sep 23, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Metro Bank",
-                    type: "Corporate sponsorship",
-                    amount: "$5,000.00",
-                    date: "Sep 22, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Jennifer Garcia",
-                    type: "One-time donation",
-                    amount: "$75.00",
-                    date: "Sep 22, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "City News",
-                    type: "Corporate sponsorship",
-                    amount: "$1,000.00",
-                    date: "Sep 21, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "William Davis",
-                    type: "One-time donation",
-                    amount: "$50.00",
-                    date: "Sep 21, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Elizabeth Smith",
-                    type: "One-time donation",
-                    amount: "$100.00",
-                    date: "Sep 20, 2023",
-                    status: "Completed",
-                  },
-                  {
-                    donor: "Daniel Johnson",
-                    type: "One-time donation",
-                    amount: "$25.00",
-                    date: "Sep 20, 2023",
-                    status: "Completed",
-                  },
-                ].map((donation, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{donation.donor}</TableCell>
+                {donations.map((donation) => (
+                  <TableRow key={donation.DonationID}>
+                    <TableCell className="font-medium">{donation.name}</TableCell>
+                    <TableCell>{donation.email}</TableCell>
                     <TableCell>{donation.type}</TableCell>
-                    <TableCell>{donation.amount}</TableCell>
-                    <TableCell>{donation.date}</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                        {donation.status}
-                      </span>
-                    </TableCell>
+                    <TableCell>${donation.Amount?.toFixed(2) || '0.00'}</TableCell>
+                    <TableCell>{new Date(donation.DonationDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">
                         View
@@ -191,12 +170,21 @@ export default function DonationsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {donations.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-4">
+                      No donations found
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
-            <div className="text-sm text-muted-foreground">Showing 1-10 of 83 donations</div>
+            <div className="text-sm text-muted-foreground">
+              Showing 1-{donations.length} of {donations.length} donations
+            </div>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" disabled>
                 Previous
@@ -217,10 +205,11 @@ export default function DonationsPage() {
         <CardContent>
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Donations Over Time</p>
-              <div className="h-[200px] bg-gray-100 rounded-md flex items-center justify-center">
-                <p className="text-sm text-muted-foreground">Chart Placeholder</p>
-              </div>
+              <p className="text-sm font-medium text-muted-foreground">Total Donations</p>
+              <div className="text-3xl font-bold">${totalDonations.toFixed(2)}</div>
+              <p className="text-sm text-muted-foreground">
+                Average donation: ${averageDonation.toFixed(2)}
+              </p>
             </div>
 
             <div className="space-y-2">

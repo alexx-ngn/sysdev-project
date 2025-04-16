@@ -1,8 +1,57 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, DollarSign, Calendar, Award } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface Registration {
+  RegistrationID: number;
+  RegistrationDate: string;
+  RegistrationStatus: string;
+  participant: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+  };
+}
 
 export default function AdminDashboard() {
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/registrations');
+        if (!response.ok) {
+          throw new Error('Failed to fetch registrations');
+        }
+        const data = await response.json();
+        setRegistrations(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRegistrations();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const recentRegistrations = registrations
+    .sort((a, b) => new Date(b.RegistrationDate).getTime() - new Date(a.RegistrationDate).getTime())
+    .slice(0, 3);
+
   return (
     <div className="space-y-6">
       <div>
@@ -19,8 +68,8 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">245</div>
-            <p className="text-xs text-muted-foreground">+12% from last week</p>
+            <div className="text-2xl font-bold">{registrations.length}</div>
+            <p className="text-xs text-muted-foreground">+{Math.floor(registrations.length * 0.12)}% from last week</p>
           </CardContent>
         </Card>
 
@@ -37,23 +86,23 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sponsors</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15</div>
-            <p className="text-xs text-muted-foreground">+2 new this month</p>
+            <div className="text-2xl font-bold">3</div>
+            <p className="text-xs text-muted-foreground">Next event in 5 days</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Days Until Event</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Active Sponsors</CardTitle>
+            <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">October 15, 2023</p>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">+2 new this month</p>
           </CardContent>
         </Card>
       </div>
@@ -72,41 +121,19 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Sarah Johnson</p>
-                    <p className="text-sm text-muted-foreground">sarah.johnson@example.com</p>
+                {recentRegistrations.map((registration) => (
+                  <div key={registration.RegistrationID} className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {registration.participant.FirstName} {registration.participant.LastName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{registration.participant.Email}</p>
+                    </div>
+                    <div className="ml-auto font-medium">
+                      {new Date(registration.RegistrationDate).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="ml-auto font-medium">Today, 10:45 AM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Michael Chen</p>
-                    <p className="text-sm text-muted-foreground">michael.chen@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">Today, 9:23 AM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Emily Rodriguez</p>
-                    <p className="text-sm text-muted-foreground">emily.rodriguez@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">Yesterday, 4:52 PM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">David Kim</p>
-                    <p className="text-sm text-muted-foreground">david.kim@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">Yesterday, 2:15 PM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Jessica Taylor</p>
-                    <p className="text-sm text-muted-foreground">jessica.taylor@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">Sep 23, 2023</div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -121,38 +148,24 @@ export default function AdminDashboard() {
               <div className="space-y-8">
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Robert Wilson</p>
-                    <p className="text-sm text-muted-foreground">One-time donation</p>
+                    <p className="text-sm font-medium leading-none">John Smith</p>
+                    <p className="text-sm text-muted-foreground">john.smith@example.com</p>
                   </div>
-                  <div className="ml-auto font-medium">$100.00</div>
+                  <div className="ml-auto font-medium">$500</div>
                 </div>
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Amanda Lee</p>
-                    <p className="text-sm text-muted-foreground">One-time donation</p>
+                    <p className="text-sm font-medium leading-none">Sarah Johnson</p>
+                    <p className="text-sm text-muted-foreground">sarah.johnson@example.com</p>
                   </div>
-                  <div className="ml-auto font-medium">$50.00</div>
+                  <div className="ml-auto font-medium">$250</div>
                 </div>
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Global Health Inc.</p>
-                    <p className="text-sm text-muted-foreground">Corporate sponsorship</p>
+                    <p className="text-sm font-medium leading-none">Michael Chen</p>
+                    <p className="text-sm text-muted-foreground">michael.chen@example.com</p>
                   </div>
-                  <div className="ml-auto font-medium">$2,500.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Thomas Brown</p>
-                    <p className="text-sm text-muted-foreground">One-time donation</p>
-                  </div>
-                  <div className="ml-auto font-medium">$25.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Metro Bank</p>
-                    <p className="text-sm text-muted-foreground">Corporate sponsorship</p>
-                  </div>
-                  <div className="ml-auto font-medium">$5,000.00</div>
+                  <div className="ml-auto font-medium">$100</div>
                 </div>
               </div>
             </CardContent>
@@ -162,44 +175,30 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Activity Log</CardTitle>
-              <CardDescription>Recent activity in the admin panel.</CardDescription>
+              <CardDescription>Recent activities in the system.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-sm text-muted-foreground">Updated event details</p>
+                    <p className="text-sm font-medium leading-none">New registration</p>
+                    <p className="text-sm text-muted-foreground">Sarah Johnson registered for the event</p>
                   </div>
-                  <div className="ml-auto font-medium">Today, 11:32 AM</div>
+                  <div className="ml-auto font-medium">Today, 10:45 AM</div>
                 </div>
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-sm text-muted-foreground">Added new sponsor: Fresh Foods</p>
+                    <p className="text-sm font-medium leading-none">Donation received</p>
+                    <p className="text-sm text-muted-foreground">John Smith donated $500</p>
                   </div>
-                  <div className="ml-auto font-medium">Today, 9:15 AM</div>
+                  <div className="ml-auto font-medium">Today, 9:23 AM</div>
                 </div>
                 <div className="flex items-center">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-sm text-muted-foreground">Exported registration data</p>
+                    <p className="text-sm font-medium leading-none">New sponsor</p>
+                    <p className="text-sm text-muted-foreground">TechCorp joined as a sponsor</p>
                   </div>
-                  <div className="ml-auto font-medium">Yesterday, 5:42 PM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-sm text-muted-foreground">Updated FAQ page</p>
-                  </div>
-                  <div className="ml-auto font-medium">Yesterday, 3:20 PM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-sm text-muted-foreground">Logged in</p>
-                  </div>
-                  <div className="ml-auto font-medium">Yesterday, 3:12 PM</div>
+                  <div className="ml-auto font-medium">Yesterday, 4:52 PM</div>
                 </div>
               </div>
             </CardContent>

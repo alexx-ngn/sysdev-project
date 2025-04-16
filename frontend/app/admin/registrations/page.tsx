@@ -1,10 +1,56 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, Search, Filter, ChevronDown } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface Registration {
+  RegistrationID: number;
+  RegistrationDate: string;
+  RegistrationStatus: string;
+  participant: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+    PhoneNumber: string;
+  };
+}
 
 export default function RegistrationsPage() {
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/registrations');
+        if (!response.ok) {
+          throw new Error('Failed to fetch registrations');
+        }
+        const data = await response.json();
+        setRegistrations(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRegistrations();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -24,7 +70,7 @@ export default function RegistrationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Registered Participants</CardTitle>
-          <CardDescription>A total of 245 participants have registered for the event.</CardDescription>
+          <CardDescription>A total of {registrations.length} participants have registered for the event.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
@@ -41,7 +87,7 @@ export default function RegistrationsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-md border">
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -54,86 +100,21 @@ export default function RegistrationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  {
-                    name: "Sarah Johnson",
-                    email: "sarah.johnson@example.com",
-                    phone: "(555) 123-4567",
-                    date: "Sep 24, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Michael Chen",
-                    email: "michael.chen@example.com",
-                    phone: "(555) 234-5678",
-                    date: "Sep 24, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Emily Rodriguez",
-                    email: "emily.rodriguez@example.com",
-                    phone: "(555) 345-6789",
-                    date: "Sep 23, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "David Kim",
-                    email: "david.kim@example.com",
-                    phone: "(555) 456-7890",
-                    date: "Sep 23, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Jessica Taylor",
-                    email: "jessica.taylor@example.com",
-                    phone: "(555) 567-8901",
-                    date: "Sep 23, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Robert Wilson",
-                    email: "robert.wilson@example.com",
-                    phone: "(555) 678-9012",
-                    date: "Sep 22, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Amanda Lee",
-                    email: "amanda.lee@example.com",
-                    phone: "(555) 789-0123",
-                    date: "Sep 22, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Thomas Brown",
-                    email: "thomas.brown@example.com",
-                    phone: "(555) 890-1234",
-                    date: "Sep 21, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "Sophia Martinez",
-                    email: "sophia.martinez@example.com",
-                    phone: "(555) 901-2345",
-                    date: "Sep 21, 2023",
-                    status: "Confirmed",
-                  },
-                  {
-                    name: "James Anderson",
-                    email: "james.anderson@example.com",
-                    phone: "(555) 012-3456",
-                    date: "Sep 20, 2023",
-                    status: "Confirmed",
-                  },
-                ].map((participant, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{participant.name}</TableCell>
-                    <TableCell>{participant.email}</TableCell>
-                    <TableCell>{participant.phone}</TableCell>
-                    <TableCell>{participant.date}</TableCell>
+                {registrations.map((registration) => (
+                  <TableRow key={registration.RegistrationID}>
+                    <TableCell className="font-medium">
+                      {registration.participant.FirstName} {registration.participant.LastName}
+                    </TableCell>
+                    <TableCell>{registration.participant.Email}</TableCell>
+                    <TableCell>{registration.participant.PhoneNumber}</TableCell>
+                    <TableCell>{new Date(registration.RegistrationDate).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                        {participant.status}
+                      <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                        registration.RegistrationStatus === 'pending' 
+                          ? 'bg-yellow-50 text-yellow-700 ring-yellow-600/20' 
+                          : 'bg-green-50 text-green-700 ring-green-600/20'
+                      } ring-1 ring-inset`}>
+                        {registration.RegistrationStatus}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -151,7 +132,9 @@ export default function RegistrationsPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
-            <div className="text-sm text-muted-foreground">Showing 1-10 of 245 participants</div>
+            <div className="text-sm text-muted-foreground">
+              Showing 1-{registrations.length} of {registrations.length} participants
+            </div>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" disabled>
                 Previous
