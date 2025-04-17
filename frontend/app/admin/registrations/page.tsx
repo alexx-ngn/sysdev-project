@@ -6,6 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, Search, Filter, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
 interface Registration {
   RegistrationID: number;
@@ -19,10 +28,26 @@ interface Registration {
   };
 }
 
+interface RegistrationFormData {
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  PhoneNumber: string;
+  RegistrationStatus: string;
+}
+
 export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState<RegistrationFormData>({
+    FirstName: '',
+    LastName: '',
+    Email: '',
+    PhoneNumber: '',
+    RegistrationStatus: 'pending'
+  });
 
   useEffect(() => {
     const fetchRegistrations = async () => {
@@ -42,6 +67,55 @@ export default function RegistrationsPage() {
 
     fetchRegistrations();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8000/api/registrations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 422) {
+          // Handle validation errors
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, messages]) => `${field}: ${(messages as string[]).join(', ')}`)
+            .join('\n');
+          toast.error(errorMessages);
+          return;
+        }
+        throw new Error(errorData.error || 'Failed to create registration');
+      }
+
+      const newRegistration = await response.json();
+      setRegistrations(prev => [newRegistration, ...prev]);
+      setIsDialogOpen(false);
+      setFormData({
+        FirstName: '',
+        LastName: '',
+        Email: '',
+        PhoneNumber: '',
+        RegistrationStatus: 'pending'
+      });
+      toast.success('Registration added successfully');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to add registration');
+      console.error(err);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -63,7 +137,82 @@ export default function RegistrationsPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button>Add Registration</Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>Add Registration</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Registration</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="FirstName">First Name</Label>
+                    <Input
+                      id="FirstName"
+                      name="FirstName"
+                      value={formData.FirstName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="LastName">Last Name</Label>
+                    <Input
+                      id="LastName"
+                      name="LastName"
+                      value={formData.LastName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="Email">Email</Label>
+                  <Input
+                    id="Email"
+                    name="Email"
+                    type="email"
+                    value={formData.Email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="PhoneNumber">Phone Number</Label>
+                  <Input
+                    id="PhoneNumber"
+                    name="PhoneNumber"
+                    value={formData.PhoneNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="RegistrationStatus">Status</Label>
+                  <select
+                    id="RegistrationStatus"
+                    name="RegistrationStatus"
+                    value={formData.RegistrationStatus}
+                    onChange={handleInputChange}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    required
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Add Registration</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

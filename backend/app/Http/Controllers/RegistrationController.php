@@ -7,6 +7,7 @@ use App\Models\Participant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RegistrationController extends Controller
 {
@@ -18,17 +19,26 @@ class RegistrationController extends Controller
 
     public function store(Request $request)
     {
+        // Validate the request data
         $validator = Validator::make($request->all(), [
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
             'Email' => 'required|email|unique:participants,Email',
-            'PhoneNumber' => 'required|string|max:20',
+            'PhoneNumber' => [
+                'required',
+                'string',
+                'regex:/^(\+1)?\d{10}$/',
+                'unique:participants,PhoneNumber'
+            ],
+            'RegistrationStatus' => 'required|in:pending,confirmed,cancelled'
+        ], [
+            'PhoneNumber.regex' => 'Please enter a valid 10-digit phone number (e.g., 1234567890 or +11234567890)',
+            'PhoneNumber.unique' => 'This phone number is already registered'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
+                'error' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -48,27 +58,19 @@ class RegistrationController extends Controller
             $registration = Registration::create([
                 'ParticipantID' => $participant->ParticipantID,
                 'RegistrationDate' => now(),
-                'RegistrationStatus' => 'pending',
+                'RegistrationStatus' => $request->RegistrationStatus,
             ]);
 
             DB::commit();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Registration created successfully',
-                'data' => [
-                    'participant' => $participant,
-                    'registration' => $registration
-                ]
-            ], 201);
+            // Load the participant relationship
+            $registration->load('participant');
 
+            return response()->json($registration, 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create registration',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error('Registration creation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to create registration'], 500);
         }
     }
 
