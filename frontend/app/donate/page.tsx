@@ -11,9 +11,84 @@ import { useLanguage } from "@/app/context/language-context"
 import { WebsiteSettings } from "@/app/components/website-settings"
 import { Header } from "@/app/components/header"
 import { Footer } from "@/app/components/footer"
+import { useState } from "react"
+import { toast } from "sonner"
 
 export default function DonatePage() {
   const { t } = useLanguage();
+  const [amount, setAmount] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handlePresetAmount = (value: string) => {
+    setAmount(value);
+  };
+
+  const handleCustomAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d+(\.\d{0,2})?$/.test(value)) {
+      setAmount(value);
+    }
+  };
+
+  const handleDonation = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error("Please enter a valid donation amount");
+      return;
+    }
+
+    if (!name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const donationData = {
+        name,
+        email,
+        Amount: parseFloat(amount),
+        DonationDate: new Date().toISOString(),
+        type: 'One-time donation',
+        ConfirmationID: Math.random().toString(36).substring(2, 15)
+      };
+
+      console.log('Sending donation data:', donationData);
+
+      const response = await fetch('http://localhost:8000/api/donations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(donationData),
+      });
+
+      const responseData = await response.json();
+      console.log('Server response:', responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Failed to process donation');
+      }
+
+      toast.success("Thank you for your donation!");
+      setAmount("");
+      setName("");
+      setEmail("");
+    } catch (error) {
+      console.error('Donation error:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -35,24 +110,39 @@ export default function DonatePage() {
             </div>
 
             <div className="mx-auto max-w-5xl">
-              <div className="grid gap-8 md:grid-cols-2 mb-16">
-                <Card className="flex flex-col">
-                  <CardHeader>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-4">
-                      <DollarSign className="h-6 w-6 text-gray-600" />
-                    </div>
-                    <CardTitle>{t('donate.oneTime.title')}</CardTitle>
-                    <CardDescription>{t('donate.oneTime.subtitle')}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    <p className="text-muted-foreground mb-4">
-                      {t('donate.oneTime.description')}
-                    </p>
-                    <div className="grid grid-cols-3 gap-2 mb-4">
-                      <Button variant="outline">$25</Button>
-                      <Button variant="outline">$50</Button>
-                      <Button variant="outline">$100</Button>
-                    </div>
+              <Card className="flex flex-col">
+                <CardHeader>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-4">
+                    <DollarSign className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <CardTitle>{t('donate.oneTime.title')}</CardTitle>
+                  <CardDescription>{t('donate.oneTime.subtitle')}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <p className="text-muted-foreground mb-4">
+                    {t('donate.oneTime.description')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <Button 
+                      variant={amount === "25" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("25")}
+                    >
+                      $25
+                    </Button>
+                    <Button 
+                      variant={amount === "50" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("50")}
+                    >
+                      $50
+                    </Button>
+                    <Button 
+                      variant={amount === "100" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("100")}
+                    >
+                      $100
+                    </Button>
+                  </div>
+                  <div className="space-y-4">
                     <div className="grid gap-2">
                       <label
                         htmlFor="custom-amount"
@@ -62,51 +152,54 @@ export default function DonatePage() {
                       </label>
                       <Input 
                         id="custom-amount" 
-                        type="number" 
+                        type="text"
+                        value={amount}
+                        onChange={handleCustomAmount}
                         placeholder={t('donate.oneTime.enterAmount')} 
-                        min="1" 
                       />
                     </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button className="w-full">{t('donate.oneTime.button')}</Button>
-                  </CardFooter>
-                </Card>
-
-                <Card className="flex flex-col border-primary">
-                  <CardHeader>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 mb-4">
-                      <Award className="h-6 w-6 text-primary" />
+                    <div className="grid gap-2">
+                      <label
+                        htmlFor="name"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Name
+                      </label>
+                      <Input 
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your name"
+                      />
                     </div>
-                    <CardTitle>{t('donate.sponsor.title')}</CardTitle>
-                    <CardDescription>{t('donate.sponsor.subtitle')}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    <p className="text-muted-foreground mb-4">
-                      {t('donate.sponsor.description')}
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center">
-                        <span className="mr-2">•</span>
-                        <span>{t('donate.sponsor.benefit1')}</span>
-                      </li>
-                      <li className="flex items-center">
-                        <span className="mr-2">•</span>
-                        <span>{t('donate.sponsor.benefit2')}</span>
-                      </li>
-                      <li className="flex items-center">
-                        <span className="mr-2">•</span>
-                        <span>{t('donate.sponsor.benefit3')}</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                  <CardFooter>
-                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" asChild>
-                      <Link href="/sponsors">{t('donate.sponsor.button')}</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
+                    <div className="grid gap-2">
+                      <label
+                        htmlFor="email"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Email
+                      </label>
+                      <Input 
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full" 
+                    onClick={handleDonation}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : t('donate.oneTime.button')}
+                  </Button>
+                </CardFooter>
+              </Card>
 
               <div className="border-t pt-12">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.impact.title')}</h2>

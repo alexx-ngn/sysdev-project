@@ -2,9 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\ExampleController;
+use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\AdminAuthController;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,18 +18,12 @@ use App\Http\Controllers\Api\ExampleController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Admin Authentication routes
+Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
-// Example route
-Route::get('/example', [ExampleController::class, 'index']);
+// Registration routes
+Route::get('registrations/confirm/{token}', [RegistrationController::class, 'confirm']);
+Route::apiResource('registrations', RegistrationController::class);
 
-// Task routes
-Route::apiResource('tasks', TaskController::class);
-
-// Category routes
-Route::apiResource('categories', CategoryController::class);
-
-// Nested routes
-Route::get('categories/{category}/tasks', [TaskController::class, 'tasksByCategory']); 
+// Other routes
+Route::resource('donations', DonationController::class);

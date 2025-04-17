@@ -93,7 +93,7 @@ export default function LoginPage() {
                       <Lock className="h-4 w-4" />
                       Password
                     </Label>
-                    <Link href="#" className="text-sm text-primary hover:underline">
+                    <Link href="/admin/forgot-password" replace className="text-sm text-primary hover:underline">
                       Forgot password?
                     </Link>
                   </div>
