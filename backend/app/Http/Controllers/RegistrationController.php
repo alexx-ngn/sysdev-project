@@ -137,4 +137,26 @@ class RegistrationController extends Controller
             return response()->json(['error' => 'Failed to update registration'], 500);
         }
     }
+
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $registration = Registration::findOrFail($id);
+            $participant = $registration->participant;
+
+            // Delete registration first (due to foreign key constraint)
+            $registration->delete();
+            
+            // Delete associated participant
+            $participant->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'Registration deleted successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to delete registration'], 500);
+        }
+    }
 }

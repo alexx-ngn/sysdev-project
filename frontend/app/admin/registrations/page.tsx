@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Download, Search, Filter, ChevronDown, Eye, Pencil } from "lucide-react"
+import { Download, Search, Filter, ChevronDown, Eye, Pencil, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -15,6 +15,16 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface Registration {
   RegistrationID: number;
@@ -176,6 +186,8 @@ export default function RegistrationsPage() {
     PhoneNumber: '',
     RegistrationStatus: 'pending'
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [registrationToDelete, setRegistrationToDelete] = useState<Registration | null>(null);
 
   useEffect(() => {
     const fetchRegistrations = async () => {
@@ -266,7 +278,6 @@ export default function RegistrationsPage() {
     if (!selectedRegistration) return;
 
     try {
-      // Format phone number - remove any non-digit characters except +
       const formattedData = {
         ...data,
         PhoneNumber: data.PhoneNumber.replace(/[^\d+]/g, '')
@@ -303,6 +314,38 @@ export default function RegistrationsPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to update registration');
       console.error(err);
+    }
+  };
+
+  const handleDeleteRegistration = async (registration: Registration) => {
+    setRegistrationToDelete(registration);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!registrationToDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/registrations/${registrationToDelete.RegistrationID}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete registration');
+      }
+
+      setRegistrations(prev => prev.filter(reg => reg.RegistrationID !== registrationToDelete.RegistrationID));
+      toast.success('Registration deleted successfully');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete registration');
+    } finally {
+      setDeleteDialogOpen(false);
+      setRegistrationToDelete(null);
     }
   };
 
@@ -470,8 +513,17 @@ export default function RegistrationsPage() {
                         variant="ghost" 
                         size="sm" 
                         onClick={() => handleEditRegistration(registration)}
+                        className="mr-2"
                       >
                         <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDeleteRegistration(registration)}
+                        className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -537,6 +589,28 @@ export default function RegistrationsPage() {
         onSave={handleSaveRegistration}
         mode={modalMode}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the registration for{' '}
+              {registrationToDelete ? `${registrationToDelete.participant.FirstName} ${registrationToDelete.participant.LastName}` : ''}.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

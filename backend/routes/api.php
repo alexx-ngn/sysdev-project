@@ -22,10 +22,7 @@ use Illuminate\Support\Facades\Log;
 Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
 // Registration routes
-Route::post('/registrations', [RegistrationController::class, 'store']);
-Route::get('/registrations', [RegistrationController::class, 'index']);
-Route::get('/registrations/{id}', [RegistrationController::class, 'show']);
-Route::put('/registrations/{id}', [RegistrationController::class, 'update']);
+Route::apiResource('registrations', RegistrationController::class);
 
 // Other routes
 Route::resource('donations', DonationController::class);
