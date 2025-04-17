@@ -2,15 +2,15 @@
 - Cross-device Support ✅
 - Switching Languages Between French and English ✅
 - Saving User Language Preference ✅
-- Automated Email Confirmation
+- Automated Email Confirmation ✅
 - Admin Login Process
 - Progressive Web App Support
 - Donation Payment Process
-- Registration Process
+- Registration Process ✅
 
 ## Shahzaib
 - Viewing Donations
-- Auto-detect Language Preference
+- Auto-detect Language Preference ✅
 - Exporting Runners Data
 - Exporting Donations Data
 - Password Recovery
