@@ -15,6 +15,7 @@ export function RegistrationForm() {
     LastName: "",
     PhoneNumber: "",
     Email: "",
+    RegistrationStatus: "pending"
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +39,11 @@ export function RegistrationForm() {
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.errors) {
+          // Handle validation errors
+          const errorMessages = Object.values(data.errors).flat().join('\n')
+          throw new Error(errorMessages)
+        }
         throw new Error(data.error || t('register.errorMessage'))
       }
 
@@ -47,6 +53,7 @@ export function RegistrationForm() {
         LastName: "",
         PhoneNumber: "",
         Email: "",
+        RegistrationStatus: "pending"
       })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t('register.errorMessage'))
@@ -97,6 +104,8 @@ export function RegistrationForm() {
           onChange={handleChange}
           required
           disabled={isLoading}
+          pattern="^(\+1)?\d{10}$"
+          title="Please enter a valid 10-digit phone number (e.g., 1234567890 or +11234567890)"
         />
       </div>
       <div>

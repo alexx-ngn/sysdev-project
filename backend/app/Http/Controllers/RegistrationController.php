@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class RegistrationController extends Controller
 {
@@ -54,12 +56,26 @@ class RegistrationController extends Controller
                 'PhoneNumber' => $request->PhoneNumber,
             ]);
 
+            // Generate confirmation token
+            $confirmationToken = Str::random(32);
+
             // Create registration
             $registration = Registration::create([
                 'ParticipantID' => $participant->ParticipantID,
                 'RegistrationDate' => now(),
-                'RegistrationStatus' => $request->RegistrationStatus,
+                'RegistrationStatus' => 'pending', // Always start as pending
+                'confirmation_token' => $confirmationToken,
             ]);
+
+            // Send confirmation email
+            $confirmationUrl = env('FRONTEND_URL', 'http://localhost:3000') . "/registration/confirm/{$confirmationToken}";
+            Mail::send('emails.registration-confirmation', [
+                'participant' => $participant,
+                'confirmationUrl' => $confirmationUrl
+            ], function ($message) use ($participant) {
+                $message->to($participant->Email)
+                       ->subject('Confirm Your Registration');
+            });
 
             DB::commit();
 
@@ -71,6 +87,26 @@ class RegistrationController extends Controller
             DB::rollBack();
             Log::error('Registration creation failed: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to create registration'], 500);
+        }
+    }
+
+    public function confirm($token)
+    {
+        try {
+            $registration = Registration::where('confirmation_token', $token)->firstOrFail();
+            
+            if ($registration->confirmed_at) {
+                return response()->json(['message' => 'Registration already confirmed'], 200);
+            }
+
+            $registration->update([
+                'RegistrationStatus' => 'confirmed',
+                'confirmed_at' => now()
+            ]);
+
+            return response()->json(['message' => 'Registration confirmed successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid confirmation token'], 404);
         }
     }
 

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
 // Registration routes
+Route::get('registrations/confirm/{token}', [RegistrationController::class, 'confirm']);
 Route::apiResource('registrations', RegistrationController::class);
 
 // Other routes

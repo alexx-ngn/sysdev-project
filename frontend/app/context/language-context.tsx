@@ -366,7 +366,14 @@ const translations: Record<Language, Translations> = {
     'register.form.submit': 'Register Now',
     'register.form.submitting': 'Registering...',
     'register.successMessage': 'Registration successful! Thank you for registering.',
-    'register.errorMessage': 'Registration failed. Please try again.'
+    'register.errorMessage': 'Registration failed. Please try again.',
+
+    // Confirmation Page
+    'confirm.loading': 'Confirming your registration...',
+    'confirm.success': 'Registration Confirmed!',
+    'confirm.error': 'Confirmation Failed',
+    'confirm.returnHome': 'Return to Home',
+    'confirm.tryAgain': 'Try Again'
   },
   fr: {
     // Navigation
@@ -715,7 +722,14 @@ const translations: Record<Language, Translations> = {
     'register.form.submit': 'S\'inscrire maintenant',
     'register.form.submitting': 'Inscription en cours...',
     'register.successMessage': 'Inscription réussie ! Merci de vous être inscrit.',
-    'register.errorMessage': 'L\'inscription a échoué. Veuillez réessayer.'
+    'register.errorMessage': 'L\'inscription a échoué. Veuillez réessayer.',
+
+    // Confirmation Page
+    'confirm.loading': 'Confirmation de votre inscription...',
+    'confirm.success': 'Inscription confirmée !',
+    'confirm.error': 'La confirmation a échoué',
+    'confirm.returnHome': 'Retour à l\'accueil',
+    'confirm.tryAgain': 'Réessayer'
   }
 };
 

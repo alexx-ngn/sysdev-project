@@ -34,7 +34,9 @@ class Registration extends Model
         'UserID',
         'ParticipantID',
         'RegistrationDate',
-        'RegistrationStatus'
+        'RegistrationStatus',
+        'confirmation_token',
+        'confirmed_at'
     ];
 
     /**
@@ -44,6 +46,7 @@ class Registration extends Model
      */
     protected $casts = [
         'RegistrationDate' => 'datetime',
+        'confirmed_at' => 'datetime'
     ];
 
     /**
