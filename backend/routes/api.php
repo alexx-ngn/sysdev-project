@@ -23,8 +23,9 @@ Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPasswor
 
 // Registration routes
 Route::post('/registrations', [RegistrationController::class, 'store']);
-Route::get('registrations', [RegistrationController::class, 'index']);
-Route::get('registrations/{id}', [RegistrationController::class, 'show']);
+Route::get('/registrations', [RegistrationController::class, 'index']);
+Route::get('/registrations/{id}', [RegistrationController::class, 'show']);
+Route::put('/registrations/{id}', [RegistrationController::class, 'update']);
 
 // Other routes
 Route::resource('donations', DonationController::class);

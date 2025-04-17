@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Download, Search, Filter, ChevronDown } from "lucide-react"
+import { Download, Search, Filter, ChevronDown, Eye, Pencil } from "lucide-react"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -36,11 +36,139 @@ interface RegistrationFormData {
   RegistrationStatus: string;
 }
 
+interface ViewEditModalProps {
+  registration: Registration | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: RegistrationFormData) => Promise<void>;
+  mode: 'view' | 'edit';
+}
+
+function ViewEditModal({ registration, isOpen, onClose, onSave, mode }: ViewEditModalProps) {
+  const [formData, setFormData] = useState<RegistrationFormData>({
+    FirstName: '',
+    LastName: '',
+    Email: '',
+    PhoneNumber: '',
+    RegistrationStatus: 'pending'
+  });
+
+  useEffect(() => {
+    if (registration) {
+      setFormData({
+        FirstName: registration.participant.FirstName,
+        LastName: registration.participant.LastName,
+        Email: registration.participant.Email,
+        PhoneNumber: registration.participant.PhoneNumber,
+        RegistrationStatus: registration.RegistrationStatus
+      });
+    }
+  }, [registration]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSave(formData);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{mode === 'view' ? 'View Registration' : 'Edit Registration'}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="FirstName">First Name</Label>
+              <Input
+                id="FirstName"
+                name="FirstName"
+                value={formData.FirstName}
+                onChange={handleInputChange}
+                required
+                disabled={mode === 'view'}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="LastName">Last Name</Label>
+              <Input
+                id="LastName"
+                name="LastName"
+                value={formData.LastName}
+                onChange={handleInputChange}
+                required
+                disabled={mode === 'view'}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="Email">Email</Label>
+            <Input
+              id="Email"
+              name="Email"
+              type="email"
+              value={formData.Email}
+              onChange={handleInputChange}
+              required
+              disabled={mode === 'view'}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="PhoneNumber">Phone Number</Label>
+            <Input
+              id="PhoneNumber"
+              name="PhoneNumber"
+              value={formData.PhoneNumber}
+              onChange={handleInputChange}
+              required
+              disabled={mode === 'view'}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="RegistrationStatus">Status</Label>
+            <select
+              id="RegistrationStatus"
+              name="RegistrationStatus"
+              value={formData.RegistrationStatus}
+              onChange={handleInputChange}
+              className="w-full rounded-md border border-input bg-background px-3 py-2"
+              required
+              disabled={mode === 'view'}
+            >
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              {mode === 'view' ? 'Close' : 'Cancel'}
+            </Button>
+            {mode === 'edit' && (
+              <Button type="submit">Save Changes</Button>
+            )}
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit'>('view');
   const [formData, setFormData] = useState<RegistrationFormData>({
     FirstName: '',
     LastName: '',
@@ -71,18 +199,23 @@ export default function RegistrationsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Format phone number - remove any non-digit characters except +
+      const formattedData = {
+        ...formData,
+        PhoneNumber: formData.PhoneNumber.replace(/[^\d+]/g, '')
+      };
+
       const response = await fetch('http://localhost:8000/api/registrations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formattedData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 422) {
-          // Handle validation errors
           const errorMessages = Object.entries(errorData.errors)
             .map(([field, messages]) => `${field}: ${(messages as string[]).join(', ')}`)
             .join('\n');
@@ -117,6 +250,62 @@ export default function RegistrationsPage() {
     }));
   };
 
+  const handleViewRegistration = (registration: Registration) => {
+    setSelectedRegistration(registration);
+    setModalMode('view');
+    setIsDialogOpen(true);
+  };
+
+  const handleEditRegistration = (registration: Registration) => {
+    setSelectedRegistration(registration);
+    setModalMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveRegistration = async (data: RegistrationFormData) => {
+    if (!selectedRegistration) return;
+
+    try {
+      // Format phone number - remove any non-digit characters except +
+      const formattedData = {
+        ...data,
+        PhoneNumber: data.PhoneNumber.replace(/[^\d+]/g, '')
+      };
+
+      const response = await fetch(`http://localhost:8000/api/registrations/${selectedRegistration.RegistrationID}`, {
+        method: 'PUT',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(formattedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 422) {
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, messages]) => `${field}: ${(messages as string[]).join(', ')}`)
+            .join('\n');
+          toast.error(errorMessages);
+          return;
+        }
+        throw new Error(errorData.error || 'Failed to update registration');
+      }
+
+      const updatedRegistration = await response.json();
+      setRegistrations(prev => prev.map(reg => 
+        reg.RegistrationID === updatedRegistration.RegistrationID ? updatedRegistration : reg
+      ));
+      setIsDialogOpen(false);
+      toast.success('Registration updated successfully');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update registration');
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -137,7 +326,7 @@ export default function RegistrationsPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen && !selectedRegistration} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>Add Registration</Button>
             </DialogTrigger>
@@ -261,17 +450,28 @@ export default function RegistrationsPage() {
                       <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                         registration.RegistrationStatus === 'pending' 
                           ? 'bg-yellow-50 text-yellow-700 ring-yellow-600/20' 
+                          : registration.RegistrationStatus === 'cancelled'
+                          ? 'bg-red-50 text-red-700 ring-red-600/20'
                           : 'bg-green-50 text-green-700 ring-green-600/20'
                       } ring-1 ring-inset`}>
-                        {registration.RegistrationStatus}
+                        {registration.RegistrationStatus.charAt(0).toUpperCase() + registration.RegistrationStatus.slice(1)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        View
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleViewRegistration(registration)}
+                        className="mr-2"
+                      >
+                        <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        Edit
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEditRegistration(registration)}
+                      >
+                        <Pencil className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -326,6 +526,17 @@ export default function RegistrationsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ViewEditModal
+        registration={selectedRegistration}
+        isOpen={isDialogOpen && !!selectedRegistration}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setSelectedRegistration(null);
+        }}
+        onSave={handleSaveRegistration}
+        mode={modalMode}
+      />
     </div>
   )
 }
