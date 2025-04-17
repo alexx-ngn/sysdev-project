@@ -51,22 +51,31 @@ export default function DonatePage() {
     setLoading(true);
 
     try {
+      const donationData = {
+        name,
+        email,
+        Amount: parseFloat(amount),
+        DonationDate: new Date().toISOString(),
+        type: 'One-time donation',
+        ConfirmationID: Math.random().toString(36).substring(2, 15)
+      };
+
+      console.log('Sending donation data:', donationData);
+
       const response = await fetch('http://localhost:8000/api/donations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          name,
-          email,
-          amount: parseFloat(amount),
-          donationDate: new Date().toISOString(),
-          type: 'One-time donation'
-        }),
+        body: JSON.stringify(donationData),
       });
 
+      const responseData = await response.json();
+      console.log('Server response:', responseData);
+
       if (!response.ok) {
-        throw new Error('Failed to process donation');
+        throw new Error(responseData.message || 'Failed to process donation');
       }
 
       toast.success("Thank you for your donation!");
@@ -74,7 +83,8 @@ export default function DonatePage() {
       setName("");
       setEmail("");
     } catch (error) {
-      toast.error("Failed to process donation. Please try again.");
+      console.error('Donation error:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
     } finally {
       setLoading(false);
     }

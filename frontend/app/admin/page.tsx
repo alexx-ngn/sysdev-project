@@ -16,20 +16,42 @@ interface Registration {
   };
 }
 
+interface Donation {
+  DonationID: number;
+  name: string;
+  email: string;
+  Amount: number;
+  DonationDate: string;
+  type: string;
+  ConfirmationID: string;
+}
+
 export default function AdminDashboard() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchRegistrations = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/registrations');
-        if (!response.ok) {
+        const [registrationsRes, donationsRes] = await Promise.all([
+          fetch('http://localhost:8000/api/registrations'),
+          fetch('http://localhost:8000/api/donations')
+        ]);
+
+        if (!registrationsRes.ok) {
           throw new Error('Failed to fetch registrations');
         }
-        const data = await response.json();
-        setRegistrations(data);
+        if (!donationsRes.ok) {
+          throw new Error('Failed to fetch donations');
+        }
+
+        const registrationsData = await registrationsRes.json();
+        const donationsData = await donationsRes.json();
+
+        setRegistrations(registrationsData);
+        setDonations(donationsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -37,7 +59,7 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchRegistrations();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -51,6 +73,31 @@ export default function AdminDashboard() {
   const recentRegistrations = registrations
     .sort((a, b) => new Date(b.RegistrationDate).getTime() - new Date(a.RegistrationDate).getTime())
     .slice(0, 3);
+
+  const recentDonations = donations
+    .sort((a, b) => new Date(b.DonationDate).getTime() - new Date(a.DonationDate).getTime())
+    .slice(0, 3);
+
+  const totalDonations = donations.reduce((sum, donation) => sum + donation.Amount, 0);
+  const lastMonthDonations = donations.filter(d => {
+    const donationDate = new Date(d.DonationDate);
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    return donationDate >= lastMonth;
+  });
+  const lastMonthTotal = lastMonthDonations.reduce((sum, d) => sum + d.Amount, 0);
+  const previousMonthTotal = donations
+    .filter(d => {
+      const donationDate = new Date(d.DonationDate);
+      const twoMonthsAgo = new Date();
+      const lastMonth = new Date();
+      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      return donationDate >= twoMonthsAgo && donationDate < lastMonth;
+    })
+    .reduce((sum, d) => sum + d.Amount, 0);
+  
+  const monthlyChange = ((lastMonthTotal - previousMonthTotal) / previousMonthTotal * 100) || 0;
 
   return (
     <div className="space-y-6">
@@ -79,8 +126,8 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,450</div>
-            <p className="text-xs text-muted-foreground">+18% from last month</p>
+            <div className="text-2xl font-bold">${totalDonations.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <p className="text-xs text-muted-foreground">{monthlyChange >= 0 ? '+' : ''}{monthlyChange.toFixed(0)}% from last month</p>
           </CardContent>
         </Card>
 
@@ -134,6 +181,9 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+                {recentRegistrations.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No recent registrations</div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -146,27 +196,20 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">John Smith</p>
-                    <p className="text-sm text-muted-foreground">john.smith@example.com</p>
+                {recentDonations.map((donation) => (
+                  <div key={donation.DonationID} className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">{donation.name}</p>
+                      <p className="text-sm text-muted-foreground">{donation.email}</p>
+                    </div>
+                    <div className="ml-auto font-medium">
+                      ${donation.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
                   </div>
-                  <div className="ml-auto font-medium">$500</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Sarah Johnson</p>
-                    <p className="text-sm text-muted-foreground">sarah.johnson@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">$250</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Michael Chen</p>
-                    <p className="text-sm text-muted-foreground">michael.chen@example.com</p>
-                  </div>
-                  <div className="ml-auto font-medium">$100</div>
-                </div>
+                ))}
+                {recentDonations.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No recent donations</div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -179,27 +222,32 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">New registration</p>
-                    <p className="text-sm text-muted-foreground">Sarah Johnson registered for the event</p>
+                {[...recentRegistrations.map(reg => ({
+                  type: 'registration',
+                  date: new Date(reg.RegistrationDate),
+                  text: `${reg.participant.FirstName} ${reg.participant.LastName} registered for the event`
+                })), ...recentDonations.map(don => ({
+                  type: 'donation',
+                  date: new Date(don.DonationDate),
+                  text: `${don.name} donated $${don.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }))].sort((a, b) => b.date.getTime() - a.date.getTime())
+                .slice(0, 3)
+                .map((activity, index) => (
+                  <div key={index} className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {activity.type === 'registration' ? 'New registration' : 'Donation received'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{activity.text}</p>
+                    </div>
+                    <div className="ml-auto font-medium">
+                      {activity.date.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="ml-auto font-medium">Today, 10:45 AM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Donation received</p>
-                    <p className="text-sm text-muted-foreground">John Smith donated $500</p>
-                  </div>
-                  <div className="ml-auto font-medium">Today, 9:23 AM</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">New sponsor</p>
-                    <p className="text-sm text-muted-foreground">TechCorp joined as a sponsor</p>
-                  </div>
-                  <div className="ml-auto font-medium">Yesterday, 4:52 PM</div>
-                </div>
+                ))}
+                {recentRegistrations.length === 0 && recentDonations.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No recent activity</div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\AdminAuthController;
 use Illuminate\Support\Facades\Log;
 
 /*
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Log;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Admin Authentication routes
+Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
 // Registration routes
 Route::post('registrations', [RegistrationController::class, 'store']);

@@ -19,8 +19,8 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
 
-  // Check if we're on the login page
-  const isLoginPage = pathname === "/admin/login"
+  // Check if we're on the login page or forgot password page
+  const isAuthPage = pathname === "/admin/login" || pathname === "/admin/forgot-password"
 
   // Check authentication status when component mounts
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function AdminLayout({
           isAuth,
           authValue,
           pathname,
-          isLoginPage
+          isAuthPage
         })
         setIsAuthenticated(isAuth)
       } catch (error) {
@@ -44,28 +44,28 @@ export default function AdminLayout({
     }
 
     checkAuth()
-  }, [pathname, isLoginPage])
+  }, [pathname, isAuthPage])
 
-  // If not authenticated and not on the login page, redirect to login
+  // If not authenticated and not on an auth page, redirect to login
   useEffect(() => {
-    if (!isChecking && !isAuthenticated && !isLoginPage) {
+    if (!isChecking && !isAuthenticated && !isAuthPage) {
       console.log("Redirecting to login:", {
         isChecking,
         isAuthenticated,
-        isLoginPage,
+        isAuthPage,
         pathname
       })
       router.replace("/admin/login")
     }
-  }, [isChecking, isAuthenticated, isLoginPage, pathname, router])
+  }, [isChecking, isAuthenticated, isAuthPage, pathname, router])
 
   // Show loading state while checking auth
   if (isChecking) {
     return <div>Loading...</div>
   }
 
-  // If we're on the login page, just render the children without the admin layout
-  if (isLoginPage) {
+  // If we're on an auth page, just render the children without the admin layout
+  if (isAuthPage) {
     return <>{children}</>
   }
 

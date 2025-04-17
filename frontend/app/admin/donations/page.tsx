@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, Search, Filter, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
+import Pusher from 'pusher-js'
+import { toast } from "sonner"
 
 interface Donation {
   DonationID: number;
@@ -20,6 +22,31 @@ export default function DonationsPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Calculate donation statistics
+  const totalDonations = donations.reduce((sum, donation) => sum + (donation.Amount || 0), 0);
+  const individualDonations = donations.filter(d => d.type === 'One-time donation');
+  const corporateDonations = donations.filter(d => d.type === 'Corporate');
+  const totalIndividualAmount = individualDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
+  const totalCorporateAmount = corporateDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
+  const goalAmount = 30000; // $30,000 goal
+  const progressPercentage = (totalDonations / goalAmount) * 100;
+
+  // Calculate month-over-month change
+  const currentDate = new Date();
+  const lastMonthDonations = donations.filter(d => {
+    const donationDate = new Date(d.DonationDate);
+    return donationDate.getMonth() === currentDate.getMonth() &&
+           donationDate.getFullYear() === currentDate.getFullYear();
+  });
+  const previousMonthDonations = donations.filter(d => {
+    const donationDate = new Date(d.DonationDate);
+    return donationDate.getMonth() === currentDate.getMonth() - 1 &&
+           donationDate.getFullYear() === currentDate.getFullYear();
+  });
+  const currentMonthTotal = lastMonthDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
+  const previousMonthTotal = previousMonthDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
+  const monthlyChange = currentMonthTotal - previousMonthTotal;
 
   useEffect(() => {
     const fetchDonations = async () => {
@@ -38,6 +65,35 @@ export default function DonationsPage() {
     };
 
     fetchDonations();
+
+    // Initialize Pusher
+    const pusher = new Pusher('milesforhope-key', {
+      cluster: 'mt1',
+      wsHost: '127.0.0.1',
+      wsPort: 6001,
+      forceTLS: false,
+      enabledTransports: ['ws']
+    });
+
+    // Subscribe to the donations channel
+    const channel = pusher.subscribe('donations');
+    
+    // Listen for new donations
+    channel.bind('new-donation', (data: Donation) => {
+      setDonations(prev => [data, ...prev]);
+      
+      // Show notification
+      toast.success('New donation received!', {
+        description: `${data.name} donated $${data.Amount}`
+      });
+    });
+
+    // Cleanup
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+      pusher.disconnect();
+    };
   }, []);
 
   if (loading) {
@@ -55,9 +111,6 @@ export default function DonationsPage() {
       </div>
     );
   }
-
-  const totalDonations = donations.reduce((sum, donation) => sum + (donation.Amount || 0), 0);
-  const averageDonation = donations.length > 0 ? totalDonations / donations.length : 0;
 
   return (
     <div className="space-y-6">
@@ -81,8 +134,10 @@ export default function DonationsPage() {
             <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,450</div>
-            <p className="text-xs text-muted-foreground">+$2,250 from last month</p>
+            <div className="text-2xl font-bold">${totalDonations.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              {monthlyChange >= 0 ? '+' : '-'}${Math.abs(monthlyChange).toFixed(2)} from last month
+            </p>
           </CardContent>
         </Card>
 
@@ -91,8 +146,8 @@ export default function DonationsPage() {
             <CardTitle className="text-sm font-medium">Individual Donations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$4,950</div>
-            <p className="text-xs text-muted-foreground">78 donations</p>
+            <div className="text-2xl font-bold">${totalIndividualAmount.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">{individualDonations.length} donations</p>
           </CardContent>
         </Card>
 
@@ -101,8 +156,8 @@ export default function DonationsPage() {
             <CardTitle className="text-sm font-medium">Corporate Sponsorships</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$7,500</div>
-            <p className="text-xs text-muted-foreground">5 sponsors</p>
+            <div className="text-2xl font-bold">${totalCorporateAmount.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">{corporateDonations.length} sponsors</p>
           </CardContent>
         </Card>
 
@@ -111,11 +166,16 @@ export default function DonationsPage() {
             <CardTitle className="text-sm font-medium">Goal Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">41.5%</div>
+            <div className="text-2xl font-bold">{progressPercentage.toFixed(1)}%</div>
             <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
-              <div className="h-full w-[41.5%] rounded-full bg-primary"></div>
+              <div 
+                className="h-full rounded-full bg-primary transition-all duration-500" 
+                style={{ width: `${Math.min(100, progressPercentage)}%` }}
+              ></div>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">$12,450 of $30,000 goal</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              ${totalDonations.toFixed(2)} of ${goalAmount.toLocaleString()} goal
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -207,9 +267,6 @@ export default function DonationsPage() {
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Total Donations</p>
               <div className="text-3xl font-bold">${totalDonations.toFixed(2)}</div>
-              <p className="text-sm text-muted-foreground">
-                Average donation: ${averageDonation.toFixed(2)}
-              </p>
             </div>
 
             <div className="space-y-2">
