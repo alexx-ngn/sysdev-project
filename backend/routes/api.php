@@ -24,7 +24,11 @@ Route::post('admin/login/verify-2fa', [AdminAuthController::class, 'verifyLogin2
 Route::post('admin/register', [AdminAuthController::class, 'registerFirstAdmin']);
 Route::post('admin/verify-2fa', [AdminAuthController::class, 'verify2FA']);
 Route::get('admin/check', [AdminAuthController::class, 'checkAdmins']);
-Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
+
+// Password Reset Routes
+Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('admin/reset-password', [AdminAuthController::class, 'resetPassword'])->name('password.reset');
+Route::post('admin/verify-reset-token', [AdminAuthController::class, 'verifyResetToken'])->name('password.verify');
 
 // Protected admin routes
 Route::middleware(['auth:sanctum', 'admin.auth'])->group(function () {

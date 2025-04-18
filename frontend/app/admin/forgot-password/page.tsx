@@ -23,18 +23,21 @@ export default function ForgotPasswordPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ email }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to process request');
-      }
+      const data = await response.json();
 
-      setIsSubmitted(true)
-      toast.success("Recovery instructions have been sent to your email")
-    } catch (error) {
-      toast.error("Failed to process request. Please try again.")
+      if (response.ok) {
+        setIsSubmitted(true)
+        toast.success("Recovery instructions have been sent to your email")
+      } else {
+        throw new Error(data.message || 'Failed to process request');
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to process request. Please try again.")
     } finally {
       setIsLoading(false)
     }

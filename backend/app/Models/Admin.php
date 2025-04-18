@@ -8,10 +8,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements CanResetPassword
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, CanResetPasswordTrait;
 
     /**
      * The primary key for the model.
@@ -44,6 +46,14 @@ class Admin extends Authenticatable
         '2FASecret',
         'remember_token',
     ];
+
+    /**
+     * Get the broker that should be used for password reset.
+     */
+    public function broker()
+    {
+        return 'admins';
+    }
 
     /**
      * Get the decrypted 2FA secret
@@ -130,5 +140,46 @@ class Admin extends Authenticatable
     public function is2FAEnabled()
     {
         return !empty($this->{'2FASecret'});
+    }
+
+    /**
+     * Route notifications for the mail channel.
+     *
+     * @return string
+     */
+    public function routeNotificationForMail()
+    {
+        return $this->Email;
+    }
+
+    /**
+     * Get the email address that should be used for password reset.
+     *
+     * @return string
+     */
+    public function getEmailForPasswordReset()
+    {
+        return $this->Email;
+    }
+
+    /**
+     * Set the password attribute.
+     *
+     * @param string $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['Password'] = $value;
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\AdminResetPasswordNotification($token));
     }
 } 

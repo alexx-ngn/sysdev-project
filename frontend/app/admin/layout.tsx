@@ -24,7 +24,8 @@ export default function AdminLayout({
   // Check if we're on the login page, register page, or forgot password page
   const isAuthPage = pathname === "/admin/login" || 
                     pathname === "/admin/register" || 
-                    pathname === "/admin/forgot-password"
+                    pathname === "/admin/forgot-password" ||
+                    pathname.startsWith("/admin/reset-password")
 
   useEffect(() => {
     const checkAuthAndAdmins = async () => {

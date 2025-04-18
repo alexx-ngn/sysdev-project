@@ -6,12 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Heart, Shield, ArrowLeft, Loader2, Check, X } from 'lucide-react'
+import { Heart, Shield, ArrowLeft, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
 import { API_ENDPOINTS } from '@/app/config/api'
-import { cn } from '@/lib/utils'
 
 interface FormData {
   firstName: string
@@ -21,49 +20,6 @@ interface FormData {
   password: string
   password_confirmation: string
 }
-
-interface ValidationErrors {
-  FirstName?: string[]
-  LastName?: string[]
-  Email?: string[]
-  PhoneNumber?: string[]
-  Password?: string[]
-  password_confirmation?: string[]
-}
-
-interface PasswordRequirement {
-  id: string
-  label: string
-  validator: (password: string) => boolean
-}
-
-const passwordRequirements: PasswordRequirement[] = [
-  {
-    id: 'length',
-    label: 'At least 12 characters long',
-    validator: (password) => password.length >= 12,
-  },
-  {
-    id: 'uppercase',
-    label: 'At least one uppercase letter',
-    validator: (password) => /[A-Z]/.test(password),
-  },
-  {
-    id: 'lowercase',
-    label: 'At least one lowercase letter',
-    validator: (password) => /[a-z]/.test(password),
-  },
-  {
-    id: 'number',
-    label: 'At least one number',
-    validator: (password) => /[0-9]/.test(password),
-  },
-  {
-    id: 'special',
-    label: 'At least one special character',
-    validator: (password) => /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  }
-]
 
 export default function AdminRegisterPage() {
   const router = useRouter()
@@ -81,8 +37,6 @@ export default function AdminRegisterPage() {
   const [verificationCode, setVerificationCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
-  const [meetsRequirements, setMeetsRequirements] = useState<{[key: string]: boolean}>({})
 
   useEffect(() => {
     const checkAdmins = async () => {
@@ -114,15 +68,6 @@ export default function AdminRegisterPage() {
 
     checkAdmins()
   }, [router])
-
-  // Check password requirements whenever password changes
-  useEffect(() => {
-    const newMeetsRequirements = passwordRequirements.reduce((acc, requirement) => ({
-      ...acc,
-      [requirement.id]: requirement.validator(formData.password)
-    }), {});
-    setMeetsRequirements(newMeetsRequirements);
-  }, [formData.password]);
 
   // Show loading state while checking
   if (isChecking) {
@@ -286,32 +231,7 @@ export default function AdminRegisterPage() {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     disabled={isLoading}
-                    className={cn(
-                      validationErrors.Password ? "border-red-500" : "",
-                      Object.values(meetsRequirements).every(Boolean) && formData.password && "border-green-500"
-                    )}
                   />
-                  <div className="text-sm space-y-1">
-                    {passwordRequirements.map((requirement) => (
-                      <div 
-                        key={requirement.id}
-                        className={cn(
-                          "flex items-center space-x-2",
-                          meetsRequirements[requirement.id] ? "text-green-600" : "text-muted-foreground"
-                        )}
-                      >
-                        {meetsRequirements[requirement.id] ? (
-                          <Check className="h-4 w-4 flex-shrink-0" />
-                        ) : (
-                          <X className="h-4 w-4 flex-shrink-0" />
-                        )}
-                        <span>{requirement.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {validationErrors.Password?.map((error, i) => (
-                    <p key={i} className="text-sm text-red-500 mt-1">{error}</p>
-                  ))}
                 </div>
 
                 <div className="space-y-2">
@@ -323,17 +243,7 @@ export default function AdminRegisterPage() {
                     onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
                     required
                     disabled={isLoading}
-                    className={cn(
-                      validationErrors.password_confirmation ? "border-red-500" : "",
-                      formData.password_confirmation && formData.password === formData.password_confirmation && "border-green-500"
-                    )}
                   />
-                  {formData.password_confirmation && formData.password !== formData.password_confirmation && (
-                    <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
-                  )}
-                  {validationErrors.password_confirmation?.map((error, i) => (
-                    <p key={i} className="text-sm text-red-500 mt-1">{error}</p>
-                  ))}
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>

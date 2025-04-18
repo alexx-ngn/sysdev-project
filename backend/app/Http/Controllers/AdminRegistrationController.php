@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use PragmaRX\Google2FA\Google2FA;
-use Illuminate\Validation\Rules\Password;
 
 class AdminRegistrationController extends Controller
 {
     public function register(Request $request)
     {
+        // Validate the request data
         $validator = Validator::make($request->all(), [
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
@@ -26,30 +26,16 @@ class AdminRegistrationController extends Controller
                 'regex:/^(\+1)?\d{10}$/',
                 'unique:admins,PhoneNumber'
             ],
-            'Password' => [
-                'required',
-                'confirmed',
-                Password::min(12)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-            ]
+            'Password' => 'required|string|min:8|confirmed',
         ], [
-            'FirstName.required' => 'Please enter your first name',
-            'LastName.required' => 'Please enter your last name',
-            'Email.required' => 'Please enter your email address',
-            'Email.email' => 'Please enter a valid email address',
-            'Email.unique' => 'This email is already registered',
-            'PhoneNumber.required' => 'Please enter your phone number',
-            'PhoneNumber.regex' => 'Please enter a valid 10-digit phone number',
+            'PhoneNumber.regex' => 'Please enter a valid 10-digit phone number (e.g., 1234567890 or +11234567890)',
             'PhoneNumber.unique' => 'This phone number is already registered',
-            'Password.required' => 'Please enter a password',
-            'Password.confirmed' => 'Password confirmation does not match',
+            'Email.unique' => 'This email is already registered'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Validation failed',
+                'error' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -88,6 +74,7 @@ class AdminRegistrationController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Admin registration failed: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to create admin account'], 500);
         }
     }
