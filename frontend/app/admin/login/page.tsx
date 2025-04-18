@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heart, Shield, Mail, Lock, ArrowRight, ArrowLeft, Loader2, KeyRound } from "lucide-react"
 import { setAuth } from "@/app/utils/auth"
-import { useAuth } from "@/app/context/auth-context"
 import Cookies from 'js-cookie'
 import { toast } from "sonner"
+import { API_ENDPOINTS } from '@/app/config/api'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -21,20 +21,60 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [requires2FA, setRequires2FA] = useState(false)
   const [tempToken, setTempToken] = useState("")
+  const [isChecking, setIsChecking] = useState(true)
   const router = useRouter()
-  const { login } = useAuth()
 
   useEffect(() => {
     // Clear any existing auth data when the login page is loaded
     localStorage.removeItem('milesforhope-admin-token');
     localStorage.removeItem('milesforhope-admin-info');
     Cookies.remove('milesforhope-admin-token');
-  }, []);
+
+    // Check if any admins exist
+    const checkAdmins = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.ADMIN.CHECK, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        })
+        const data = await response.json()
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to check admin status')
+        }
+
+        // If no admins exist, redirect to register
+        if (!data.has_admins) {
+          router.replace('/admin/register')
+          return
+        }
+        setIsChecking(false)
+      } catch (error) {
+        console.error('Error checking admin status:', error)
+        setIsChecking(false)
+      }
+    }
+
+    checkAdmins()
+  }, [router])
+
+  // Show loading state while checking
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Checking system status...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleSuccessfulLogin = (token: string, admin: any) => {
     setAuth(token, admin);
     Cookies.set('milesforhope-admin-token', token, { path: '/' });
-    login(admin.email, admin); // Update auth context state
     toast.success('Login successful');
     
     // Add a small delay to ensure state is updated before navigation
@@ -49,10 +89,11 @@ export default function AdminLoginPage() {
     setError("")
 
     try {
-      const response = await fetch("http://localhost:8000/api/admin/login", {
+      const response = await fetch(API_ENDPOINTS.ADMIN.LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify({ email, password }),
       })
@@ -83,10 +124,11 @@ export default function AdminLoginPage() {
     setError("")
 
     try {
-      const response = await fetch("http://localhost:8000/api/admin/login/verify-2fa", {
+      const response = await fetch(API_ENDPOINTS.ADMIN.LOGIN_2FA, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           "Authorization": `Bearer ${tempToken}`
         },
         body: JSON.stringify({ email, code: verificationCode }),

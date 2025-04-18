@@ -35,22 +35,8 @@ export default function AdminLayout({
           return
         }
 
-        // First check authentication
-        const isAuth = checkAuth()
-
-        // If not authenticated, redirect to login
-        if (!isAuth) {
-          router.replace("/admin/login")
-          setIsChecking(false)
-          return
-        }
-
-        // Only check admin status if authenticated and not on an auth page
-        const response = await fetch('http://localhost:8000/api/admin/check', {
-          headers: {
-            'Authorization': `Bearer ${getAuthToken()}`
-          }
-        })
+        // First check if any admins exist
+        const response = await fetch('http://localhost:8000/api/admin/check')
         const data = await response.json()
         
         if (!response.ok) {
@@ -60,14 +46,20 @@ export default function AdminLayout({
         // If no admins exist, redirect to register
         if (!data.has_admins) {
           router.replace('/admin/register')
+          setIsChecking(false)
           return
         }
 
-        // If on register page and admins exist, redirect to login
-        if (pathname === '/admin/register' && data.has_admins) {
-          router.replace('/admin/login')
+        // Now check authentication
+        const isAuth = checkAuth()
+
+        // If not authenticated and not on an auth page, redirect to login
+        if (!isAuth && !isAuthPage) {
+          router.replace("/admin/login")
+          setIsChecking(false)
           return
         }
+
       } catch (error) {
         console.error("Error during auth check:", error)
         // On error, redirect to login if not on an auth page
@@ -80,7 +72,7 @@ export default function AdminLayout({
     }
 
     checkAuthAndAdmins()
-  }, [pathname, isAuthPage]) // Only re-run when pathname or isAuthPage changes
+  }, [pathname, isAuthPage, router, checkAuth])
 
   // Show loading state while checking
   if (isChecking) {

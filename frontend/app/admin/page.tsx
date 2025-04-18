@@ -35,12 +35,31 @@ export default function AdminDashboard() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCheckingAdmins, setIsCheckingAdmins] = useState(true);
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      router.push('/admin/login');
-    }
+    const checkAdminsAndAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/admin/check');
+        const data = await response.json();
+        
+        if (!data.has_admins) {
+          router.push('/admin/register');
+          return;
+        }
+
+        const token = getAuthToken();
+        if (!token) {
+          router.push('/admin/login');
+        }
+      } catch (error) {
+        console.error('Error checking admins:', error);
+      } finally {
+        setIsCheckingAdmins(false);
+      }
+    };
+
+    checkAdminsAndAuth();
   }, [router]);
 
   useEffect(() => {
@@ -73,12 +92,12 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  if (!user) {
-    return null;
+  if (isCheckingAdmins || loading) {
+    return <div>Loading...</div>;
   }
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!user) {
+    return null;
   }
 
   if (error) {
