@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heart, Shield, Mail, Lock, ArrowRight, ArrowLeft, Loader2, KeyRound } from "lucide-react"
+import { setAuth } from "@/app/utils/auth"
+import { useAuth } from "@/app/context/auth-context"
+import Cookies from 'js-cookie'
+import { toast } from "sonner"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -16,7 +20,28 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [requires2FA, setRequires2FA] = useState(false)
+  const [tempToken, setTempToken] = useState("")
   const router = useRouter()
+  const { login } = useAuth()
+
+  useEffect(() => {
+    // Clear any existing auth data when the login page is loaded
+    localStorage.removeItem('milesforhope-admin-token');
+    localStorage.removeItem('milesforhope-admin-info');
+    Cookies.remove('milesforhope-admin-token');
+  }, []);
+
+  const handleSuccessfulLogin = (token: string, admin: any) => {
+    setAuth(token, admin);
+    Cookies.set('milesforhope-admin-token', token, { path: '/' });
+    login(admin.email, admin); // Update auth context state
+    toast.success('Login successful');
+    
+    // Add a small delay to ensure state is updated before navigation
+    setTimeout(() => {
+      router.replace('/admin');
+    }, 100);
+  };
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,21 +60,17 @@ export default function AdminLoginPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed")
+        throw new Error(data.message || "Login failed")
       }
 
       if (data.requires_2fa) {
         setRequires2FA(true)
+        setTempToken(data.temp_token)
         setIsLoading(false)
         return
       }
 
-      // Store authentication state
-      localStorage.setItem("milesforhope-admin-auth", "true")
-      localStorage.setItem("milesforhope-admin-info", JSON.stringify(data.admin))
-
-      // Redirect to admin dashboard
-      window.location.href = "/admin"
+      handleSuccessfulLogin(data.token, data.admin);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during login")
       setIsLoading(false)
@@ -66,6 +87,7 @@ export default function AdminLoginPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${tempToken}`
         },
         body: JSON.stringify({ email, code: verificationCode }),
       })
@@ -76,12 +98,7 @@ export default function AdminLoginPage() {
         throw new Error(data.message || "2FA verification failed")
       }
 
-      // Store authentication state
-      localStorage.setItem("milesforhope-admin-auth", "true")
-      localStorage.setItem("milesforhope-admin-info", JSON.stringify(data.admin))
-
-      // Redirect to admin dashboard
-      window.location.href = "/admin"
+      handleSuccessfulLogin(data.token, data.admin);
     } catch (err) {
       setError(err instanceof Error ? err.message : "2FA verification failed")
       setIsLoading(false)
@@ -89,8 +106,16 @@ export default function AdminLoginPage() {
   }
 
   const handleSkipAuth = () => {
-    localStorage.setItem("milesforhope-admin-auth", "true")
-    window.location.href = "/admin"
+    // Create mock admin data for development
+    const mockToken = 'dev-mode-token';
+    const mockAdmin = {
+      id: 0,
+      email: 'dev@milesforhope.org',
+      name: 'Developer Mode'
+    };
+
+    // Use the same auth mechanism as regular login
+    handleSuccessfulLogin(mockToken, mockAdmin);
   }
 
   return (

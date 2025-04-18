@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, DollarSign, Calendar, Award } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
+import { getAuthToken, getAuthUser } from '@/app/utils/auth'
 
 interface Registration {
   RegistrationID: number;
@@ -27,10 +29,19 @@ interface Donation {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const user = getAuthUser();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      router.push('/admin/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +72,10 @@ export default function AdminDashboard() {
 
     fetchData();
   }, []);
+
+  if (!user) {
+    return null;
+  }
 
   if (loading) {
     return <div>Loading...</div>;

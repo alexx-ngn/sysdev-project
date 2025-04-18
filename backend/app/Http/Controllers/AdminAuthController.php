@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AdminAuthController extends Controller
 {
@@ -44,7 +45,7 @@ class AdminAuthController extends Controller
         // Send reset email
         try {
             // For now, just log the token since email is not set up
-            \Log::info("Password reset token for {$request->email}: {$token}");
+            Log::info("Password reset token for {$request->email}: {$token}");
 
             return response()->json([
                 'message' => 'We will send a reset link if this email exists in our system.'
@@ -75,19 +76,26 @@ class AdminAuthController extends Controller
         $requires2FA = !empty($admin->{'2FASecret'});
 
         if ($requires2FA) {
+            // Store temporary login state for 2FA
+            $tempToken = $admin->createToken('temp_2fa', ['2fa.pending'])->plainTextToken;
+            
             return response()->json([
                 'message' => '2FA verification required',
                 'requires_2fa' => true,
+                'temp_token' => $tempToken,
                 'admin' => [
                     'email' => $admin->Email,
                 ]
             ]);
         }
 
-        // If 2FA is not required, proceed with login
+        // If 2FA is not required, generate full access token
+        $token = $admin->createToken('admin_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Login successful',
             'requires_2fa' => false,
+            'token' => $token,
             'admin' => [
                 'id' => $admin->AdminID,
                 'email' => $admin->Email,
@@ -112,8 +120,17 @@ class AdminAuthController extends Controller
         }
 
         if ($admin->verify2FACode($request->code)) {
+            // Delete temporary token
+            if ($request->bearerToken()) {
+                $admin->tokens()->where('token', hash('sha256', $request->bearerToken()))->delete();
+            }
+
+            // Create new token with full access
+            $token = $admin->createToken('admin_token')->plainTextToken;
+
             return response()->json([
                 'message' => 'Login successful',
+                'token' => $token,
                 'admin' => [
                     'id' => $admin->AdminID,
                     'email' => $admin->Email,
@@ -125,6 +142,18 @@ class AdminAuthController extends Controller
         return response()->json([
             'message' => 'Invalid verification code'
         ], 400);
+    }
+
+    public function logout(Request $request)
+    {
+        // Revoke the token that was used to authenticate the current request
+        if ($request->bearerToken()) {
+            $request->user()->currentAccessToken()->delete();
+        }
+        
+        return response()->json([
+            'message' => 'Successfully logged out'
+        ]);
     }
 
     public function checkAdmins()
@@ -202,7 +231,7 @@ class AdminAuthController extends Controller
 
         if ($admin->verify2FACode($request->code)) {
             return response()->json([
-                'message' => '2FA verification successful',
+                'message' => '2FA setup complete',
                 'admin' => [
                     'id' => $admin->AdminID,
                     'email' => $admin->Email,

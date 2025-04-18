@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Crypt;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The primary key for the model.
@@ -69,6 +70,16 @@ class Admin extends Authenticatable
     public function getAuthIdentifierName()
     {
         return 'AdminID';
+    }
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->Password;
     }
 
     /**

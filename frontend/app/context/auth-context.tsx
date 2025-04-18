@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { getAuthToken, getAuthUser, clearAuth } from '@/app/utils/auth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,94 +20,103 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [admin, setAdmin] = useState<AuthContextType['admin']>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const isLoginPage = pathname === '/admin/login';
 
-  // Check authentication on mount
+  // Check authentication on mount and when localStorage changes
   useEffect(() => {
     const checkAuthStatus = () => {
-      const authData = localStorage.getItem('milesforhope-admin-auth');
-      if (authData) {
-        try {
-          const { timestamp } = JSON.parse(authData);
-          const isSessionValid = Date.now() - timestamp < 24 * 60 * 60 * 1000;
-          setIsAuthenticated(isSessionValid);
-          
-          if (!isSessionValid) {
-            localStorage.removeItem('milesforhope-admin-auth');
-          }
-        } catch (e) {
-          localStorage.removeItem('milesforhope-admin-auth');
-          setIsAuthenticated(false);
-        }
+      const token = getAuthToken();
+      const user = getAuthUser();
+      
+      if (token && user) {
+        setIsAuthenticated(true);
+        setAdmin(user);
       } else {
         setIsAuthenticated(false);
+        setAdmin(null);
       }
       setIsInitialized(true);
     };
 
     checkAuthStatus();
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'milesforhope-admin-token' || e.key === 'milesforhope-admin-info') {
+        checkAuthStatus();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Handle redirection based on auth state
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (!isAuthenticated && !isLoginPage) {
+    const isLoginPage = pathname === '/admin/login';
+    const isAdminRoute = pathname?.startsWith('/admin');
+
+    if (!isAuthenticated && isAdminRoute && !isLoginPage) {
       router.replace('/admin/login');
     } else if (isAuthenticated && isLoginPage) {
       router.replace('/admin');
     }
-  }, [isAuthenticated, isLoginPage, router, isInitialized]);
+  }, [isAuthenticated, pathname, router, isInitialized]);
 
-  const login = (email: string, admin: any) => {
-    const authData = {
-      timestamp: Date.now(),
-      email,
-      admin
-    };
-    localStorage.setItem('milesforhope-admin-auth', JSON.stringify(authData));
+  const login = (email: string, adminData: any) => {
     setIsAuthenticated(true);
+    setAdmin(adminData);
   };
 
   const logout = () => {
-    localStorage.removeItem('milesforhope-admin-auth');
+    clearAuth(); // Clear all auth data
     setIsAuthenticated(false);
+    setAdmin(null);
     router.replace('/admin/login');
   };
 
   const checkAuth = () => {
-    const authData = localStorage.getItem('milesforhope-admin-auth');
-    if (authData) {
-      try {
-        const { timestamp, admin } = JSON.parse(authData);
-        const isSessionValid = Date.now() - timestamp < 24 * 60 * 60 * 1000;
-        if (isSessionValid) {
-          setIsAuthenticated(true);
-          return true;
-        }
-        localStorage.removeItem('milesforhope-admin-auth');
-      } catch (e) {
-        localStorage.removeItem('milesforhope-admin-auth');
-      }
+    const token = getAuthToken();
+    const user = getAuthUser();
+    const isValid = !!token && !!user;
+    
+    // Update state if it doesn't match current state
+    if (isValid !== isAuthenticated) {
+      setIsAuthenticated(isValid);
     }
-    setIsAuthenticated(false);
-    return false;
+    if (user !== admin) {
+      setAdmin(user);
+    }
+    
+    return isValid;
+  };
+
+  const value = {
+    isAuthenticated,
+    admin,
+    login,
+    logout,
+    checkAuth,
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, admin: null, login, logout, checkAuth }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}; 

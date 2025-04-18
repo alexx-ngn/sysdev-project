@@ -7,6 +7,8 @@ import { useState, useEffect } from "react"
 import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
+import { useAuth } from "@/app/context/auth-context"
+import { getAuthToken } from "@/app/utils/auth"
 
 export default function AdminLayout({
   children,
@@ -14,10 +16,10 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
+  const { isAuthenticated, checkAuth, logout } = useAuth()
 
   // Check if we're on the login page, register page, or forgot password page
   const isAuthPage = pathname === "/admin/login" || 
@@ -27,34 +29,37 @@ export default function AdminLayout({
   useEffect(() => {
     const checkAuthAndAdmins = async () => {
       try {
-        // First check authentication
-        const authValue = localStorage.getItem("milesforhope-admin-auth")
-        const isAuth = authValue === "true"
-        setIsAuthenticated(isAuth)
+        // Skip checks for auth pages
+        if (isAuthPage) {
+          setIsChecking(false)
+          return
+        }
 
-        // Check admin status for all admin routes
-        const response = await fetch('http://localhost:8000/api/admin/check')
+        // First check authentication
+        const isAuth = checkAuth()
+
+        // If not authenticated, redirect to login
+        if (!isAuth) {
+          router.replace("/admin/login")
+          setIsChecking(false)
+          return
+        }
+
+        // Only check admin status if authenticated and not on an auth page
+        const response = await fetch('http://localhost:8000/api/admin/check', {
+          headers: {
+            'Authorization': `Bearer ${getAuthToken()}`
+          }
+        })
         const data = await response.json()
         
         if (!response.ok) {
           throw new Error(data.error || 'Failed to check admin status')
         }
 
-        // If no admins exist, redirect to register regardless of the current page
+        // If no admins exist, redirect to register
         if (!data.has_admins) {
           router.replace('/admin/register')
-          return
-        }
-
-        // If not authenticated and not on an auth page, redirect to login
-        if (!isAuth && !isAuthPage) {
-          router.replace("/admin/login")
-          return
-        }
-
-        // If authenticated and on an auth page, redirect to admin dashboard
-        if (isAuth && isAuthPage) {
-          router.replace("/admin")
           return
         }
 
@@ -65,13 +70,17 @@ export default function AdminLayout({
         }
       } catch (error) {
         console.error("Error during auth check:", error)
+        // On error, redirect to login if not on an auth page
+        if (!isAuthPage) {
+          router.replace("/admin/login")
+        }
       } finally {
         setIsChecking(false)
       }
     }
 
     checkAuthAndAdmins()
-  }, [pathname, router, isAuthPage])
+  }, [pathname, isAuthPage]) // Only re-run when pathname or isAuthPage changes
 
   // Show loading state while checking
   if (isChecking) {
@@ -100,6 +109,10 @@ export default function AdminLayout({
         </div>
       </div>
     )
+  }
+
+  const handleLogout = () => {
+    logout() // Use the auth context's logout function
   }
 
   return (
@@ -192,11 +205,7 @@ export default function AdminLayout({
           <Button
             variant="outline"
             className="w-full flex items-center justify-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
-            onClick={() => {
-              // Clear auth flag and redirect to login
-              localStorage.removeItem("milesforhope-admin-auth")
-              window.location.href = "/admin/login"
-            }}
+            onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />
             <span>Logout</span>

@@ -18,11 +18,19 @@ use Illuminate\Support\Facades\Log;
 |
 */
 
-// Admin Authentication routes
-Route::get('admin/check', [AdminAuthController::class, 'checkAdmins']);
+// Public admin routes
+Route::post('admin/login', [AdminAuthController::class, 'login']);
+Route::post('admin/login/verify-2fa', [AdminAuthController::class, 'verifyLogin2FA']);
 Route::post('admin/register', [AdminAuthController::class, 'registerFirstAdmin']);
 Route::post('admin/verify-2fa', [AdminAuthController::class, 'verify2FA']);
+Route::get('admin/check', [AdminAuthController::class, 'checkAdmins']);
 Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
+
+// Protected admin routes
+Route::middleware(['auth:sanctum', 'admin.auth'])->group(function () {
+    Route::post('admin/logout', [AdminAuthController::class, 'logout']);
+    // Add other protected admin routes here
+});
 
 // Registration routes
 Route::get('registrations/confirm/{token}', [RegistrationController::class, 'confirm']);
@@ -34,7 +42,3 @@ Route::resource('donations', DonationController::class);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-// Admin Authentication Routes
-Route::post('/admin/login', [AdminAuthController::class, 'login']);
-Route::post('/admin/login/verify-2fa', [AdminAuthController::class, 'verifyLogin2FA']);
