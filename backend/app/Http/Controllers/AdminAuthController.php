@@ -74,15 +74,57 @@ class AdminAuthController extends Controller
         // Check if 2FA is enabled
         $requires2FA = !empty($admin->{'2FASecret'});
 
+        if ($requires2FA) {
+            return response()->json([
+                'message' => '2FA verification required',
+                'requires_2fa' => true,
+                'admin' => [
+                    'email' => $admin->Email,
+                ]
+            ]);
+        }
+
+        // If 2FA is not required, proceed with login
         return response()->json([
-            'message' => 'Authentication successful',
-            'requires_2fa' => $requires2FA,
+            'message' => 'Login successful',
+            'requires_2fa' => false,
             'admin' => [
                 'id' => $admin->AdminID,
                 'email' => $admin->Email,
                 'name' => $admin->FirstName . ' ' . $admin->LastName,
             ],
         ]);
+    }
+
+    public function verifyLogin2FA(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
+
+        $admin = Admin::where('Email', $request->email)->first();
+
+        if (!$admin) {
+            return response()->json([
+                'message' => 'Invalid email'
+            ], 404);
+        }
+
+        if ($admin->verify2FACode($request->code)) {
+            return response()->json([
+                'message' => 'Login successful',
+                'admin' => [
+                    'id' => $admin->AdminID,
+                    'email' => $admin->Email,
+                    'name' => $admin->FirstName . ' ' . $admin->LastName
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Invalid verification code'
+        ], 400);
     }
 
     public function checkAdmins()

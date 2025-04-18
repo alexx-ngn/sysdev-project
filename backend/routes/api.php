@@ -37,3 +37,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Admin Authentication Routes
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::post('/admin/login/verify-2fa', [AdminAuthController::class, 'verifyLogin2FA']);

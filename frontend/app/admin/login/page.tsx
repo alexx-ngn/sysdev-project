@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Heart, Shield, Mail, Lock, ArrowRight, ArrowLeft, Loader2 } from "lucide-react"
+import { Heart, Shield, Mail, Lock, ArrowRight, ArrowLeft, Loader2, KeyRound } from "lucide-react"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [verificationCode, setVerificationCode] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [requires2FA, setRequires2FA] = useState(false)
   const router = useRouter()
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
@@ -36,6 +38,12 @@ export default function AdminLoginPage() {
         throw new Error(data.error || "Login failed")
       }
 
+      if (data.requires_2fa) {
+        setRequires2FA(true)
+        setIsLoading(false)
+        return
+      }
+
       // Store authentication state
       localStorage.setItem("milesforhope-admin-auth", "true")
       localStorage.setItem("milesforhope-admin-info", JSON.stringify(data.admin))
@@ -44,7 +52,38 @@ export default function AdminLoginPage() {
       window.location.href = "/admin"
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during login")
-    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handle2FAVerification = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("http://localhost:8000/api/admin/login/verify-2fa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code: verificationCode }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "2FA verification failed")
+      }
+
+      // Store authentication state
+      localStorage.setItem("milesforhope-admin-auth", "true")
+      localStorage.setItem("milesforhope-admin-info", JSON.stringify(data.admin))
+
+      // Redirect to admin dashboard
+      window.location.href = "/admin"
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "2FA verification failed")
       setIsLoading(false)
     }
   }
@@ -70,64 +109,105 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <CardTitle className="text-2xl text-center">Admin Authentication</CardTitle>
-            <CardDescription className="text-center">Secure access to the MilesForHope admin panel</CardDescription>
+            <CardDescription className="text-center">
+              {requires2FA ? "Enter your 2FA code" : "Secure access to the MilesForHope admin panel"}
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@milesforhope.org"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Password
+            {!requires2FA ? (
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email
                   </Label>
-                  <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </Link>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@milesforhope.org"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
-                  {error}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="flex items-center gap-2">
+                      <Lock className="h-4 w-4" />
+                      Password
+                    </Label>
+                    <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
                 </div>
-              )}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    Continue
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
+                    {error}
+                  </div>
                 )}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      Continue
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handle2FAVerification} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="verificationCode" className="flex items-center gap-2">
+                    <KeyRound className="h-4 w-4" />
+                    Verification Code
+                  </Label>
+                  <Input
+                    id="verificationCode"
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    maxLength={6}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
+                    {error}
+                  </div>
+                )}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      Verify Code
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
 

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use PragmaRX\Google2FA\Google2FA;
+use Illuminate\Support\Facades\Crypt;
 
 class Admin extends Authenticatable
 {
@@ -44,6 +45,23 @@ class Admin extends Authenticatable
     ];
 
     /**
+     * Get the decrypted 2FA secret
+     */
+    public function getDecrypted2FASecret()
+    {
+        return $this->{'2FASecret'} ? Crypt::decryptString($this->{'2FASecret'}) : null;
+    }
+
+    /**
+     * Set the encrypted 2FA secret
+     */
+    public function setEncrypted2FASecret($value)
+    {
+        $this->{'2FASecret'} = $value ? Crypt::encryptString($value) : null;
+        return $this;
+    }
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
@@ -59,9 +77,10 @@ class Admin extends Authenticatable
     public function generate2FASecret()
     {
         $google2fa = new Google2FA();
-        $this->{'2FASecret'} = $google2fa->generateSecretKey();
+        $secret = $google2fa->generateSecretKey();
+        $this->setEncrypted2FASecret($secret);
         $this->save();
-        return $this->{'2FASecret'};
+        return $secret;
     }
 
     /**
@@ -70,10 +89,14 @@ class Admin extends Authenticatable
     public function get2FAQRCode()
     {
         $google2fa = new Google2FA();
+        $secret = $this->getDecrypted2FASecret();
+        if (!$secret) {
+            return null;
+        }
         return $google2fa->getQRCodeUrl(
-            config('app.name'),
+            'MilesForHope',
             $this->Email,
-            $this->{'2FASecret'}
+            $secret
         );
     }
 
@@ -83,7 +106,11 @@ class Admin extends Authenticatable
     public function verify2FACode($code)
     {
         $google2fa = new Google2FA();
-        return $google2fa->verifyKey($this->{'2FASecret'}, $code);
+        $secret = $this->getDecrypted2FASecret();
+        if (!$secret) {
+            return false;
+        }
+        return $google2fa->verifyKey($secret, $code);
     }
 
     /**
