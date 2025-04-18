@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Log;
 */
 
 // Admin Authentication routes
+Route::get('admin/check', [AdminAuthController::class, 'checkAdmins']);
+Route::post('admin/register', [AdminAuthController::class, 'registerFirstAdmin']);
 Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
 // Registration routes
@@ -27,3 +29,10 @@ Route::apiResource('registrations', RegistrationController::class);
 
 // Other routes
 Route::resource('donations', DonationController::class);
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+// Admin Authentication Routes
+Route::post('/admin/login', [AdminAuthController::class, 'login']);

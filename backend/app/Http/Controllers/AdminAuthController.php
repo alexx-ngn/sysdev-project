@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
@@ -52,5 +54,86 @@ class AdminAuthController extends Controller
                 'message' => 'Unable to send reset email. Please try again later.'
             ], 500);
         }
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $admin = Admin::where('Email', $request->email)->first();
+
+        if (!$admin || !Hash::check($request->password, $admin->Password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        // Check if 2FA is enabled
+        $requires2FA = !empty($admin->{'2FASecret'});
+
+        return response()->json([
+            'message' => 'Authentication successful',
+            'requires_2fa' => $requires2FA,
+            'admin' => [
+                'id' => $admin->AdminID,
+                'email' => $admin->Email,
+                'name' => $admin->FirstName . ' ' . $admin->LastName,
+            ],
+        ]);
+    }
+
+    public function checkAdmins()
+    {
+        try {
+            $adminCount = Admin::count();
+            return response()->json([
+                'has_admins' => $adminCount > 0,
+                'count' => $adminCount
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking admin count: ' . $e->getMessage());
+            return response()->json([
+                'has_admins' => false,
+                'error' => 'Failed to check admin status'
+            ], 500);
+        }
+    }
+
+    public function registerFirstAdmin(Request $request)
+    {
+        $adminCount = Admin::count();
+        if ($adminCount > 0) {
+            return response()->json([
+                'message' => 'Admin registration is closed'
+            ], 403);
+        }
+
+        $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,Email',
+            'password' => 'required|string|min:8',
+            'phoneNumber' => 'required|string|max:20'
+        ]);
+
+        $admin = Admin::create([
+            'FirstName' => $request->firstName,
+            'LastName' => $request->lastName,
+            'Email' => $request->email,
+            'Password' => Hash::make($request->password),
+            'PhoneNumber' => $request->phoneNumber
+        ]);
+
+        return response()->json([
+            'message' => 'Admin registered successfully',
+            'admin' => [
+                'id' => $admin->AdminID,
+                'email' => $admin->Email,
+                'name' => $admin->FirstName . ' ' . $admin->LastName,
+            ]
+        ]);
     }
 } 

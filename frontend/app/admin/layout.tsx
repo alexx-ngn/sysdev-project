@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X } from "lucide-react"
+import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 
@@ -19,54 +19,87 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
 
-  // Check if we're on the login page or forgot password page
-  const isAuthPage = pathname === "/admin/login" || pathname === "/admin/forgot-password"
+  // Check if we're on the login page, register page, or forgot password page
+  const isAuthPage = pathname === "/admin/login" || 
+                    pathname === "/admin/register" || 
+                    pathname === "/admin/forgot-password"
 
-  // Check authentication status when component mounts
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuthAndAdmins = async () => {
       try {
+        // First check authentication
         const authValue = localStorage.getItem("milesforhope-admin-auth")
         const isAuth = authValue === "true"
-        console.log("Auth check in admin layout:", {
-          isAuth,
-          authValue,
-          pathname,
-          isAuthPage
-        })
         setIsAuthenticated(isAuth)
+
+        // Check admin status for all admin routes
+        const response = await fetch('http://localhost:8000/api/admin/check')
+        const data = await response.json()
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to check admin status')
+        }
+
+        // If no admins exist, redirect to register regardless of the current page
+        if (!data.has_admins) {
+          router.replace('/admin/register')
+          return
+        }
+
+        // If not authenticated and not on an auth page, redirect to login
+        if (!isAuth && !isAuthPage) {
+          router.replace("/admin/login")
+          return
+        }
+
+        // If authenticated and on an auth page, redirect to admin dashboard
+        if (isAuth && isAuthPage) {
+          router.replace("/admin")
+          return
+        }
+
+        // If on register page and admins exist, redirect to login
+        if (pathname === '/admin/register' && data.has_admins) {
+          router.replace('/admin/login')
+          return
+        }
       } catch (error) {
-        console.error("Error checking auth:", error)
-        setIsAuthenticated(false)
+        console.error("Error during auth check:", error)
       } finally {
         setIsChecking(false)
       }
     }
 
-    checkAuth()
-  }, [pathname, isAuthPage])
+    checkAuthAndAdmins()
+  }, [pathname, router, isAuthPage])
 
-  // If not authenticated and not on an auth page, redirect to login
-  useEffect(() => {
-    if (!isChecking && !isAuthenticated && !isAuthPage) {
-      console.log("Redirecting to login:", {
-        isChecking,
-        isAuthenticated,
-        isAuthPage,
-        pathname
-      })
-      router.replace("/admin/login")
-    }
-  }, [isChecking, isAuthenticated, isAuthPage, pathname, router])
-
-  // Show loading state while checking auth
+  // Show loading state while checking
   if (isChecking) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Checking system status...</p>
+        </div>
+      </div>
+    )
   }
 
   // If we're on an auth page, just render the children without the admin layout
   if (isAuthPage) {
     return <>{children}</>
+  }
+
+  // If not authenticated, show loading state (will be redirected by the effect)
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Redirecting to login...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

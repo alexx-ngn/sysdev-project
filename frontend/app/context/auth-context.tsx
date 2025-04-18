@@ -5,7 +5,12 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string) => void;
+  admin: {
+    id: number;
+    email: string;
+    name: string;
+  } | null;
+  login: (email: string, admin: any) => void;
   logout: () => void;
   checkAuth: () => boolean;
 }
@@ -56,10 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, isLoginPage, router, isInitialized]);
 
-  const login = (email: string) => {
+  const login = (email: string, admin: any) => {
     const authData = {
       timestamp: Date.now(),
-      email
+      email,
+      admin
     };
     localStorage.setItem('milesforhope-admin-auth', JSON.stringify(authData));
     setIsAuthenticated(true);
@@ -75,17 +81,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authData = localStorage.getItem('milesforhope-admin-auth');
     if (authData) {
       try {
-        const { timestamp } = JSON.parse(authData);
-        return Date.now() - timestamp < 24 * 60 * 60 * 1000;
+        const { timestamp, admin } = JSON.parse(authData);
+        const isSessionValid = Date.now() - timestamp < 24 * 60 * 60 * 1000;
+        if (isSessionValid) {
+          setIsAuthenticated(true);
+          return true;
+        }
+        localStorage.removeItem('milesforhope-admin-auth');
       } catch (e) {
-        return false;
+        localStorage.removeItem('milesforhope-admin-auth');
       }
     }
+    setIsAuthenticated(false);
     return false;
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, admin: null, login, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

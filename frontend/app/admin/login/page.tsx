@@ -1,54 +1,57 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
-import { Heart, Shield, Mail, Lock, KeyRound, ArrowRight, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Heart, Shield, Mail, Lock, ArrowRight, ArrowLeft, Loader2 } from "lucide-react"
 
-export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [step, setStep] = useState<"credentials" | "2fa">("credentials")
+export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [code, setCode] = useState("")
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleCredentialsSubmit = (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      setStep("2fa")
-    }, 1000)
-  }
+    try {
+      const response = await fetch("http://localhost:8000/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-  const handle2FASubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+      const data = await response.json()
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // Set authentication flag in localStorage
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed")
+      }
+
+      // Store authentication state
       localStorage.setItem("milesforhope-admin-auth", "true")
-      console.log("Auth flag set after 2FA:", localStorage.getItem("milesforhope-admin-auth"))
-      router.replace("/admin")
-    }, 1000)
+      localStorage.setItem("milesforhope-admin-info", JSON.stringify(data.admin))
+
+      // Redirect to admin dashboard
+      window.location.href = "/admin"
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred during login")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSkipAuth = () => {
-    // Set auth flag and redirect immediately
     localStorage.setItem("milesforhope-admin-auth", "true")
-    console.log("Auth flag set:", localStorage.getItem("milesforhope-admin-auth"))
-    router.replace("/admin")
+    window.location.href = "/admin"
   }
 
   return (
@@ -70,108 +73,62 @@ export default function LoginPage() {
             <CardDescription className="text-center">Secure access to the MilesForHope admin panel</CardDescription>
           </CardHeader>
 
-          {step === "credentials" ? (
-            <form onSubmit={handleCredentialsSubmit}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email
+          <CardContent>
+            <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@milesforhope.org"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Password
                   </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="admin@milesforhope.org"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
+                    Forgot password?
+                  </Link>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="flex items-center gap-2">
-                      <Lock className="h-4 w-4" />
-                      Password
-                    </Label>
-                    <Link href="/admin/forgot-password" replace className="text-sm text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
+                  {error}
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      Continue
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
+              )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
             </form>
-          ) : (
-            <form onSubmit={handle2FASubmit}>
-              <CardContent className="space-y-4">
-                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
-                  <p>A verification code has been sent to your email and authenticator app.</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="2fa-code" className="flex items-center gap-2">
-                    <KeyRound className="h-4 w-4" />
-                    Two-Factor Authentication Code
-                  </Label>
-                  <Input
-                    id="2fa-code"
-                    type="text"
-                    placeholder="Enter 6-digit code"
-                    maxLength={6}
-                    required
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ""))}
-                    className="text-center text-lg tracking-widest"
-                  />
-                  <p className="text-xs text-muted-foreground text-center">
-                    Enter the 6-digit code from your authenticator app
-                  </p>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <Button variant="ghost" type="button" onClick={() => setStep("credentials")} disabled={isLoading}>
-                    Back
-                  </Button>
-                  <Button variant="link" type="button" className="text-sm" disabled={isLoading}>
-                    Resend code
-                  </Button>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" type="submit" disabled={isLoading || code.length !== 6}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    "Verify and Login"
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
-          )}
+          </CardContent>
         </Card>
 
         <div className="mt-4 text-center">
@@ -191,7 +148,7 @@ export default function LoginPage() {
             href="/"
             className="text-sm text-muted-foreground hover:text-gray-900 hover:underline inline-flex items-center"
           >
-            <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Return to Website
           </Link>
         </div>
