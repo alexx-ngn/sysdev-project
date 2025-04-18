@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 // Admin Authentication routes
 Route::get('admin/check', [AdminAuthController::class, 'checkAdmins']);
 Route::post('admin/register', [AdminAuthController::class, 'registerFirstAdmin']);
+Route::post('admin/verify-2fa', [AdminAuthController::class, 'verify2FA']);
 Route::post('admin/forgot-password', [AdminAuthController::class, 'forgotPassword']);
 
 // Registration routes

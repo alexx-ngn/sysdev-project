@@ -127,13 +127,50 @@ class AdminAuthController extends Controller
             'PhoneNumber' => $request->phoneNumber
         ]);
 
+        // Generate 2FA secret and QR code
+        $secret = $admin->generate2FASecret();
+        $qrCodeUrl = $admin->get2FAQRCode();
+
         return response()->json([
             'message' => 'Admin registered successfully',
             'admin' => [
                 'id' => $admin->AdminID,
                 'email' => $admin->Email,
                 'name' => $admin->FirstName . ' ' . $admin->LastName,
-            ]
+            ],
+            'qr_code_url' => $qrCodeUrl,
+            'secret' => $secret
         ]);
+    }
+
+    public function verify2FA(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
+
+        $admin = Admin::where('Email', $request->email)->first();
+
+        if (!$admin) {
+            return response()->json([
+                'message' => 'Invalid email'
+            ], 404);
+        }
+
+        if ($admin->verify2FACode($request->code)) {
+            return response()->json([
+                'message' => '2FA verification successful',
+                'admin' => [
+                    'id' => $admin->AdminID,
+                    'email' => $admin->Email,
+                    'name' => $admin->FirstName . ' ' . $admin->LastName
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Invalid verification code'
+        ], 400);
     }
 } 
