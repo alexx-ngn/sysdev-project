@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { downloadCSV } from "@/lib/utils"
 
 interface Donation {
   DonationID: number;
@@ -146,6 +147,21 @@ export default function DonationsPage() {
     }
   };
 
+  const handleExport = () => {
+    // Transform donations data for CSV export
+    const exportData = donations.map(donation => ({
+      'Donor Name': donation.name,
+      'Email': donation.email,
+      'Amount': `$${donation.Amount.toFixed(2)}`,
+      'Type': donation.type,
+      'Date': new Date(donation.DonationDate).toLocaleDateString(),
+      'Donation ID': donation.DonationID
+    }));
+
+    // Download CSV with current date in filename
+    downloadCSV(exportData, `donations-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -170,7 +186,7 @@ export default function DonationsPage() {
           <p className="text-muted-foreground">Manage and track all donations for the charity run.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
             <Download className="h-4 w-4" />
             Export
           </Button>
