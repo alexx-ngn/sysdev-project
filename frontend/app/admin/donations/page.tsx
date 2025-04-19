@@ -8,6 +8,14 @@ import { Download, Search, Filter, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import Pusher from 'pusher-js'
 import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 interface Donation {
   DonationID: number;
@@ -22,6 +30,13 @@ export default function DonationsPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newDonation, setNewDonation] = useState({
+    name: '',
+    email: '',
+    Amount: 0,
+    type: 'One-time donation'
+  });
 
   // Calculate donation statistics
   const totalDonations = donations.reduce((sum, donation) => sum + (donation.Amount || 0), 0);
@@ -96,6 +111,41 @@ export default function DonationsPage() {
     };
   }, []);
 
+  const handleAddDonation = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/donations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...newDonation,
+          DonationDate: new Date().toISOString(),
+          ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add donation');
+      }
+
+      const data = await response.json();
+      setDonations(prev => [data, ...prev]);
+      setIsAddDialogOpen(false);
+      setNewDonation({
+        name: '',
+        email: '',
+        Amount: 0,
+        type: 'One-time donation'
+      });
+      toast.success('Donation added successfully!');
+    } catch (err) {
+      console.error('Error adding donation:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to add donation');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -124,7 +174,72 @@ export default function DonationsPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button>Add Donation</Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>Add Donation</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Donation</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Donor Name</Label>
+                  <Input
+                    id="name"
+                    value={newDonation.name}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter donor name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newDonation.email}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter donor email"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    value={newDonation.Amount || ''}
+                    onChange={(e) => setNewDonation(prev => ({ 
+                      ...prev, 
+                      Amount: e.target.value ? parseFloat(e.target.value) : 0 
+                    }))}
+                    placeholder="Enter donation amount"
+                    min={0}
+                    step={0.01}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="type">Donation Type</Label>
+                  <select
+                    id="type"
+                    value={newDonation.type}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, type: e.target.value }))}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                  >
+                    <option value="One-time donation">One-time donation</option>
+                    <option value="Corporate">Corporate</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddDonation}>
+                  Add Donation
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -213,8 +328,8 @@ export default function DonationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {donations.map((donation) => (
-                  <TableRow key={donation.DonationID}>
+                {donations.map((donation, index) => (
+                  <TableRow key={donation.DonationID || `donation-${index}`}>
                     <TableCell className="font-medium">{donation.name}</TableCell>
                     <TableCell>{donation.email}</TableCell>
                     <TableCell>{donation.type}</TableCell>
