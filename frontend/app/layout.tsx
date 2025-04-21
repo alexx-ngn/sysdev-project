@@ -4,13 +4,14 @@ import { Inter } from "next/font/google"
 import type { Metadata } from "next"
 import { LanguageProvider } from "./context/language-context"
 import { SettingsProvider } from "./context/settings-context"
+import { AuthProvider } from "./context/auth-context"
 import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "MilesForHope",
-  description: "Making a difference for children's hospitals in Montréal",
+  description: "Charity run management system",
 }
 
 export default function RootLayout({
@@ -32,12 +33,14 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className={inter.className}>
-        <LanguageProvider>
-          <SettingsProvider>
-            {children}
-            <Toaster position="top-center" />
-          </SettingsProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <SettingsProvider>
+              {children}
+              <Toaster />
+            </SettingsProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   )

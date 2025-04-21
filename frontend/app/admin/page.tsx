@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, DollarSign, Calendar, Award } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
+import { getAuthToken, getAuthUser } from '@/app/utils/auth'
 
 interface Registration {
   RegistrationID: number;
@@ -27,10 +29,38 @@ interface Donation {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const user = getAuthUser();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCheckingAdmins, setIsCheckingAdmins] = useState(true);
+
+  useEffect(() => {
+    const checkAdminsAndAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/admin/check');
+        const data = await response.json();
+        
+        if (!data.has_admins) {
+          router.push('/admin/register');
+          return;
+        }
+
+        const token = getAuthToken();
+        if (!token) {
+          router.push('/admin/login');
+        }
+      } catch (error) {
+        console.error('Error checking admins:', error);
+      } finally {
+        setIsCheckingAdmins(false);
+      }
+    };
+
+    checkAdminsAndAuth();
+  }, [router]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,8 +92,12 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  if (loading) {
+  if (isCheckingAdmins || loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return null;
   }
 
   if (error) {

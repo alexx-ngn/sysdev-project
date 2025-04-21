@@ -4,9 +4,11 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X } from "lucide-react"
+import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
+import { useAuth } from "@/app/context/auth-context"
+import { getAuthToken } from "@/app/utils/auth"
 import { NotificationsPopover } from "@/components/ui/notifications"
 
 export default function AdminLayout({
@@ -15,59 +17,97 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
+  const { isAuthenticated, checkAuth, logout } = useAuth()
 
-  // Check if we're on the login page or forgot password page
-  const isAuthPage = pathname === "/admin/login" || pathname === "/admin/forgot-password"
+  // Check if we're on the login page, register page, or forgot password page
+  const isAuthPage = pathname === "/admin/login" || 
+                    pathname === "/admin/register" || 
+                    pathname === "/admin/forgot-password" ||
+                    pathname.startsWith("/admin/reset-password") ||
+                    pathname === "/admin/verify-2fa"
 
-  // Check authentication status when component mounts
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuthAndAdmins = async () => {
       try {
-        const authValue = localStorage.getItem("milesforhope-admin-auth")
-        const isAuth = authValue === "true"
-        console.log("Auth check in admin layout:", {
-          isAuth,
-          authValue,
-          pathname,
-          isAuthPage
-        })
-        setIsAuthenticated(isAuth)
+        // Skip checks for auth pages
+        if (isAuthPage) {
+          setIsChecking(false)
+          return
+        }
+
+        // First check if any admins exist
+        const response = await fetch('http://localhost:8000/api/admin/check')
+        const data = await response.json()
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to check admin status')
+        }
+
+        // If no admins exist, redirect to register
+        if (!data.has_admins) {
+          router.replace('/admin/register')
+          setIsChecking(false)
+          return
+        }
+
+        // Now check authentication
+        const isAuth = checkAuth()
+
+        // If not authenticated and not on an auth page, redirect to login
+        if (!isAuth && !isAuthPage) {
+          router.replace("/admin/login")
+          setIsChecking(false)
+          return
+        }
+
       } catch (error) {
-        console.error("Error checking auth:", error)
-        setIsAuthenticated(false)
+        console.error("Error during auth check:", error)
+        // On error, redirect to login if not on an auth page
+        if (!isAuthPage) {
+          router.replace("/admin/login")
+        }
       } finally {
         setIsChecking(false)
       }
     }
 
-    checkAuth()
-  }, [pathname, isAuthPage])
+    checkAuthAndAdmins()
+  }, [pathname, isAuthPage, router, checkAuth])
 
-  // If not authenticated and not on an auth page, redirect to login
-  useEffect(() => {
-    if (!isChecking && !isAuthenticated && !isAuthPage) {
-      console.log("Redirecting to login:", {
-        isChecking,
-        isAuthenticated,
-        isAuthPage,
-        pathname
-      })
-      router.replace("/admin/login")
-    }
-  }, [isChecking, isAuthenticated, isAuthPage, pathname, router])
-
-  // Show loading state while checking auth
+  // Show loading state while checking
   if (isChecking) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Checking system status...</p>
+        </div>
+      </div>
+    )
   }
 
   // If we're on an auth page, just render the children without the admin layout
   if (isAuthPage) {
     return <>{children}</>
+  }
+
+  // If not authenticated, show loading state (will be redirected by the effect)
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Redirecting to login...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const handleLogout = () => {
+    logout() // Use the auth context's logout function
   }
 
   return (
@@ -160,11 +200,7 @@ export default function AdminLayout({
           <Button
             variant="outline"
             className="w-full flex items-center justify-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
-            onClick={() => {
-              // Clear auth flag and redirect to login
-              localStorage.removeItem("milesforhope-admin-auth")
-              window.location.href = "/admin/login"
-            }}
+            onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />
             <span>Logout</span>
