@@ -26,18 +26,22 @@ class AdminAuthController extends Controller
         $admin = Admin::where('Email', $request->email)->first();
 
         if (!$admin) {
+            // Return same response even if admin not found to prevent email enumeration
             return response()->json([
                 'message' => 'We will send a reset link if this email exists in our system.'
             ], 200);
         }
 
-        // Create reset token
+        // Delete any existing tokens for this email
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Generate a secure random token
         $token = Str::random(64);
 
         // Store the token
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
+        DB::table('password_reset_tokens')->insert(
             [
+                'email' => $request->email,
                 'token' => $token,
                 'created_at' => Carbon::now()
             ]
@@ -122,16 +126,26 @@ class AdminAuthController extends Controller
         }
 
         $admin = Admin::where('Email', $request->email)->first();
+        
+        // Update password
         $admin->Password = Hash::make($request->password, [
             'rounds' => 12
         ]);
+        
+        // Generate new 2FA secret
+        $secret = $admin->generate2FASecret();
+        $qrCodeUrl = $admin->get2FAQRCode();
+        
         $admin->save();
 
         // Delete the token
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json([
-            'message' => 'Password has been reset successfully'
+            'message' => 'Password has been reset successfully. Please set up your 2FA again.',
+            'requires_2fa_setup' => true,
+            'qr_code_url' => $qrCodeUrl,
+            'secret' => $secret
         ]);
     }
 

@@ -25,7 +25,8 @@ export default function AdminLayout({
   const isAuthPage = pathname === "/admin/login" || 
                     pathname === "/admin/register" || 
                     pathname === "/admin/forgot-password" ||
-                    pathname.startsWith("/admin/reset-password")
+                    pathname.startsWith("/admin/reset-password") ||
+                    pathname === "/admin/verify-2fa"
 
   useEffect(() => {
     const checkAuthAndAdmins = async () => {

@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lock, AlertCircle, Heart, Check, X } from 'lucide-react';
 
 export default function ResetPasswordPage() {
@@ -113,54 +113,52 @@ export default function ResetPasswordPage() {
     updatePasswordChecks(formData.password, formData.password_confirmation);
   }, [formData.password, formData.password_confirmation]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-    setValidationErrors({});
-
-    // Client-side validation
-    const passwordErrors = validatePassword(formData.password);
-    if (passwordErrors.length > 0) {
-      setValidationErrors({ password: passwordErrors });
-      return;
-    }
-
-    if (formData.password !== formData.password_confirmation) {
-      setValidationErrors({ password: ['Passwords do not match'] });
-      return;
-    }
+    setIsLoading(true);
+    setError('');
 
     try {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:8000/api/admin/reset-password', {
+      const response = await fetch('/api/admin/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email,
+          token: formData.token,
+          password: formData.password,
+          password_confirmation: formData.password_confirmation,
+        }),
       });
-      
+
       const data = await response.json();
-      
-      if (response.ok) {
-        setSuccess('Password has been reset successfully. You can now login with your new password.');
-        setTimeout(() => {
-          router.push('/admin/login');
-        }, 3000);
-      } else {
-        if (data.errors?.password) {
-          setValidationErrors({ password: Array.isArray(data.errors.password) ? data.errors.password : [data.errors.password] });
-        } else {
-          throw new Error(data.message || 'Failed to reset password');
-        }
+
+      if (!response.ok) {
+        setError(data.message || 'Failed to reset password');
+        setIsLoading(false);
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to reset password. Please try again.');
-    } finally {
+
+      if (data.qr_code_url && data.secret) {
+        localStorage.setItem('2fa_setup_data', JSON.stringify({
+          email: formData.email,
+          qr_code_url: data.qr_code_url,
+          secret: data.secret,
+        }));
+        router.push('/admin/verify-2fa');
+      } else {
+        router.push('/admin/login');
+      }
+    } catch (err) {
+      setError('An error occurred while resetting password');
       setIsLoading(false);
     }
+  };
+
+  const proceedTo2FASetup = () => {
+    console.log('Proceeding to 2FA setup...');
+    window.location.href = '/admin/verify-2fa';
   };
 
   const RequirementCheck = ({ met, text }: { met: boolean; text: string }) => (
@@ -215,6 +213,7 @@ export default function ResetPasswordPage() {
           {error && (
             <Alert variant="destructive" className="mx-4">
               <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -222,6 +221,14 @@ export default function ResetPasswordPage() {
           {success && (
             <Alert className="mx-4">
               <AlertDescription>{success}</AlertDescription>
+              {success.includes('2FA setup') && (
+                <Button
+                  onClick={proceedTo2FASetup}
+                  className="w-full mt-4"
+                >
+                  Proceed to 2FA Setup
+                </Button>
+              )}
             </Alert>
           )}
 

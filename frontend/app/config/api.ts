@@ -7,5 +7,6 @@ export const API_ENDPOINTS = {
     REGISTER_2FA: `${API_BASE_URL}/admin/register/verify-2fa`,
     LOGIN: `${API_BASE_URL}/admin/login`,
     LOGIN_2FA: `${API_BASE_URL}/admin/login/verify-2fa`,
+    VERIFY_2FA: `${API_BASE_URL}/admin/verify-2fa`,
   },
 }; 
