@@ -8,6 +8,7 @@ Before you begin, ensure you have met the following requirements:
 - **Composer**: Version 2.8 or higher
 - **Database**: MySQL
 - **Node.js**: Version 22 or higher
+- **Docker**: Version 20.10 or higher
 
 ## Clone the Repository
 
@@ -47,14 +48,48 @@ cd backend
 cp .env.example .env
 ```
 
-Edit the `.env` file to set your database connection and other environment-specific settings.
+Edit the `.env` file to set the database connection and other environment-specific settings:
+
 ```bash
+APP_NAME=MilesForHope
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=milesforhope
 DB_USERNAME=root
 DB_PASSWORD=
+
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=localhost
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="noreply@milesforhope.org"
+MAIL_FROM_NAME="Miles for Hope"
+
+FRONTEND_URL=http://localhost:3000
+```
+
+## Run Supporting Services with Docker Compose
+
+To run the database and mail catcher in Docker, from the project root execute:
+
+```bash
+docker compose -f docker/docker-compose.yml up -d
+```
+
+This will bring up:
+- **MySQL** on http://localhost:3306
+- **phpMyAdmin** at http://localhost:8080
+- **Mailpit** at http://localhost:8025
+
+To tear everything down:
+
+```bash
+docker compose -f docker/docker-compose.yml down
 ```
 
 ## Initialize Laravel App

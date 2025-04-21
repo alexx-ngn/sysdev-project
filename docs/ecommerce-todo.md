@@ -3,17 +3,17 @@
 - Switching Languages Between French and English ✅
 - Saving User Language Preference ✅
 - Automated Email Confirmation ✅
-- Admin Login Process
-- Progressive Web App Support
+- Admin Login Process ✅
+- Progressive Web App Support ✅
 - Donation Payment Process
 - Registration Process ✅
 
 ## Shahzaib
 - Viewing Donations
 - Auto-detect Language Preference ✅
-- Exporting Runners Data
-- Exporting Donations Data
-- Password Recovery
+- Exporting Runners Data ✅
+- Exporting Donations Data ✅
+- Password Recovery ✅
 - Viewing Registered Runners
 - Live Donation Feed
 - Calendar Export
