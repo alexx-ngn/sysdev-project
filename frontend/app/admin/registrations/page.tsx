@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { downloadCSV } from "@/lib/utils"
 
 interface Registration {
   RegistrationID: number;
@@ -349,6 +350,22 @@ export default function RegistrationsPage() {
     }
   };
 
+  const handleExport = () => {
+    // Transform registrations data for CSV export
+    const exportData = registrations.map(reg => ({
+      'First Name': reg.participant.FirstName,
+      'Last Name': reg.participant.LastName,
+      'Email': reg.participant.Email,
+      'Phone Number': reg.participant.PhoneNumber,
+      'Registration Date': new Date(reg.RegistrationDate).toLocaleDateString(),
+      'Status': reg.RegistrationStatus,
+      'Registration ID': reg.RegistrationID
+    }));
+
+    // Download CSV
+    downloadCSV(exportData, `registrations-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -365,7 +382,7 @@ export default function RegistrationsPage() {
           <p className="text-muted-foreground">Manage and view all participant registrations for the charity run.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
             <Download className="h-4 w-4" />
             Export
           </Button>
