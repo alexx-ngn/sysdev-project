@@ -1,10 +1,31 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Clock, MapPin, Users, CheckCircle, AlertCircle, Plus } from "lucide-react"
+import { Calendar, Clock, MapPin, Users, CheckCircle, AlertCircle, Plus, Download } from "lucide-react"
+import { downloadCSV } from "@/lib/utils"
 
 export default function EventsPage() {
+  const handleExport = () => {
+    // Format event data for export
+    const eventData = [{
+      'Event Name': 'MilesForHope Charity Run 2023',
+      'Date': 'October 15, 2023',
+      'Time': '7:00 AM - 11:00 AM',
+      'Location': 'City Park, Hopeville',
+      'Participants': '245',
+      'Tasks Completed': '3',
+      'Tasks In Progress': '2',
+      'Tasks Pending': '3',
+      'Total Volunteers': '32'
+    }];
+
+    // Download CSV with current date in filename
+    downloadCSV(eventData, `events-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -12,10 +33,16 @@ export default function EventsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Event Management</h2>
           <p className="text-muted-foreground">Manage all aspects of the charity run event.</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Create Event
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Create Event
+          </Button>
+        </div>
       </div>
 
       <Card>
