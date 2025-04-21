@@ -125,11 +125,9 @@ export default function Verify2FAPage() {
           </CardHeader>
 
           {error && (
-            <Alert variant="destructive" className="mx-6 mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800 mx-6 mb-6">
+              {error}
+            </div>
           )}
 
           <CardContent>

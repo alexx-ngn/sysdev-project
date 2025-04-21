@@ -210,102 +210,102 @@ export default function ResetPasswordPage() {
             </CardDescription>
           </CardHeader>
 
-          {error && (
-            <Alert variant="destructive" className="mx-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {success && (
-            <Alert className="mx-4">
-              <AlertDescription>{success}</AlertDescription>
-              {success.includes('2FA setup') && (
-                <Button
-                  onClick={proceedTo2FASetup}
-                  className="w-full mt-4"
-                >
-                  Proceed to 2FA Setup
-                </Button>
-              )}
-            </Alert>
-          )}
-
-          {isTokenValid && (
-            <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    New Password
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    minLength={12}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  />
-                  {validationErrors.password && (
-                    <div className="text-sm text-red-500 space-y-1">
-                      {validationErrors.password.map((error, index) => (
-                        <p key={index}>{error}</p>
-                      ))}
-                    </div>
-                  )}
-                  <div className="text-sm space-y-2 mt-2">
-                    <p className="text-muted-foreground">Password requirements:</p>
-                    <div className="grid gap-2">
-                      <RequirementCheck met={passwordChecks.length} text="At least 12 characters long" />
-                      <RequirementCheck met={passwordChecks.uppercase} text="One uppercase letter" />
-                      <RequirementCheck met={passwordChecks.lowercase} text="One lowercase letter" />
-                      <RequirementCheck met={passwordChecks.number} text="One number" />
-                      <RequirementCheck met={passwordChecks.special} text="One special character (@$!%*?&)" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password_confirmation" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Confirm New Password
-                  </Label>
-                  <Input
-                    id="password_confirmation"
-                    type="password"
-                    required
-                    minLength={12}
-                    value={formData.password_confirmation}
-                    onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
-                  />
-                  <div className="text-sm mt-2">
-                    <RequirementCheck met={passwordChecks.match} text="Passwords match" />
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading || !Object.values(passwordChecks).every(Boolean)}
-                >
-                  {isLoading ? 'Resetting Password...' : 'Reset Password'}
-                </Button>
-              </CardContent>
-            </form>
-          )}
-
-          {!isTokenValid && (
-            <CardContent>
+          {!isTokenValid ? (
+            <CardContent className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
+                Invalid or expired reset link. Please request a new password reset.
+              </div>
               <Button
                 onClick={() => router.push('/admin/forgot-password')}
                 className="w-full"
-                variant="outline"
               >
                 Request New Reset Link
               </Button>
             </CardContent>
+          ) : (
+            <>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800 mx-6 mb-6">
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <Alert className="mx-4">
+                  <AlertDescription>{success}</AlertDescription>
+                  {success.includes('2FA setup') && (
+                    <Button
+                      onClick={proceedTo2FASetup}
+                      className="w-full mt-4"
+                    >
+                      Proceed to 2FA Setup
+                    </Button>
+                  )}
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="flex items-center gap-2">
+                      <Lock className="h-4 w-4" />
+                      New Password
+                    </Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={12}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    {validationErrors.password && (
+                      <div className="text-sm text-red-500 space-y-1">
+                        {validationErrors.password.map((error, index) => (
+                          <p key={index}>{error}</p>
+                        ))}
+                      </div>
+                    )}
+                    <div className="text-sm space-y-2 mt-2">
+                      <p className="text-muted-foreground">Password requirements:</p>
+                      <div className="grid gap-2">
+                        <RequirementCheck met={passwordChecks.length} text="At least 12 characters long" />
+                        <RequirementCheck met={passwordChecks.uppercase} text="One uppercase letter" />
+                        <RequirementCheck met={passwordChecks.lowercase} text="One lowercase letter" />
+                        <RequirementCheck met={passwordChecks.number} text="One number" />
+                        <RequirementCheck met={passwordChecks.special} text="One special character (@$!%*?&)" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password_confirmation" className="flex items-center gap-2">
+                      <Lock className="h-4 w-4" />
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      id="password_confirmation"
+                      type="password"
+                      required
+                      minLength={12}
+                      value={formData.password_confirmation}
+                      onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                    />
+                    <div className="text-sm mt-2">
+                      <RequirementCheck met={passwordChecks.match} text="Passwords match" />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading || !Object.values(passwordChecks).every(Boolean)}
+                  >
+                    {isLoading ? 'Resetting Password...' : 'Reset Password'}
+                  </Button>
+                </CardContent>
+              </form>
+            </>
           )}
         </Card>
       </div>
