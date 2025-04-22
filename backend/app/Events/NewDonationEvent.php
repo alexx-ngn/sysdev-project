@@ -36,11 +36,12 @@ class NewDonationEvent implements ShouldBroadcast
     {
         return [
             'id' => $this->donation->DonationID,
-            'name' => $this->donation->name,
-            'email' => $this->donation->email,
+            'user' => [
+                'firstName' => $this->donation->user->FirstName,
+                'lastName' => $this->donation->user->LastName
+            ],
             'amount' => $this->donation->Amount,
-            'date' => $this->donation->DonationDate,
-            'type' => $this->donation->type
+            'date' => $this->donation->DonationDate
         ];
     }
 } 

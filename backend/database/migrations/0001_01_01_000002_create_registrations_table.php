@@ -10,8 +10,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id('RegistrationID');
-            $table->foreignId('ParticipantID')->constrained('participants', 'ParticipantID');
-            $table->timestamp('RegistrationDate');
+            $table->foreignId('UserID')->constrained('users', 'UserID');
+            $table->date('RegistrationDate');
             $table->string('RegistrationStatus');
             $table->timestamps();
         });

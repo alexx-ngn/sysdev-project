@@ -7,11 +7,9 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('donations', function (Blueprint $table) {
             $table->id('DonationID');
-            $table->string('name');
-            $table->string('email');
-            $table->decimal('Amount', 8, 2);
-            $table->timestamp('DonationDate');
-            $table->string('type');
+            $table->foreignId('UserID')->constrained('users', 'UserID');
+            $table->double('Amount');
+            $table->date('DonationDate');
             $table->string('ConfirmationID');
             $table->timestamps();
         });

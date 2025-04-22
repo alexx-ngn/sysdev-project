@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donation;
+use App\Models\User;
 use App\Events\NewDonationEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +14,7 @@ class DonationController extends Controller
 {
     public function index()
     {
-        $donations = Donation::orderBy('DonationDate', 'desc')->get();
+        $donations = Donation::with('user')->orderBy('DonationDate', 'desc')->get();
         return response()->json($donations);
     }
 
@@ -27,11 +28,9 @@ class DonationController extends Controller
         Log::info('Received donation request:', $request->all());
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'UserID' => 'required|exists:users,UserID',
             'Amount' => 'required|numeric|min:0.01',
             'DonationDate' => 'required|date',
-            'type' => 'required|string',
             'ConfirmationID' => 'required|string'
         ]);
 
@@ -46,15 +45,16 @@ class DonationController extends Controller
 
         try {
             $donation = Donation::create([
-                'name' => $request->name,
-                'email' => $request->email,
+                'UserID' => $request->UserID,
                 'Amount' => $request->Amount,
                 'DonationDate' => $request->DonationDate,
-                'type' => $request->type,
                 'ConfirmationID' => $request->ConfirmationID
             ]);
 
             Log::info('Donation created successfully:', ['donation_id' => $donation->DonationID]);
+
+            // Load the user relationship
+            $donation->load('user');
 
             // Try to broadcast the event, but don't let it fail the donation
             try {
@@ -87,7 +87,7 @@ class DonationController extends Controller
 
     public function show($id)
     {
-        $donation = Donation::findOrFail($id);
+        $donation = Donation::with('user')->findOrFail($id);
         return response()->json($donation);
     }
 }

@@ -31,7 +31,7 @@ interface Registration {
   RegistrationID: number;
   RegistrationDate: string;
   RegistrationStatus: string;
-  participant: {
+  user: {
     FirstName: string;
     LastName: string;
     Email: string;
@@ -67,10 +67,10 @@ function ViewEditModal({ registration, isOpen, onClose, onSave, mode }: ViewEdit
   useEffect(() => {
     if (registration) {
       setFormData({
-        FirstName: registration.participant.FirstName,
-        LastName: registration.participant.LastName,
-        Email: registration.participant.Email,
-        PhoneNumber: registration.participant.PhoneNumber,
+        FirstName: registration.user.FirstName,
+        LastName: registration.user.LastName,
+        Email: registration.user.Email,
+        PhoneNumber: registration.user.PhoneNumber,
         RegistrationStatus: registration.RegistrationStatus
       });
     }
@@ -353,10 +353,10 @@ export default function RegistrationsPage() {
   const handleExport = () => {
     // Transform registrations data for CSV export
     const exportData = registrations.map(reg => ({
-      'First Name': reg.participant.FirstName,
-      'Last Name': reg.participant.LastName,
-      'Email': reg.participant.Email,
-      'Phone Number': reg.participant.PhoneNumber,
+      'First Name': reg.user.FirstName,
+      'Last Name': reg.user.LastName,
+      'Email': reg.user.Email,
+      'Phone Number': reg.user.PhoneNumber,
       'Registration Date': new Date(reg.RegistrationDate).toLocaleDateString(),
       'Status': reg.RegistrationStatus,
       'Registration ID': reg.RegistrationID
@@ -501,10 +501,10 @@ export default function RegistrationsPage() {
                 {registrations.map((registration) => (
                   <TableRow key={registration.RegistrationID}>
                     <TableCell className="font-medium">
-                      {registration.participant.FirstName} {registration.participant.LastName}
+                      {registration.user.FirstName} {registration.user.LastName}
                     </TableCell>
-                    <TableCell>{registration.participant.Email}</TableCell>
-                    <TableCell>{registration.participant.PhoneNumber}</TableCell>
+                    <TableCell>{registration.user.Email}</TableCell>
+                    <TableCell>{registration.user.PhoneNumber}</TableCell>
                     <TableCell>{new Date(registration.RegistrationDate).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
@@ -613,7 +613,7 @@ export default function RegistrationsPage() {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete the registration for{' '}
-              {registrationToDelete ? `${registrationToDelete.participant.FirstName} ${registrationToDelete.participant.LastName}` : ''}.
+              {registrationToDelete ? `${registrationToDelete.user.FirstName} ${registrationToDelete.user.LastName}` : ''}.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

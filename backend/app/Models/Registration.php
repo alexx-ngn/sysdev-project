@@ -32,7 +32,6 @@ class Registration extends Model
      */
     protected $fillable = [
         'UserID',
-        'ParticipantID',
         'RegistrationDate',
         'RegistrationStatus',
         'confirmation_token',
@@ -45,7 +44,7 @@ class Registration extends Model
      * @var array
      */
     protected $casts = [
-        'RegistrationDate' => 'datetime',
+        'RegistrationDate' => 'date',
         'confirmed_at' => 'datetime'
     ];
 
@@ -55,13 +54,5 @@ class Registration extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'UserID');
-    }
-
-    /**
-     * Get the participant associated with the registration.
-     */
-    public function participant(): BelongsTo
-    {
-        return $this->belongsTo(Participant::class, 'ParticipantID');
     }
 }

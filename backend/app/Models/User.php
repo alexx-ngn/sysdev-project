@@ -24,9 +24,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'FirstName',
+        'LastName',
+        'PhoneNumber',
+        'Email'
     ];
 
     /**
@@ -55,5 +56,13 @@ class User extends Authenticatable
     public function registrations(): HasMany
     {
         return $this->hasMany(Registration::class, 'UserID');
+    }
+
+    /**
+     * Get the donations for the user.
+     */
+    public function donations(): HasMany
+    {
+        return $this->hasMany(Donation::class, 'UserID');
     }
 } 
