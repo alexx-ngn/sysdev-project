@@ -20,11 +20,17 @@ import { downloadCSV } from "@/lib/utils"
 
 interface Donation {
   DonationID: number;
-  name: string;
-  email: string;
+  UserID: number;
   Amount: number;
   DonationDate: string;
+  ConfirmationID: string;
   type: string;
+  user: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+    PhoneNumber: string;
+  };
 }
 
 export default function DonationsPage() {
@@ -33,7 +39,9 @@ export default function DonationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newDonation, setNewDonation] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
     email: '',
     Amount: 0,
     type: 'One-time donation'
@@ -100,7 +108,7 @@ export default function DonationsPage() {
       
       // Show notification
       toast.success('New donation received!', {
-        description: `${data.name} donated $${data.Amount}`
+        description: `${data.user ? `${data.user.FirstName} ${data.user.LastName}` : 'N/A'} donated $${data.Amount}`
       });
     });
 
@@ -114,14 +122,38 @@ export default function DonationsPage() {
 
   const handleAddDonation = async () => {
     try {
+      // First, find or create a user
+      const userResponse = await fetch('http://localhost:8000/api/users/find-or-create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          FirstName: newDonation.firstName,
+          LastName: newDonation.lastName,
+          PhoneNumber: newDonation.phoneNumber,
+          Email: newDonation.email
+        }),
+      });
+
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        throw new Error(errorData.message || 'Failed to find or create user');
+      }
+
+      const userData = await userResponse.json();
+      const userId = userData.UserID;
+
+      // Then create the donation
       const response = await fetch('http://localhost:8000/api/donations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...newDonation,
-          DonationDate: new Date().toISOString(),
+          UserID: userId,
+          Amount: newDonation.Amount,
+          DonationDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
           ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
         }),
       });
@@ -132,10 +164,19 @@ export default function DonationsPage() {
       }
 
       const data = await response.json();
-      setDonations(prev => [data, ...prev]);
+      
+      // Add the new donation to the state with the user data
+      const newDonationWithUser = {
+        ...data.data,
+        type: newDonation.type // Add the type since it's not stored in the database
+      };
+      
+      setDonations(prev => [newDonationWithUser, ...prev]);
       setIsAddDialogOpen(false);
       setNewDonation({
-        name: '',
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
         email: '',
         Amount: 0,
         type: 'One-time donation'
@@ -150,8 +191,8 @@ export default function DonationsPage() {
   const handleExport = () => {
     // Transform donations data for CSV export
     const exportData = donations.map(donation => ({
-      'Donor Name': donation.name,
-      'Email': donation.email,
+      'Donor Name': donation.user ? `${donation.user.FirstName} ${donation.user.LastName}` : 'N/A',
+      'Email': donation.user?.Email || 'N/A',
       'Amount': `$${donation.Amount.toFixed(2)}`,
       'Type': donation.type,
       'Date': new Date(donation.DonationDate).toLocaleDateString(),
@@ -199,13 +240,34 @@ export default function DonationsPage() {
                 <DialogTitle>Add New Donation</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      value={newDonation.firstName}
+                      onChange={(e) => setNewDonation(prev => ({ ...prev, firstName: e.target.value }))}
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      value={newDonation.lastName}
+                      onChange={(e) => setNewDonation(prev => ({ ...prev, lastName: e.target.value }))}
+                      placeholder="Enter last name"
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Donor Name</Label>
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
                   <Input
-                    id="name"
-                    value={newDonation.name}
-                    onChange={(e) => setNewDonation(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter donor name"
+                    id="phoneNumber"
+                    type="tel"
+                    value={newDonation.phoneNumber}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    placeholder="Enter phone number"
                   />
                 </div>
                 <div className="space-y-2">
@@ -346,11 +408,15 @@ export default function DonationsPage() {
               <TableBody>
                 {donations.map((donation, index) => (
                   <TableRow key={donation.DonationID || `donation-${index}`}>
-                    <TableCell className="font-medium">{donation.name}</TableCell>
-                    <TableCell>{donation.email}</TableCell>
-                    <TableCell>{donation.type}</TableCell>
+                    <TableCell className="font-medium">
+                      {donation.user ? `${donation.user.FirstName} ${donation.user.LastName}` : 'N/A'}
+                    </TableCell>
+                    <TableCell>{donation.user?.Email || 'N/A'}</TableCell>
+                    <TableCell>{donation.type || 'One-time donation'}</TableCell>
                     <TableCell>${donation.Amount?.toFixed(2) || '0.00'}</TableCell>
-                    <TableCell>{new Date(donation.DonationDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {donation.DonationDate ? new Date(donation.DonationDate).toLocaleDateString() : 'N/A'}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">
                         View

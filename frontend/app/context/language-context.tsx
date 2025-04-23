@@ -365,7 +365,7 @@ const translations: Record<Language, Translations> = {
     'register.form.email': 'Email',
     'register.form.submit': 'Register Now',
     'register.form.submitting': 'Registering...',
-    'register.successMessage': 'Registration successful! Thank you for registering.',
+    'register.successMessage': 'Registration successful! Please check your email for a confirmation message.',
     'register.errorMessage': 'Registration failed. Please try again.',
 
     // Confirmation Page
@@ -721,7 +721,7 @@ const translations: Record<Language, Translations> = {
     'register.form.email': 'Courriel',
     'register.form.submit': 'S\'inscrire maintenant',
     'register.form.submitting': 'Inscription en cours...',
-    'register.successMessage': 'Inscription réussie ! Merci de vous être inscrit.',
+    'register.successMessage': 'Inscription réussie ! Veuillez vérifier votre courriel pour un message de confirmation.',
     'register.errorMessage': 'L\'inscription a échoué. Veuillez réessayer.',
 
     // Confirmation Page

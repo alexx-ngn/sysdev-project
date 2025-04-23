@@ -51,12 +51,31 @@ export default function DonatePage() {
     setLoading(true);
 
     try {
+      // First, find or create a user
+      const userResponse = await fetch('http://localhost:8000/api/users/find-or-create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          email
+        }),
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Failed to find or create user');
+      }
+
+      const userData = await userResponse.json();
+      const userId = userData.UserID;
+
+      // Then create the donation
       const donationData = {
-        name,
-        email,
+        UserID: userId,
         Amount: parseFloat(amount),
-        DonationDate: new Date().toISOString(),
-        type: 'One-time donation',
+        DonationDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
         ConfirmationID: Math.random().toString(36).substring(2, 15)
       };
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AdminAuthController;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +47,5 @@ Route::resource('donations', DonationController::class);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('users/find-or-create', [UserController::class, 'findOrCreate']);
