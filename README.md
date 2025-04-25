@@ -124,4 +124,8 @@ php artisan serve
 
 ## Access the Application
 
-Open your web browser and go to `http://localhost:8000` to access the application.
+Open your web browser and go to `http://localhost:3000` to access the application.
+
+## Admin Access
+
+By default, the first user in the admin panel will have to setup the admin account at `http://localhost:3000/admin`
