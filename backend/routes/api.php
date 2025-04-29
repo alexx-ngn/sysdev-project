@@ -46,6 +46,7 @@ Route::resource('donations', DonationController::class);
 
 Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
 Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
+Route::get('/verify-payment', [StripeController::class, 'verifyPayment']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

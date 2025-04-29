@@ -110,10 +110,17 @@ export default function DonatePage() {
     setLoading(true);
 
     try {
+      console.log('Sending request with data:', {
+        amount: parseFloat(amount),
+        name,
+        email,
+      });
+      
       const response = await fetch('http://localhost:8000/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           amount: parseFloat(amount),
@@ -122,17 +129,28 @@ export default function DonatePage() {
         }),
       });
 
-      const { sessionId } = await response.json();
+      const data = await response.json();
+      console.log('Response from server:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to create checkout session');
+      }
+
       const stripe = await loadStripe('pk_test_51RGss0D6lPUkmN5DgD3K2MDsOwMLSxbAd4YwVriFa3G3anxTpi1c9Ogeyrr8uqSMQbVDAejSAe4Xi78PojnZHmou00x7WfQNGy');
-      if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-        if (error) {
-          toast.error(error.message);
-        }
+      if (!stripe) {
+        throw new Error('Failed to load Stripe');
+      }
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: data.sessionId
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
       }
     } catch (error) {
       console.error('Stripe donation error:', error);
-      toast.error("Failed to process donation. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
     } finally {
       setLoading(false);
     }
