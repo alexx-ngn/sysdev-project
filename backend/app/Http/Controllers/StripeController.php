@@ -8,6 +8,7 @@ use Stripe\Checkout\Session;
 use App\Models\Donation;
 use App\Events\NewDonationEvent;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class StripeController extends Controller
 {
@@ -87,38 +88,73 @@ class StripeController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
         $endpointSecret = config('services.stripe.webhook_secret');
 
+        Log::info('Received webhook request:', [
+            'signature' => $sigHeader,
+            'has_secret' => !empty($endpointSecret),
+            'payload' => json_decode($payload, true)
+        ]);
+
         try {
             $event = \Stripe\Webhook::constructEvent(
                 $payload, $sigHeader, $endpointSecret
             );
+
+            Log::info('Webhook event constructed successfully:', [
+                'event_type' => $event->type,
+                'event_id' => $event->id
+            ]);
         } catch (\UnexpectedValueException $e) {
+            Log::error('Invalid webhook payload:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Invalid payload'], 400);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            Log::error('Invalid webhook signature:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
         if ($event->type === 'checkout.session.completed') {
             $session = $event->data->object;
 
+            Log::info('Processing checkout.session.completed event:', [
+                'session_id' => $session->id,
+                'amount' => $session->amount_total,
+                'metadata' => $session->metadata
+            ]);
+
             try {
+                // Find or create user
+                $user = User::firstOrCreate(
+                    ['Email' => $session->metadata->donor_email],
+                    [
+                        'FirstName' => explode(' ', $session->metadata->donor_name)[0],
+                        'LastName' => explode(' ', $session->metadata->donor_name)[1] ?? '',
+                        'PhoneNumber' => null,
+                    ]
+                );
+
+                Log::info('User found/created:', [
+                    'user_id' => $user->UserID,
+                    'email' => $user->Email
+                ]);
+
+                // Create donation
                 $donation = Donation::create([
-                    'name' => $session->metadata->donor_name,
-                    'email' => $session->metadata->donor_email,
+                    'UserID' => $user->UserID,
                     'Amount' => $session->amount_total / 100, // Convert from cents
                     'DonationDate' => now(),
-                    'type' => 'One-time donation',
                     'ConfirmationID' => 'DON-' . time() . '-' . substr(md5(uniqid()), 0, 8),
                 ]);
 
-                event(new NewDonationEvent($donation));
-
-                Log::info('Donation processed successfully:', [
+                Log::info('Donation created successfully:', [
                     'donation_id' => $donation->DonationID,
-                    'amount' => $donation->Amount
+                    'amount' => $donation->Amount,
+                    'user_id' => $user->UserID
                 ]);
+
+                event(new NewDonationEvent($donation));
             } catch (\Exception $e) {
                 Log::error('Failed to process donation after successful payment:', [
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                     'session_id' => $session->id
                 ]);
             }
