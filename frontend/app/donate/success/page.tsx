@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,25 @@ import { Header } from "@/app/components/header";
 import { Footer } from "@/app/components/footer";
 import { WebsiteSettings } from "@/app/components/website-settings";
 
-export default function DonationSuccessPage() {
+function LoadingFallback() {
+  const { t } = useLanguage();
+  return (
+    <div className="flex flex-col min-h-screen">
+      <WebsiteSettings />
+      <Header />
+      <main className="flex-1 container max-w-[1400px] mx-auto px-4 md:px-6 py-12">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground">{t('donate.success.verifying')}</p>
+          </CardContent>
+        </Card>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function DonationSuccessContent() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,5 +104,13 @@ export default function DonationSuccessPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function DonationSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <DonationSuccessContent />
+    </Suspense>
   );
 } 

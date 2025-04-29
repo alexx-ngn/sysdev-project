@@ -5,7 +5,7 @@
 - Automated Email Confirmation ✅
 - Admin Login Process ✅
 - Progressive Web App Support ✅
-- Donation Payment Process
+- Donation Payment Process ✅
 - Registration Process ✅
 
 ## Shahzaib

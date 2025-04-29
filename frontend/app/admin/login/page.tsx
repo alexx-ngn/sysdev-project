@@ -37,28 +37,37 @@ export default function AdminLoginPage() {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
+            'Content-Type': 'application/json',
           },
-        })
-        const data = await response.json()
-        
+          // Add credentials if your API requires it
+          credentials: 'include',
+        });
+
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to check admin status')
+          // If response is not ok, we'll still continue but log the error
+          console.warn('Admin check failed:', response.status, response.statusText);
+          setIsChecking(false);
+          return;
         }
 
+        const data = await response.json();
+        
         // If no admins exist, redirect to register
         if (!data.has_admins) {
-          router.replace('/admin/register')
-          return
+          router.replace('/admin/register');
+          return;
         }
-        setIsChecking(false)
+        
+        setIsChecking(false);
       } catch (error) {
-        console.error('Error checking admin status:', error)
-        setIsChecking(false)
+        // Log the error but don't prevent access to the login page
+        console.error('Error checking admin status:', error);
+        setIsChecking(false);
       }
-    }
+    };
 
-    checkAdmins()
-  }, [router])
+    checkAdmins();
+  }, [router]);
 
   // Show loading state while checking
   if (isChecking) {
