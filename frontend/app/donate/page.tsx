@@ -13,6 +13,7 @@ import { Header } from "@/app/components/header"
 import { Footer } from "@/app/components/footer"
 import { useState } from "react"
 import { toast } from "sonner"
+import { loadStripe } from '@stripe/stripe-js'
 
 export default function DonatePage() {
   const { t } = useLanguage();
@@ -85,6 +86,53 @@ export default function DonatePage() {
     } catch (error) {
       console.error('Donation error:', error);
       toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStripeDonation = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error("Please enter a valid donation amount");
+      return;
+    }
+
+    if (!name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          name,
+          email,
+        }),
+      });
+
+      const { sessionId } = await response.json();
+      const stripe = await loadStripe('pk_test_51RGss0D6lPUkmN5DgD3K2MDsOwMLSxbAd4YwVriFa3G3anxTpi1c9Ogeyrr8uqSMQbVDAejSAe4Xi78PojnZHmou00x7WfQNGy');
+      if (stripe) {
+        const { error } = await stripe.redirectToCheckout({ sessionId });
+        if (error) {
+          toast.error(error.message);
+        }
+      }
+    } catch (error) {
+      console.error('Stripe donation error:', error);
+      toast.error("Failed to process donation. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -193,10 +241,10 @@ export default function DonatePage() {
                 <CardFooter>
                   <Button 
                     className="w-full" 
-                    onClick={handleDonation}
+                    onClick={handleStripeDonation}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : t('donate.oneTime.button')}
+                    {loading ? "Processing..." : "Donate with Stripe"}
                   </Button>
                 </CardFooter>
               </Card>
