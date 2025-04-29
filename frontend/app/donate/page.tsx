@@ -262,7 +262,7 @@ export default function DonatePage() {
                     onClick={handleStripeDonation}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : "Donate with Stripe"}
+                    {loading ? "Processing..." : `Donate $${amount || "0"}`}
                   </Button>
                 </CardFooter>
               </Card>

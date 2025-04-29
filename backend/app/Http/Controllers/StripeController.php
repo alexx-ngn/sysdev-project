@@ -46,7 +46,7 @@ class StripeController extends Controller
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'usd',
+                        'currency' => 'cad',
                         'unit_amount' => (int)($request->amount * 100), // Convert to cents and ensure integer
                         'product_data' => [
                             'name' => 'Charity Run Donation',
@@ -56,8 +56,8 @@ class StripeController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => url('/donate/success?session_id={CHECKOUT_SESSION_ID}'),
-                'cancel_url' => url('/donate/cancel'),
+                'success_url' => 'http://localhost:3000/donate/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => 'http://localhost:3000/donate/cancel',
                 'customer_email' => $request->email,
                 'metadata' => [
                     'donor_name' => $request->name,
