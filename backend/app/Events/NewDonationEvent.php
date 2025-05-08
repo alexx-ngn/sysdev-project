@@ -35,13 +35,15 @@ class NewDonationEvent implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'id' => $this->donation->DonationID,
+            'DonationID' => $this->donation->DonationID,
             'user' => [
-                'firstName' => $this->donation->user->FirstName,
-                'lastName' => $this->donation->user->LastName
+                'FirstName' => $this->donation->user->FirstName,
+                'LastName' => $this->donation->user->LastName,
+                'Email' => $this->donation->user->Email
             ],
-            'amount' => $this->donation->Amount,
-            'date' => $this->donation->DonationDate
+            'Amount' => $this->donation->Amount,
+            'DonationDate' => $this->donation->DonationDate,
+            'ConfirmationID' => $this->donation->ConfirmationID
         ];
     }
 } 

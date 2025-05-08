@@ -9,12 +9,12 @@
 - Registration Process ✅
 
 ## Shahzaib
-- Viewing Donations
+- Viewing Donations ✅
 - Auto-detect Language Preference ✅
 - Exporting Runners Data ✅
 - Exporting Donations Data ✅
 - Password Recovery ✅
-- Viewing Registered Runners
+- Viewing Registered Runners ✅
 - Live Donation Feed
 - Calendar Export
 
@@ -23,7 +23,7 @@
 - Fundraising Progress Bar
 - Leaderboard for Top Fundraisers
 - Event Schedule Display
-- Contact Form Submission
+- Contact Form Submission ✅
 - Admin Data Filtering
 - Admin Search
 - Visual Map Route
