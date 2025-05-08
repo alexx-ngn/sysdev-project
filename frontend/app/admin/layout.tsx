@@ -165,16 +165,6 @@ export default function AdminLayout({
             </li>
             <li>
               <Link
-                href="/admin/events"
-                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Calendar className="h-5 w-5" />
-                <span>Event Management</span>
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/admin/settings"
                 className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors"
                 onClick={() => setSidebarOpen(false)}

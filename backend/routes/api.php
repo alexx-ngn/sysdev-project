@@ -35,6 +35,7 @@ Route::post('admin/verify-reset-token', [AdminAuthController::class, 'verifyRese
 // Protected admin routes
 Route::middleware(['auth:sanctum', 'admin.auth'])->group(function () {
     Route::post('admin/logout', [AdminAuthController::class, 'logout']);
+    Route::get('admin', [AdminAuthController::class, 'listAdmins']);
     // Add other protected admin routes here
 });
 

@@ -360,4 +360,10 @@ class AdminAuthController extends Controller
             'message' => 'Invalid verification code'
         ], 400);
     }
+
+    public function listAdmins(Request $request)
+    {
+        $admins = Admin::select('AdminID', 'FirstName', 'LastName', 'Email', 'PhoneNumber', '2FASecret', 'updated_at')->get();
+        return response()->json(['admins' => $admins]);
+    }
 } 
