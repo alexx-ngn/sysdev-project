@@ -366,4 +366,111 @@ class AdminAuthController extends Controller
         $admins = Admin::select('AdminID', 'FirstName', 'LastName', 'Email', 'PhoneNumber', '2FASecret', 'updated_at')->get();
         return response()->json(['admins' => $admins]);
     }
+
+    public function updateAdmin(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        $validated = $request->validate([
+            'FirstName' => 'required|string|max:255',
+            'LastName' => 'required|string|max:255',
+            'Email' => 'required|email|unique:admins,Email,' . $admin->AdminID . ',AdminID',
+            'PhoneNumber' => 'required|string|max:20',
+        ]);
+        $admin->update($validated);
+        return response()->json(['message' => 'Admin updated successfully', 'admin' => $admin]);
+    }
+
+    public function deleteAdmin(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        // Prevent deleting the currently authenticated admin
+        if ($request->user()->AdminID == $admin->AdminID) {
+            return response()->json(['error' => 'You cannot delete your own admin account.'], 403);
+        }
+        $admin->delete();
+        return response()->json(['message' => 'Admin deleted successfully']);
+    }
+
+    public function createAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            'FirstName' => 'required|string|max:255',
+            'LastName' => 'required|string|max:255',
+            'Email' => 'required|email|unique:admins,Email',
+            'PhoneNumber' => 'required|string|max:20',
+            'Password' => 'required|string|min:12|confirmed',
+        ]);
+
+        $hashedPassword = Hash::make($validated['Password'], ['rounds' => 12]);
+        $admin = Admin::create([
+            'FirstName' => $validated['FirstName'],
+            'LastName' => $validated['LastName'],
+            'Email' => $validated['Email'],
+            'PhoneNumber' => $validated['PhoneNumber'],
+            'Password' => $hashedPassword,
+        ]);
+
+        // Generate 2FA secret and QR code
+        $secret = $admin->generate2FASecret();
+        $qrCodeUrl = $admin->get2FAQRCode();
+
+        return response()->json([
+            'message' => 'Admin created successfully',
+            'admin' => $admin,
+            'qr_code_url' => $qrCodeUrl,
+            'secret' => $secret
+        ], 201);
+    }
+
+    public function verify2FAForAdmin(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+        if ($admin->verify2FACode($request->code)) {
+            return response()->json([
+                'message' => '2FA setup complete',
+                'admin' => [
+                    'id' => $admin->AdminID,
+                    'email' => $admin->Email,
+                    'name' => $admin->FirstName . ' ' . $admin->LastName
+                ]
+            ]);
+        }
+        return response()->json([
+            'message' => 'Invalid verification code'
+        ], 400);
+    }
+
+    public function resetPasswordForAdmin(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        if ($request->user()->AdminID == $admin->AdminID) {
+            return response()->json(['error' => 'You cannot reset your own password from here.'], 403);
+        }
+        $newPassword = Str::random(16);
+        $admin->Password = Hash::make($newPassword, ['rounds' => 12]);
+        $admin->save();
+        // Optionally, you could email the new password to the admin here
+        return response()->json(['message' => 'Password reset successfully', 'new_password' => $newPassword]);
+    }
+
+    public function reset2FAForAdmin(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        if ($request->user()->AdminID == $admin->AdminID) {
+            return response()->json(['error' => 'You cannot reset your own 2FA from here.'], 403);
+        }
+        // Generate new 2FA secret and QR code
+        $secret = $admin->generate2FASecret();
+        $qrCodeUrl = $admin->get2FAQRCode();
+        $admin->save();
+
+        return response()->json([
+            'message' => '2FA reset successfully. Please set up new 2FA.',
+            'qr_code_url' => $qrCodeUrl,
+            'secret' => $secret
+        ]);
+    }
 } 

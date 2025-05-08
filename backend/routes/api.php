@@ -36,6 +36,12 @@ Route::post('admin/verify-reset-token', [AdminAuthController::class, 'verifyRese
 Route::middleware(['auth:sanctum', 'admin.auth'])->group(function () {
     Route::post('admin/logout', [AdminAuthController::class, 'logout']);
     Route::get('admin', [AdminAuthController::class, 'listAdmins']);
+    Route::post('admin', [AdminAuthController::class, 'createAdmin']);
+    Route::match(['put', 'patch'], 'admin/{id}', [AdminAuthController::class, 'updateAdmin']);
+    Route::delete('admin/{id}', [AdminAuthController::class, 'deleteAdmin']);
+    Route::post('admin/{id}/verify-2fa', [AdminAuthController::class, 'verify2FAForAdmin']);
+    Route::post('admin/{id}/reset-password', [AdminAuthController::class, 'resetPasswordForAdmin']);
+    Route::post('admin/{id}/reset-2fa', [AdminAuthController::class, 'reset2FAForAdmin']);
     // Add other protected admin routes here
 });
 
