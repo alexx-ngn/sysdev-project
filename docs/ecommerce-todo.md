@@ -19,10 +19,10 @@
 - Calendar Export
 
 ## Gideon
-- Social Media Sharing
-- Fundraising Progress Bar
+- Social Media Sharing ✅
+- Fundraising Progress Bar ✅
 - Leaderboard for Top Fundraisers
-- Event Schedule Display
+- Event Schedule Display ✅
 - Contact Form Submission ✅
 - Admin Data Filtering
 - Admin Search

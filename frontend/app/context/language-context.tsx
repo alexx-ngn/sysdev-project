@@ -49,6 +49,7 @@ const translations: Record<Language, Translations> = {
     'featured.about.description': 'Learn about our mission and impact',
     'featured.about.content': 'MilesForHope is a student-led charity run dedicated to raising funds for children\'s hospitals in Montréal, specifically supporting CHU Sainte-Justine and Montreal Children\'s Hospital.',
     'featured.about.readMore': 'Read More',
+    'featured.about.learnMore': 'Learn More',
     
     'featured.run.title': 'Charity Run',
     'featured.run.description': 'Event details and schedule',
@@ -419,7 +420,7 @@ const translations: Record<Language, Translations> = {
     'featured.about.description': 'Découvrez notre mission et notre impact',
     'featured.about.content': 'MilesForHope est une course de bienfaisance organisée par des étudiants, dont le but est de lever des fonds pour les hôpitaux pour enfants de Montréal, en soutenant spécifiquement le CHU Sainte-Justine et l\'Hôpital des enfants de Montréal.',
     'featured.about.readMore': 'Lire la suite',
-    
+    'featured.about.learnMore': 'En savoir plus',
     'featured.run.title': 'Course de bienfaisance',
     'featured.run.description': 'Détails et horaire de l\'événement',
     'featured.run.content': 'Rejoignez-nous pour une journée de course, de communauté et de changement. Les participants peuvent gagner des médailles, des articles de merchandising et d\'autres biens tout en soutenant une grande cause. Chaque pas compte !',

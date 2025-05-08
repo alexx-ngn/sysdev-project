@@ -71,6 +71,11 @@ MAIL_FROM_ADDRESS="noreply@milesforhope.org"
 MAIL_FROM_NAME="Miles for Hope"
 
 FRONTEND_URL=http://localhost:3000
+
+#Ask Alex for Stripe API keys
+STRIPE_SECRET=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_KEY=
 ```
 
 ## Run Supporting Services with Docker Compose
