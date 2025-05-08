@@ -7,6 +7,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AdminAuthController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\StripeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,10 @@ Route::apiResource('registrations', RegistrationController::class);
 
 // Other routes
 Route::resource('donations', DonationController::class);
+
+Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
+Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
+Route::get('/verify-payment', [StripeController::class, 'verifyPayment']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

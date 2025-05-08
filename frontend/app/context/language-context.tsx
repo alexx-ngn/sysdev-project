@@ -259,7 +259,7 @@ const translations: Record<Language, Translations> = {
     'donate.oneTime.title': 'One-Time Donation',
     'donate.oneTime.subtitle': 'Support children\'s healthcare with a single contribution',
     'donate.oneTime.description': 'Your one-time donation directly supports medical care, research, and equipment for children at CHU Sainte-Justine and Montreal Children\'s Hospital. Every dollar makes a difference in a child\'s life.',
-    'donate.oneTime.customAmount': 'Custom Amount',
+    'donate.oneTime.customAmount': 'Amount',
     'donate.oneTime.enterAmount': 'Enter amount',
     'donate.oneTime.button': 'Donate Now',
     'donate.sponsor.title': 'Become a Sponsor',
@@ -285,6 +285,20 @@ const translations: Record<Language, Translations> = {
     'donate.contact.message': 'Message',
     'donate.contact.messagePlaceholder': 'Your Message',
     'donate.contact.button': 'Send Message',
+
+    // Donation Success Page
+    'donate.success.title': 'Donation Successful!',
+    'donate.success.subtitle': 'Thank you for your generous support',
+    'donate.success.verifying': 'Verifying your donation...',
+    'donate.success.message': 'Your donation has been successfully processed. We appreciate your support in helping children\'s healthcare in Montréal.',
+    'donate.success.backButton': 'Back to Donations',
+
+    // Donation Cancel Page
+    'donate.cancel.title': 'Donation Cancelled',
+    'donate.cancel.subtitle': 'Your donation was not processed',
+    'donate.cancel.message': 'No charges were made. If you experienced any issues, please try again or contact our support team.',
+    'donate.cancel.backButton': 'Back to Donations',
+    'donate.cancel.supportButton': 'Contact Support',
 
     // Contact Page
     'contact.title': 'Contact Us',
@@ -615,7 +629,7 @@ const translations: Record<Language, Translations> = {
     'donate.oneTime.title': 'Don unique',
     'donate.oneTime.subtitle': 'Soutenez les soins de santé des enfants avec une contribution unique',
     'donate.oneTime.description': 'Votre don unique soutient directement les soins médicaux, la recherche et l\'équipement pour les enfants au CHU Sainte-Justine et à l\'Hôpital de Montréal pour enfants. Chaque dollar fait une différence dans la vie d\'un enfant.',
-    'donate.oneTime.customAmount': 'Montant Personnalisé',
+    'donate.oneTime.customAmount': 'Montant',
     'donate.oneTime.enterAmount': 'Entrez le montant',
     'donate.oneTime.button': 'Faire un Don',
     'donate.sponsor.title': 'Devenez Commanditaire',
@@ -641,6 +655,20 @@ const translations: Record<Language, Translations> = {
     'donate.contact.message': 'Message',
     'donate.contact.messagePlaceholder': 'Votre Message',
     'donate.contact.button': 'Envoyer le Message',
+
+    // Donation Success Page
+    'donate.success.title': 'Don réussi !',
+    'donate.success.subtitle': 'Merci pour votre généreux soutien',
+    'donate.success.verifying': 'Vérification de votre don...',
+    'donate.success.message': 'Votre don a été traité avec succès. Nous apprécions votre soutien pour aider les soins de santé des enfants à Montréal.',
+    'donate.success.backButton': 'Retour aux dons',
+
+    // Donation Cancel Page
+    'donate.cancel.title': 'Don annulé',
+    'donate.cancel.subtitle': 'Votre don n\'a pas été traité',
+    'donate.cancel.message': 'Aucun frais n\'a été facturé. Si vous avez rencontré des problèmes, veuillez réessayer ou contacter notre équipe de support.',
+    'donate.cancel.backButton': 'Retour aux dons',
+    'donate.cancel.supportButton': 'Contacter le support',
 
     // Contact Page
     'contact.title': 'Contactez-nous',

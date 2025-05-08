@@ -521,14 +521,6 @@ export default function RegistrationsPage() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        onClick={() => handleViewRegistration(registration)}
-                        className="mr-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
                         onClick={() => handleEditRegistration(registration)}
                         className="mr-2"
                       >
