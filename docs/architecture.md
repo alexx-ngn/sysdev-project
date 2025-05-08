@@ -6,24 +6,19 @@ MilesForHope is a full-stack charity run management system built with Next.js an
 ## Core Features
 
 ### User Registration System
-The registration system is designed to provide a seamless experience while ensuring data accuracy and security. Users begin their registration through a multi-step form that collects essential information such as personal details, contact information, and event preferences. The system implements real-time validation to ensure data integrity, checking for valid email formats, phone numbers, and required fields.
+The registration system is designed to provide a seamless experience while ensuring data accuracy and security. Users begin their registration through a multi-step form that collects essential information such as personal details, contact information, and emergency contact information. The system implements real-time validation to ensure data integrity, checking for valid email formats, phone numbers, and required fields.
 
-Upon submission, the system automatically generates a unique registration token and sends a verification email to the user. This email contains a secure link that the user must click to confirm their registration. The system maintains different registration states (pending, confirmed, cancelled) and automatically updates the user's status based on their actions. Throughout this process, users receive timely email notifications about their registration status, upcoming events, and important deadlines.
+Upon submission, the system automatically generates a unique registration token and sends a verification email to the user. This email contains a secure link that the user must click to confirm their registration. The system maintains different registration states (pending, confirmed, cancelled) and automatically updates the user's status based on their actions. Throughout this process, users receive timely email notifications about their registration status and important deadlines.
 
 ### Donation Management
-The donation system is built around Stripe's secure payment infrastructure, providing a reliable and secure way to process donations. When a user initiates a donation, the system creates a secure checkout session through Stripe, supporting various payment methods including credit cards, debit cards, and digital wallets. The system handles both one-time and recurring donations, with the ability to set up automated monthly contributions.
+The donation system is built around Stripe's secure payment infrastructure, providing a reliable and secure way to process donations. When a user initiates a donation, the system creates a secure checkout session through Stripe, supporting various payment methods including credit cards, debit cards, and digital wallets.
 
 Each donation is tracked with a unique transaction ID and generates an automated receipt that includes all necessary information. The system maintains a comprehensive audit trail of all transactions, including payment status, payment history, and communication records.
 
 ### Admin Dashboard
-The admin dashboard serves as the central control center for managing the entire charity run operation. Administrators can access the dashboard after completing a secure two-factor authentication process. The dashboard provides real-time insights into registration numbers, donation totals, and event progress.
+The admin dashboard serves as the central control center for managing the entire charity run operation. Administrators can access the dashboard after completing a secure two-factor authentication process. The dashboard provides real-time insights into registration numbers, donation totals, and progress.
 
 Administrators have granular control over user registrations, with the ability to review, approve, or reject applications. They can manage user profiles, update information, and handle special requests. The donation management interface allows administrators to track all financial transactions, process refunds, and generate financial reports. The system maintains detailed audit logs of all administrative actions, ensuring accountability and transparency.
-
-### Event Management
-The event management system provides comprehensive tools for organizing and executing charity runs. Administrators can create and configure events with detailed information about routes, start times, and participant requirements.
-
-The route management feature allows administrators to define and map out the course, including start and finish lines, water stations, and medical checkpoints. The system integrates with timing systems to track participant progress and generate accurate results. Real-time analytics provide insights into participant distribution, completion rates, and potential bottlenecks.
 
 ### Communication System
 The communication system is built around a robust email infrastructure that ensures reliable delivery of important information to all stakeholders. The system maintains a comprehensive library of email templates for various scenarios, including registration confirmations, donation receipts, event reminders, and important announcements. Each template is customizable and can be personalized with user-specific information.
@@ -63,7 +58,7 @@ Data protection measures include encryption of sensitive information, secure sto
 - Admin panel with authentication
 - User registration system
 - Donation management interface
-- Multi-language support
+- Multi-language support (French/English)
 - Responsive design
 - Progressive Web App (PWA) capabilities
 
@@ -106,7 +101,6 @@ Data protection measures include encryption of sensitive information, secure sto
    - System presents a multi-step registration form
    - Each step collects specific information:
      - Personal details (name, contact information)
-     - Event preferences (run category, t-shirt size)
      - Emergency contact information
    - Real-time validation ensures data accuracy
    - System checks for duplicate registrations
@@ -119,20 +113,12 @@ Data protection measures include encryption of sensitive information, secure sto
    - Sends welcome email with next steps
 
 3. **Registration Confirmation**
-   - Admin reviews registration details
-   - System notifies user of registration approval
-   - User receives confirmation email with:
-     - Registration details
-     - Event information
-     - Important dates and deadlines
-     - Next steps for preparation
+   - User receives confirmation email to confirm their participation
 
 #### Donation Process
 1. **Donation Initiation**
    - User selects donation amount
-   - Chooses between one-time or recurring donation
    - Enters payment information
-   - System validates payment details
    - Creates secure Stripe checkout session
 
 2. **Payment Processing**
@@ -145,49 +131,20 @@ Data protection measures include encryption of sensitive information, secure sto
 3. **Post-Donation**
    - System sends confirmation email with receipt
    - Updates user's donation history
-   - Records transaction in audit log
+   - Records transaction in database
    - Updates fundraising totals
-   - Triggers any applicable rewards or recognition
 
 ### Administrative Workflow
-
-#### Event Management
-1. **Event Setup**
-   - Admin creates new event
-   - Configures event details:
-     - Date and time
-     - Location and route
-     - Registration limits
-     - Pricing tiers
-   - Sets up registration periods
-   - Configures email templates
-
-2. **Registration Management**
-   - Admin monitors registration progress
-   - Reviews pending registrations
-   - Approves or rejects applications
-   - Manages waitlist if applicable
-   - Sends bulk communications
-
-3. **Event Execution**
-   - System tracks registration status
-   - Manages participant check-in
-   - Records race results
-   - Updates participant records
-   - Displays event statistics
 
 #### Financial Management
 1. **Donation Tracking**
    - System records all transactions
-   - Categorizes donations
    - Tracks payment status
-   - Manages refund requests
    - Displays donation statistics
 
 2. **Financial Overview**
    - System compiles financial data
    - Shows revenue totals
-   - Tracks expense categories
    - Displays fundraising progress
    - Provides donation analytics
 
@@ -198,13 +155,10 @@ Data protection measures include encryption of sensitive information, secure sto
    - Registration information flows to user database
    - Payment information processed through Stripe
    - Donation records linked to user profiles
-   - Event participation tracked in registration system
 
 2. **Administrative Data**
-   - Admin actions logged in audit trail
    - System configurations stored in settings
-   - Email templates managed in communication system
-   - Financial records maintained in transaction database
+   - Financial records maintained in donations database
 
 #### Integration Points
 1. **Payment Processing**
@@ -217,13 +171,6 @@ Data protection measures include encryption of sensitive information, secure sto
    - Triggered by system events
    - Personalized with user data
    - Tracked for delivery status
-   - Managed for unsubscribe requests
-
-3. **Event Management**
-   - Integrated with registration system
-   - Connected to payment processing
-   - Linked to communication system
-   - Displays event analytics
 
 ### Error Handling and Recovery
 
@@ -239,19 +186,6 @@ Data protection measures include encryption of sensitive information, secure sto
    - User notification system
    - Error logging and tracking
    - Support ticket generation
-
-#### System Errors
-1. **Technical Issues**
-   - Database connection failures
-   - API integration errors
-   - Payment processing issues
-   - Email delivery problems
-
-2. **Recovery Mechanisms**
-   - Automatic system recovery
-   - Error notification to administrators
-   - Transaction rollback procedures
-   - System state preservation
 
 ## Security Architecture
 
