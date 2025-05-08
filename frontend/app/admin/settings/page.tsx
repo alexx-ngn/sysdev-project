@@ -511,22 +511,6 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
-                <div className="space-y-0.5">
-                  <div className="flex items-center space-x-2">
-                    <input 
-                      type="checkbox" 
-                      id="showSponsorsHighlight"
-                      checked={formData.showSponsorsHighlight}
-                      onChange={(e) => handleSwitchChange('showSponsorsHighlight', e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    />
-                    <Label htmlFor="showSponsorsHighlight" className="text-base cursor-pointer">Sponsors Highlight</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground ml-6">Showcase of event sponsors</p>
-                </div>
-              </div>
-
               <div className="flex justify-end">
                 <Button 
                   onClick={() => handleSaveChanges('Homepage Layout')} 

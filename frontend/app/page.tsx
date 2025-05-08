@@ -134,38 +134,6 @@ export default function Home() {
             </div>
           </section>
         )}
-
-        {/* Sponsors Highlight */}
-        {settings.showSponsorsHighlight && (
-          <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-            <div className="container max-w-[1400px] mx-auto px-4 md:px-6">
-              <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">{t('sponsors.title')}</h2>
-                  <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    {t('sponsors.description')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mx-auto max-w-5xl">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-gray-100 rounded-lg w-32 h-32 flex items-center justify-center">
-                      <span className="text-gray-400 font-bold">Sponsor {i}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-12 text-center">
-                  <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                    <Link href="/sponsors">{t('sponsors.viewAll')}</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
       </main>
 
       <Footer />

@@ -45,12 +45,6 @@ export function Header() {
               {t('nav.faq')}
             </Link>
             <Link
-              href="/sponsors"
-              className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-            >
-              {t('nav.sponsors')}
-            </Link>
-            <Link
               href="/donate"
               className="flex items-center text-sm font-medium text-muted-foreground nav-link"
             >

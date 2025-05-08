@@ -44,11 +44,6 @@ export function Footer() {
                   {t('nav.faq')}
                 </Link>
               </li>
-              <li>
-                <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                  {t('nav.sponsors')}
-                </Link>
-              </li>
             </ul>
           </div>
           <div className="space-y-4">
