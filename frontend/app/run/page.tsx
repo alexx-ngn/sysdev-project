@@ -190,14 +190,6 @@ export default function RunPage() {
                   <ul className="space-y-2">
                     <li className="flex items-start">
                       <span className="mr-2 mt-1">•</span>
-                      <span>{t('run.amenities.parking')}</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 mt-1">•</span>
-                      <span>{t('run.amenities.bagCheck')}</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 mt-1">•</span>
                       <span>{t('run.amenities.waterStations')}</span>
                     </li>
                     <li className="flex items-start">
@@ -208,61 +200,11 @@ export default function RunPage() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-8 rounded-lg mb-12">
-                <h2 className="text-2xl font-bold mb-6 text-center">{t('run.awards.title')}</h2>
-                <div className="grid gap-6 md:grid-cols-3">
-                  <Card>
-                    <CardHeader className="flex flex-row items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                        <Trophy className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <CardTitle>{t('run.awards.topFinishers')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">
-                        {t('run.awards.topFinishersDescription')}
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="flex flex-row items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                        <Users className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <CardTitle>{t('run.awards.teamSpirit')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">
-                        {t('run.awards.teamSpiritDescription')}
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="flex flex-row items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                        <Heart className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <CardTitle>{t('run.awards.topFundraisers')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">
-                        {t('run.awards.topFundraisersDescription')}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-6">{t('run.readyToJoin')}</h2>
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link href="/register">{t('run.registerNow')}</Link>
                 </Button>
-                <p className="mt-4 text-muted-foreground">
-                  {t('run.registrationInfo')}
-                </p>
               </div>
             </div>
           </div>

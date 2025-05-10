@@ -58,7 +58,7 @@ const translations: Record<Language, Translations> = {
     
     'featured.involved.title': 'Get Involved',
     'featured.involved.description': 'Ways to support our cause',
-    'featured.involved.content': 'There are many ways to support MilesForHope - register for the run, make a donation, or become a sponsor.',
+    'featured.involved.content': 'There are many ways to support MilesForHope - register for the run, make a donation, or even spreading the word!',
     'featured.involved.support': 'Support Us',
     
     // Registration CTA
@@ -84,22 +84,11 @@ const translations: Record<Language, Translations> = {
     
     // About Page Story Section
     'about.story.title': 'Our Story',
-    'about.story.paragraph1': 'MilesForHope began in 2015 when a small group of passionate runners decided to combine their love for running with their desire to make a positive impact in their community. What started as a local 5K with just 50 participants has grown into an annual event that attracts hundreds of runners from across the region.',
-    'about.story.paragraph2': 'Our founders believed that physical activity could be a powerful catalyst for social change. By bringing people together through running, we create a community of individuals committed to supporting important causes and making a difference in the lives of others.',
-    'about.story.paragraph3': 'Over the years, MilesForHope has raised over $500,000 for various community initiatives, focusing on education, healthcare, and sustainable development. We\'ve funded scholarships for underprivileged students, supported local health clinics, and contributed to environmental conservation projects.',
-    'about.story.paragraph4': 'Today, MilesForHope continues to grow, but our core mission remains the same: to harness the collective energy and goodwill of runners to create positive change in our communities. Every step taken in our charity run is a step toward a better, more equitable world.',
+    'about.story.paragraph1': 'MilesForHope was founded in 2025 by a group of students who shared a common vision: to support children in need in our local community. Starting as a small campus initiative, we are building connections between students and local families to make a difference in children\'s lives right here in our neighborhood.',
+    'about.story.paragraph2': 'Our student founders believe that even small actions can create meaningful change. Through local charity runs and community events, we aim to bring together our neighbors to support children\'s healthcare and education in our area.',
+    'about.story.paragraph3': 'As a new local organization, we are committed to supporting our community\'s children\'s hospital and nearby schools. Our goal is to help provide medical supplies for pediatric care, support local children\'s educational needs, and create after-school programs that promote health and wellness in our community.',
+    'about.story.paragraph4': 'MilesForHope is just beginning its journey in our community, but our mission is clear: to bring together local students and residents to make a difference in the lives of children in our neighborhood. Every step taken in our charity run represents our commitment to building a brighter future for the children in our community.',
     
-    // About Page Team Section
-    'about.team.title': 'Our Team',
-    'about.team.sarah.name': 'Sarah Johnson',
-    'about.team.sarah.role': 'Founder & Executive Director',
-    'about.team.sarah.description': 'Marathon runner and community advocate with 15 years of nonprofit experience.',
-    'about.team.michael.name': 'Michael Chen',
-    'about.team.michael.role': 'Event Director',
-    'about.team.michael.description': 'Former Olympic athlete dedicated to creating inclusive sporting events.',
-    'about.team.aisha.name': 'Aisha Patel',
-    'about.team.aisha.role': 'Community Outreach Coordinator',
-    'about.team.aisha.description': 'Social worker and running coach passionate about empowering communities.',
     
     // Run Page
     'run.title': 'Charity Run Details',
@@ -115,7 +104,7 @@ const translations: Record<Language, Translations> = {
     'run.location.address3': 'Hopeville, State 12345',
     'run.courseInfo.title': 'Course Information',
     'run.courseInfo.subtitle': '5K Run/Walk',
-    'run.courseInfo.description': 'Our 5K course is designed to be accessible for participants of all fitness levels. The route takes you through scenic City Park with beautiful views of the lake and gardens.',
+    'run.courseInfo.description': 'Our 5K course is designed to be accessible for participants of all fitness levels.',
     'run.courseInfo.terrain': 'Mostly flat terrain with gentle inclines',
     'run.courseInfo.paths': 'Paved paths throughout the course',
     'run.courseInfo.waterStations': 'Water stations at the 1.5K and 3K marks',
@@ -152,19 +141,10 @@ const translations: Record<Language, Translations> = {
     'run.amenities.waterStations': 'Water stations along the course',
     'run.amenities.refreshments': 'Post-race refreshments',
     
-    // Run Page Awards Section
-    'run.awards.title': 'Awards & Recognition',
-    'run.awards.topFinishers': 'Top Finishers',
-    'run.awards.topFinishersDescription': 'Awards for the top three male and female finishers in various age categories.',
-    'run.awards.teamSpirit': 'Team Spirit',
-    'run.awards.teamSpiritDescription': 'Recognition for the largest team and the team with the most creative theme.',
-    'run.awards.topFundraisers': 'Top Fundraisers',
-    'run.awards.topFundraisersDescription': 'Special recognition for individuals and teams who raise the most funds for our cause.',
     
     // Run Page Ready to Join Section
     'run.readyToJoin': 'Ready to Join Us?',
     'run.registerNow': 'Register Now',
-    'run.registrationInfo': 'Registration is free and includes a t-shirt, race bib, and access to all event activities.',
     
     // Footer
     'footer.about': 'About Us',
@@ -454,7 +434,7 @@ const translations: Record<Language, Translations> = {
     
     // About Page Story Section
     'about.story.title': 'Notre histoire',
-    'about.story.paragraph1': 'MilesForHope a débuté en 2015 lorsqu\'un petit groupe de coureurs passionnés a décidé de combiner leur amour de la course avec leur désir de faire une différence positive dans leur communauté. Ce qui a commencé comme un 5K local avec seulement 50 participants est devenu un événement annuel qui attire des centaines de coureurs de toute la région.',
+    'about.story.paragraph1': 'MilesForHope a débuté en 2025 lorsqu\'un petit groupe de coureurs passionnés a décidé de combiner leur amour de la course avec leur désir de faire une différence positive dans leur communauté. Ce qui a commencé comme un 5K local avec seulement 50 participants est devenu un événement annuel qui attire des centaines de coureurs de toute la région.',
     'about.story.paragraph2': 'Nos fondateurs croyaient que l\'activité physique pouvait être un catalyseur puissant pour le changement social. En rassemblant les gens par la course, nous créons une communauté d\'individus engagés à soutenir des causes importantes et à faire une différence dans la vie des autres.',
     'about.story.paragraph3': 'Au fil des années, MilesForHope a levé plus de 500 000 $ pour diverses initiatives communautaires, se concentrant sur l\'éducation, la santé et le développement durable. Nous avons financé des bourses pour des étudiants défavorisés, soutenu des cliniques de santé locales et contribué à des projets de conservation de l\'environnement.',
     'about.story.paragraph4': 'Aujourd\'hui, MilesForHope continue de croître, mais notre mission de base reste la même : mobiliser l\'énergie et la bienveillance collectives des coureurs pour créer un changement positif dans nos communautés. Chaque pas effectué dans notre course de bienfaisance est un pas vers un monde meilleur et plus équitable.',
