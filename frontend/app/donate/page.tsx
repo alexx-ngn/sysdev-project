@@ -35,28 +35,28 @@ export default function DonatePage() {
 
   const handleDonation = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      toast.error("Please enter a valid donation amount");
+      toast.error(t('donate.contact.invalidAmount'));
       return;
     }
 
     if (!name.trim()) {
-      toast.error("Please enter your name");
+      toast.error(t('donate.contact.invalidName'));
       return;
     }
 
     if (!email.trim()) {
-      toast.error("Please enter your email");
+      toast.error(t('donate.contact.invalidEmail'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address");
+      toast.error(t('donate.contact.invalidEmail'));
       return;
     }
 
     if (parseFloat(amount) < 0.01) {
-      toast.error("Minimum donation amount is $0.01");
+      toast.error(t('donate.contact.minimumAmount'));
       return;
     }
 
@@ -268,7 +268,6 @@ export default function DonatePage() {
                           type="text"
                           value={amount}
                           onChange={handleCustomAmount}
-                          placeholder={t('donate.oneTime.enterAmount')}
                           className="pl-7"
                           min="0.01"
                           step="0.01"
@@ -280,14 +279,14 @@ export default function DonatePage() {
                         htmlFor="name"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Name
+                        {t('donate.contact.name')}
                       </label>
                       <Input 
                         id="name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter your full name"
+                        placeholder={t('donate.contact.namePlaceholder')}
                         required
                       />
                     </div>
@@ -296,14 +295,14 @@ export default function DonatePage() {
                         htmlFor="email"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Email
+                        {t('donate.contact.email')}
                       </label>
                       <Input 
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
+                        placeholder={t('donate.contact.emailPlaceholder')}
                         required
                       />
                     </div>
@@ -315,7 +314,7 @@ export default function DonatePage() {
                     onClick={handleStripeDonation}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : `Donate $${amount || "0"}`}
+                    {loading ? t('donate.oneTime.buttonLoading') : t('donate.oneTime.buttonWithAmount').replace('{{amount}}', amount || '0')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -334,7 +333,14 @@ export default function DonatePage() {
                       >
                         {t('donate.contact.name')}
                       </label>
-                      <Input id="name" placeholder={t('donate.contact.namePlaceholder')} />
+                      <Input 
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder={t('donate.contact.namePlaceholder')}
+                        required
+                      />
                     </div>
                     <div className="grid gap-2">
                       <label
@@ -343,7 +349,14 @@ export default function DonatePage() {
                       >
                         {t('donate.contact.email')}
                       </label>
-                      <Input id="email" type="email" placeholder={t('donate.contact.emailPlaceholder')} />
+                      <Input 
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t('donate.contact.emailPlaceholder')}
+                        required
+                      />
                     </div>
                   </div>
                   <div className="grid gap-2">

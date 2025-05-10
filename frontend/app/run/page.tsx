@@ -189,10 +189,6 @@ export default function RunPage() {
                   <ul className="space-y-2">
                     <li className="flex items-start">
                       <span className="mr-2 mt-1">•</span>
-                      <span>{t('run.amenities.parking')}</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 mt-1">•</span>
                       <span>{t('run.amenities.waterStations')}</span>
                     </li>
                     <li className="flex items-start">
