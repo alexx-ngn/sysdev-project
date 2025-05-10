@@ -5,25 +5,25 @@
 - Automated Email Confirmation ✅
 - Admin Login Process ✅
 - Progressive Web App Support ✅
-- Donation Payment Process
+- Donation Payment Process ✅
 - Registration Process ✅
 
 ## Shahzaib
-- Viewing Donations
+- Viewing Donations ✅
 - Auto-detect Language Preference ✅
 - Exporting Runners Data ✅
 - Exporting Donations Data ✅
 - Password Recovery ✅
-- Viewing Registered Runners
+- Viewing Registered Runners ✅
 - Live Donation Feed
 - Calendar Export
 
 ## Gideon
-- Social Media Sharing
-- Fundraising Progress Bar
+- Social Media Sharing ✅
+- Fundraising Progress Bar ✅
 - Leaderboard for Top Fundraisers
-- Event Schedule Display
-- Contact Form Submission
+- Event Schedule Display ✅
+- Contact Form Submission ✅
 - Admin Data Filtering
 - Admin Search
 - Visual Map Route

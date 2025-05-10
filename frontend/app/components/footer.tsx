@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Heart } from "lucide-react"
+import { HeartHandshake } from "lucide-react"
 import { useLanguage } from "@/app/context/language-context"
 import { useSettings } from "@/app/context/settings-context"
 
@@ -18,7 +18,7 @@ export function Footer() {
               {settings.logo ? (
                 <img src={settings.logo} alt={settings.organizationName} className="h-6 w-6 object-contain" />
               ) : (
-                <Heart className="h-6 w-6 text-primary" />
+                <HeartHandshake className="h-6 w-6 text-primary" />
               )}
               <span className="text-lg font-bold">{settings.organizationName}</span>
             </div>
@@ -42,11 +42,6 @@ export function Footer() {
               <li>
                 <Link href="/faq" className="text-sm text-muted-foreground hover:text-gray-800">
                   {t('nav.faq')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/sponsors" className="text-sm text-muted-foreground hover:text-gray-800">
-                  {t('nav.sponsors')}
                 </Link>
               </li>
             </ul>

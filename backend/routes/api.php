@@ -7,6 +7,8 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\StripeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +36,13 @@ Route::post('admin/verify-reset-token', [AdminAuthController::class, 'verifyRese
 // Protected admin routes
 Route::middleware(['auth:sanctum', 'admin.auth'])->group(function () {
     Route::post('admin/logout', [AdminAuthController::class, 'logout']);
+    Route::get('admin', [AdminAuthController::class, 'listAdmins']);
+    Route::post('admin', [AdminAuthController::class, 'createAdmin']);
+    Route::match(['put', 'patch'], 'admin/{id}', [AdminAuthController::class, 'updateAdmin']);
+    Route::delete('admin/{id}', [AdminAuthController::class, 'deleteAdmin']);
+    Route::post('admin/{id}/verify-2fa', [AdminAuthController::class, 'verify2FAForAdmin']);
+    Route::post('admin/{id}/reset-password', [AdminAuthController::class, 'resetPasswordForAdmin']);
+    Route::post('admin/{id}/reset-2fa', [AdminAuthController::class, 'reset2FAForAdmin']);
     // Add other protected admin routes here
 });
 
@@ -47,6 +56,13 @@ Route::resource('donations', DonationController::class);
 // Contact form route
 Route::post('contact', [ContactController::class, 'submit']);
 
+// Stripe payment routes
+Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
+Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
+Route::get('/verify-payment', [StripeController::class, 'verifyPayment']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('users/find-or-create', [UserController::class, 'findOrCreate']);

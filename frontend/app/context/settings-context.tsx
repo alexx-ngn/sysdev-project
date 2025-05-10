@@ -41,7 +41,7 @@ export interface WebsiteSettings {
 // Default settings
 const defaultSettings: WebsiteSettings = {
   organizationName: 'MilesForHope',
-  eventName: 'MilesForHope Charity Run 2023',
+  eventName: 'MilesForHope',
   contactEmail: 'info@milesforhope.org',
   contactPhone: '(555) 123-4567',
   address: '456 Community Lane\nHopeville, State 12345',

@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
+import { HeartHandshake, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/auth-context"
@@ -30,7 +30,7 @@ export default function AdminLayout({
                     pathname === "/admin/verify-2fa"
 
   useEffect(() => {
-    const checkAuthAndAdmins = async () => {
+    const checkAdmins = async () => {
       try {
         // Skip checks for auth pages
         if (isAuthPage) {
@@ -49,33 +49,32 @@ export default function AdminLayout({
         // If no admins exist, redirect to register
         if (!data.has_admins) {
           router.replace('/admin/register')
-          setIsChecking(false)
           return
         }
-
-        // Now check authentication
-        const isAuth = checkAuth()
-
-        // If not authenticated and not on an auth page, redirect to login
-        if (!isAuth && !isAuthPage) {
-          router.replace("/admin/login")
-          setIsChecking(false)
-          return
-        }
-
       } catch (error) {
-        console.error("Error during auth check:", error)
-        // On error, redirect to login if not on an auth page
-        if (!isAuthPage) {
-          router.replace("/admin/login")
-        }
+        console.error("Error checking admins:", error)
       } finally {
         setIsChecking(false)
       }
     }
 
-    checkAuthAndAdmins()
-  }, [pathname, isAuthPage, router, checkAuth])
+    checkAdmins()
+  }, [isAuthPage, router]) // Only run when auth page status changes
+
+  useEffect(() => {
+    // Skip auth check for auth pages
+    if (isAuthPage) {
+      return
+    }
+
+    // Check authentication
+    const isAuth = checkAuth()
+
+    // If not authenticated and not on an auth page, redirect to login
+    if (!isAuth) {
+      router.replace("/admin/login")
+    }
+  }, [isAuthPage, router]) // Only run when auth page status changes
 
   // Show loading state while checking
   if (isChecking) {
@@ -125,7 +124,7 @@ export default function AdminLayout({
       >
         <div className="flex h-16 items-center justify-between px-4 border-b border-gray-800">
           <Link href="/admin" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6" />
+            <HeartHandshake className="h-6 w-6" />
             <span className="font-bold text-lg">Admin Panel</span>
           </Link>
           <button className="p-1 rounded-md hover:bg-gray-800 lg:hidden" onClick={() => setSidebarOpen(false)}>
@@ -162,26 +161,6 @@ export default function AdminLayout({
               >
                 <DollarSign className="h-5 w-5" />
                 <span>Donations</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/sponsors"
-                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Award className="h-5 w-5" />
-                <span>Sponsors</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/events"
-                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Calendar className="h-5 w-5" />
-                <span>Event Management</span>
               </Link>
             </li>
             <li>

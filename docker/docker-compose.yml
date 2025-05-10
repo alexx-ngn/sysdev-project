@@ -33,6 +33,12 @@ services:
       MP_DATABASE: /data/mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+  stripe:
+    image: stripe/stripe-cli
+    command: listen --api-key ${STRIPE_SECRET} --forward-to http://localhost:8000/api/stripe/webhook
+    env_file:
+      - ../backend/.env
+    restart: unless-stopped
 
 volumes:
   mysql_data:

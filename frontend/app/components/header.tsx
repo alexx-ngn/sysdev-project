@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Heart } from "lucide-react"
+import { HeartHandshake } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MobileNav } from "@/components/mobile-nav"
 import { LanguageSwitcher } from "@/components/language-switcher"
@@ -21,7 +21,7 @@ export function Header() {
             {settings.logo ? (
               <img src={settings.logo} alt={settings.organizationName} className="h-6 w-6 object-contain" />
             ) : (
-              <Heart className="h-6 w-6 text-primary" />
+              <HeartHandshake className="h-6 w-6 text-primary" />
             )}
             <span className="inline-block font-bold">{settings.organizationName}</span>
           </Link>
@@ -43,12 +43,6 @@ export function Header() {
               className="flex items-center text-sm font-medium text-muted-foreground nav-link"
             >
               {t('nav.faq')}
-            </Link>
-            <Link
-              href="/sponsors"
-              className="flex items-center text-sm font-medium text-muted-foreground nav-link"
-            >
-              {t('nav.sponsors')}
             </Link>
             <Link
               href="/donate"

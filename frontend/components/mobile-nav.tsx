@@ -67,12 +67,6 @@ export function MobileNav() {
                 {t('nav.faq')}
               </Link>
               <Link
-                href="/sponsors"
-                className="text-sm font-medium text-gray-900 nav-link px-6"
-              >
-                {t('nav.sponsors')}
-              </Link>
-              <Link
                 href="/donate"
                 className="text-sm font-medium text-gray-900 nav-link px-6"
               >

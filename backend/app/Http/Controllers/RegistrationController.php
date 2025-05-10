@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Registration;
-use App\Models\Participant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ class RegistrationController extends Controller
 {
     public function index()
     {
-        $registrations = Registration::with(['participant', 'user'])->get();
+        $registrations = Registration::with('user')->get();
         return response()->json($registrations);
     }
 
@@ -25,12 +25,12 @@ class RegistrationController extends Controller
         $validator = Validator::make($request->all(), [
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
-            'Email' => 'required|email|unique:participants,Email',
+            'Email' => 'required|email|unique:users,Email',
             'PhoneNumber' => [
                 'required',
                 'string',
                 'regex:/^(\+1)?\d{10}$/',
-                'unique:participants,PhoneNumber'
+                'unique:users,PhoneNumber'
             ],
             'RegistrationStatus' => 'required|in:pending,confirmed,cancelled'
         ], [
@@ -48,8 +48,8 @@ class RegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create participant
-            $participant = Participant::create([
+            // Create user
+            $user = User::create([
                 'FirstName' => $request->FirstName,
                 'LastName' => $request->LastName,
                 'Email' => $request->Email,
@@ -61,7 +61,7 @@ class RegistrationController extends Controller
 
             // Create registration
             $registration = Registration::create([
-                'ParticipantID' => $participant->ParticipantID,
+                'UserID' => $user->UserID,
                 'RegistrationDate' => now(),
                 'RegistrationStatus' => 'pending', // Always start as pending
                 'confirmation_token' => $confirmationToken,
@@ -70,17 +70,17 @@ class RegistrationController extends Controller
             // Send confirmation email
             $confirmationUrl = env('FRONTEND_URL', 'http://localhost:3000') . "/registration/confirm/{$confirmationToken}";
             Mail::send('emails.registration-confirmation', [
-                'participant' => $participant,
+                'user' => $user,
                 'confirmationUrl' => $confirmationUrl
-            ], function ($message) use ($participant) {
-                $message->to($participant->Email)
+            ], function ($message) use ($user) {
+                $message->to($user->Email)
                        ->subject('Confirm Your Registration');
             });
 
             DB::commit();
 
-            // Load the participant relationship
-            $registration->load('participant');
+            // Load the user relationship
+            $registration->load('user');
 
             return response()->json($registration, 201);
         } catch (\Exception $e) {
@@ -112,25 +112,25 @@ class RegistrationController extends Controller
 
     public function show($id)
     {
-        $registration = Registration::with(['participant', 'user'])->findOrFail($id);
+        $registration = Registration::with('user')->findOrFail($id);
         return response()->json($registration);
     }
 
     public function update(Request $request, $id)
     {
         $registration = Registration::findOrFail($id);
-        $participant = $registration->participant;
+        $user = $registration->user;
 
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
-            'Email' => 'required|email|unique:participants,Email,' . $participant->ParticipantID . ',ParticipantID',
+            'Email' => 'required|email|unique:users,Email,' . $user->UserID . ',UserID',
             'PhoneNumber' => [
                 'required',
                 'string',
                 'regex:/^(\+1)?\d{10}$/',
-                'unique:participants,PhoneNumber,' . $participant->ParticipantID . ',ParticipantID'
+                'unique:users,PhoneNumber,' . $user->UserID . ',UserID'
             ],
             'RegistrationStatus' => 'required|in:pending,confirmed,cancelled'
         ], [
@@ -149,8 +149,8 @@ class RegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update participant
-            $participant->update([
+            // Update user
+            $user->update([
                 'FirstName' => $request->FirstName,
                 'LastName' => $request->LastName,
                 'Email' => $request->Email,
@@ -164,8 +164,8 @@ class RegistrationController extends Controller
 
             DB::commit();
 
-            // Load the participant relationship
-            $registration->load('participant');
+            // Load the user relationship
+            $registration->load('user');
 
             return response()->json($registration);
         } catch (\Exception $e) {
@@ -180,13 +180,13 @@ class RegistrationController extends Controller
             DB::beginTransaction();
 
             $registration = Registration::findOrFail($id);
-            $participant = $registration->participant;
+            $user = $registration->user;
 
             // Delete registration first (due to foreign key constraint)
             $registration->delete();
             
-            // Delete associated participant
-            $participant->delete();
+            // Delete associated user
+            $user->delete();
 
             DB::commit();
             return response()->json(['message' => 'Registration deleted successfully']);

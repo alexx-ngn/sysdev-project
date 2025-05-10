@@ -26,12 +26,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { downloadCSV } from "@/lib/utils"
+import { getApiUrl } from '../../config/api'
 
 interface Registration {
   RegistrationID: number;
   RegistrationDate: string;
   RegistrationStatus: string;
-  participant: {
+  user: {
     FirstName: string;
     LastName: string;
     Email: string;
@@ -67,10 +68,10 @@ function ViewEditModal({ registration, isOpen, onClose, onSave, mode }: ViewEdit
   useEffect(() => {
     if (registration) {
       setFormData({
-        FirstName: registration.participant.FirstName,
-        LastName: registration.participant.LastName,
-        Email: registration.participant.Email,
-        PhoneNumber: registration.participant.PhoneNumber,
+        FirstName: registration.user.FirstName,
+        LastName: registration.user.LastName,
+        Email: registration.user.Email,
+        PhoneNumber: registration.user.PhoneNumber,
         RegistrationStatus: registration.RegistrationStatus
       });
     }
@@ -193,7 +194,7 @@ export default function RegistrationsPage() {
   useEffect(() => {
     const fetchRegistrations = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/registrations');
+        const response = await fetch(getApiUrl('/registrations'));
         if (!response.ok) {
           throw new Error('Failed to fetch registrations');
         }
@@ -212,18 +213,12 @@ export default function RegistrationsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Format phone number - remove any non-digit characters except +
-      const formattedData = {
-        ...formData,
-        PhoneNumber: formData.PhoneNumber.replace(/[^\d+]/g, '')
-      };
-
-      const response = await fetch('http://localhost:8000/api/registrations', {
+      const response = await fetch(getApiUrl('/registrations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -279,19 +274,12 @@ export default function RegistrationsPage() {
     if (!selectedRegistration) return;
 
     try {
-      const formattedData = {
-        ...data,
-        PhoneNumber: data.PhoneNumber.replace(/[^\d+]/g, '')
-      };
-
-      const response = await fetch(`http://localhost:8000/api/registrations/${selectedRegistration.RegistrationID}`, {
+      const response = await fetch(getApiUrl(`/registrations/${selectedRegistration.RegistrationID}`), {
         method: 'PUT',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -327,13 +315,8 @@ export default function RegistrationsPage() {
     if (!registrationToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/registrations/${registrationToDelete.RegistrationID}`, {
+      const response = await fetch(getApiUrl(`/registrations/${registrationToDelete.RegistrationID}`), {
         method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
       });
 
       if (!response.ok) {
@@ -353,10 +336,10 @@ export default function RegistrationsPage() {
   const handleExport = () => {
     // Transform registrations data for CSV export
     const exportData = registrations.map(reg => ({
-      'First Name': reg.participant.FirstName,
-      'Last Name': reg.participant.LastName,
-      'Email': reg.participant.Email,
-      'Phone Number': reg.participant.PhoneNumber,
+      'First Name': reg.user.FirstName,
+      'Last Name': reg.user.LastName,
+      'Email': reg.user.Email,
+      'Phone Number': reg.user.PhoneNumber,
       'Registration Date': new Date(reg.RegistrationDate).toLocaleDateString(),
       'Status': reg.RegistrationStatus,
       'Registration ID': reg.RegistrationID
@@ -501,10 +484,10 @@ export default function RegistrationsPage() {
                 {registrations.map((registration) => (
                   <TableRow key={registration.RegistrationID}>
                     <TableCell className="font-medium">
-                      {registration.participant.FirstName} {registration.participant.LastName}
+                      {registration.user.FirstName} {registration.user.LastName}
                     </TableCell>
-                    <TableCell>{registration.participant.Email}</TableCell>
-                    <TableCell>{registration.participant.PhoneNumber}</TableCell>
+                    <TableCell>{registration.user.Email}</TableCell>
+                    <TableCell>{registration.user.PhoneNumber}</TableCell>
                     <TableCell>{new Date(registration.RegistrationDate).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
@@ -518,14 +501,6 @@ export default function RegistrationsPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => handleViewRegistration(registration)}
-                        className="mr-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -613,7 +588,7 @@ export default function RegistrationsPage() {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete the registration for{' '}
-              {registrationToDelete ? `${registrationToDelete.participant.FirstName} ${registrationToDelete.participant.LastName}` : ''}.
+              {registrationToDelete ? `${registrationToDelete.user.FirstName} ${registrationToDelete.user.LastName}` : ''}.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

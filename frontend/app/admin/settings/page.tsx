@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Heart, Plus, CheckCircle, X, Upload } from "lucide-react"
+import { Heart, Plus, CheckCircle, X, Upload, Loader2 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useSettings } from "@/app/context/settings-context"
 import { useState, useEffect, useRef } from "react"
@@ -15,14 +15,63 @@ import { toast } from "sonner"
 import { handleFileUpload } from "@/lib/upload-utils"
 import { HexColorPicker } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { API_ENDPOINTS } from "@/app/config/api"
+
+interface AdminUser {
+  AdminID: number;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  PhoneNumber: string;
+  '2FASecret': string | null;
+  updated_at: string;
+}
 
 export default function SettingsPage() {
   const { settings, updateSettings, isLoading } = useSettings()
   const [formData, setFormData] = useState(settings)
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
+  const [isLoadingAdmins, setIsLoadingAdmins] = useState(false)
+  const [adminError, setAdminError] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
   const faviconInputRef = useRef<HTMLInputElement>(null)
+
+  // Fetch admin users
+  const fetchAdminUsers = async () => {
+    setIsLoadingAdmins(true)
+    setAdminError(null)
+    try {
+      const response = await fetch(`${API_ENDPOINTS.ADMIN.LIST}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch admin users')
+      }
+
+      const data = await response.json()
+      setAdminUsers(data.admins)
+    } catch (error) {
+      setAdminError(error instanceof Error ? error.message : 'Failed to fetch admin users')
+      toast.error('Failed to fetch admin users')
+    } finally {
+      setIsLoadingAdmins(false)
+    }
+  }
+
+  // Fetch admin users on component mount
+  useEffect(() => {
+    fetchAdminUsers()
+  }, [])
+
+  // Format date to local string
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString()
+  }
 
   // Update form data when settings change
   useEffect(() => {
@@ -511,22 +560,6 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
-                <div className="space-y-0.5">
-                  <div className="flex items-center space-x-2">
-                    <input 
-                      type="checkbox" 
-                      id="showSponsorsHighlight"
-                      checked={formData.showSponsorsHighlight}
-                      onChange={(e) => handleSwitchChange('showSponsorsHighlight', e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    />
-                    <Label htmlFor="showSponsorsHighlight" className="text-base cursor-pointer">Sponsors Highlight</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground ml-6">Showcase of event sponsors</p>
-                </div>
-              </div>
-
               <div className="flex justify-end">
                 <Button 
                   onClick={() => handleSaveChanges('Homepage Layout')} 
@@ -649,57 +682,57 @@ export default function SettingsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
+                      <TableHead>First Name</TableHead>
+                      <TableHead>Last Name</TableHead>
                       <TableHead>Email</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Last Login</TableHead>
+                      <TableHead>Phone Number</TableHead>
+                      <TableHead>Last Updated</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {[
-                      {
-                        name: "Admin User",
-                        email: "admin@milesforhope.org",
-                        role: "Administrator",
-                        lastLogin: "Today, 11:32 AM",
-                      },
-                      {
-                        name: "Sarah Johnson",
-                        email: "sarah@milesforhope.org",
-                        role: "Editor",
-                        lastLogin: "Yesterday, 3:15 PM",
-                      },
-                      {
-                        name: "Michael Chen",
-                        email: "michael@milesforhope.org",
-                        role: "Editor",
-                        lastLogin: "Sep 22, 2023",
-                      },
-                      {
-                        name: "David Kim",
-                        email: "david@milesforhope.org",
-                        role: "Viewer",
-                        lastLogin: "Sep 20, 2023",
-                      },
-                    ].map((user, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>{user.lastLogin}</TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            Edit
-                          </Button>
-                          {user.name !== "Admin User" && (
-                            <Button variant="ghost" size="sm">
-                              Remove
-                            </Button>
-                          )}
+                    {isLoadingAdmins ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center">
+                          <div className="flex items-center justify-center">
+                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <span className="ml-2">Loading admin users...</span>
+                          </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : adminError ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center text-red-500">
+                          {adminError}
+                        </TableCell>
+                      </TableRow>
+                    ) : adminUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                          No admin users found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      adminUsers.map((user) => (
+                        <TableRow key={user.AdminID}>
+                          <TableCell className="font-medium">{user.FirstName}</TableCell>
+                          <TableCell>{user.LastName}</TableCell>
+                          <TableCell>{user.Email}</TableCell>
+                          <TableCell>{user.PhoneNumber}</TableCell>
+                          <TableCell>{formatDate(user.updated_at)}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">
+                              Edit
+                            </Button>
+                            {user.Email !== "dev@milesforhope.org" && (
+                              <Button variant="ghost" size="sm">
+                                Remove
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -709,87 +742,6 @@ export default function SettingsPage() {
                   <Plus className="h-4 w-4" />
                   Add User
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>User Roles</CardTitle>
-              <CardDescription>Configure permissions for different user roles.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Administrator</h3>
-                <p className="text-sm text-muted-foreground mb-2">Full access to all features and settings</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Manage Users</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Edit Settings</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Manage Content</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Manage Registrations</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Editor</h3>
-                <p className="text-sm text-muted-foreground mb-2">Can edit content and manage registrations</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Manage Users</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Edit Settings</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Manage Content</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Manage Registrations</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Viewer</h3>
-                <p className="text-sm text-muted-foreground mb-2">Read-only access to data</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Manage Users</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Edit Settings</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Manage Content</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span className="text-sm">Manage Registrations</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button>Edit Role Permissions</Button>
               </div>
             </CardContent>
           </Card>

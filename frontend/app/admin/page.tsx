@@ -6,12 +6,13 @@ import { Users, DollarSign, Calendar, Award } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
 import { getAuthToken, getAuthUser } from '@/app/utils/auth'
+import { getApiUrl } from '../config/api'
 
 interface Registration {
   RegistrationID: number;
   RegistrationDate: string;
   RegistrationStatus: string;
-  participant: {
+  user: {
     FirstName: string;
     LastName: string;
     Email: string;
@@ -40,7 +41,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkAdminsAndAuth = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/admin/check');
+        const response = await fetch(getApiUrl('/admin/check'));
         const data = await response.json();
         
         if (!data.has_admins) {
@@ -66,8 +67,8 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const [registrationsRes, donationsRes] = await Promise.all([
-          fetch('http://localhost:8000/api/registrations'),
-          fetch('http://localhost:8000/api/donations')
+          fetch(getApiUrl('/registrations')),
+          fetch(getApiUrl('/donations'))
         ]);
 
         if (!registrationsRes.ok) {
@@ -175,17 +176,6 @@ export default function AdminDashboard() {
             <p className="text-xs text-muted-foreground">Next event in 5 days</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Sponsors</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 new this month</p>
-          </CardContent>
-        </Card>
       </div>
 
       <Tabs defaultValue="registrations">
@@ -206,9 +196,9 @@ export default function AdminDashboard() {
                   <div key={registration.RegistrationID} className="flex items-center">
                     <div className="space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {registration.participant.FirstName} {registration.participant.LastName}
+                        {registration.user.FirstName} {registration.user.LastName}
                       </p>
-                      <p className="text-sm text-muted-foreground">{registration.participant.Email}</p>
+                      <p className="text-sm text-muted-foreground">{registration.user.Email}</p>
                     </div>
                     <div className="ml-auto font-medium">
                       {new Date(registration.RegistrationDate).toLocaleDateString()}
@@ -259,7 +249,7 @@ export default function AdminDashboard() {
                 {[...recentRegistrations.map(reg => ({
                   type: 'registration',
                   date: new Date(reg.RegistrationDate),
-                  text: `${reg.participant.FirstName} ${reg.participant.LastName} registered for the event`
+                  text: `${reg.user.FirstName} ${reg.user.LastName} registered for the event`
                 })), ...recentDonations.map(don => ({
                   type: 'donation',
                   date: new Date(don.DonationDate),

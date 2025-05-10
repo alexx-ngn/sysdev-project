@@ -71,6 +71,11 @@ MAIL_FROM_ADDRESS="noreply@milesforhope.org"
 MAIL_FROM_NAME="Miles for Hope"
 
 FRONTEND_URL=http://localhost:3000
+
+#Ask Alex for Stripe API keys
+STRIPE_SECRET=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_KEY=
 ```
 
 ## Run Supporting Services with Docker Compose
@@ -124,4 +129,8 @@ php artisan serve
 
 ## Access the Application
 
-Open your web browser and go to `http://localhost:8000` to access the application.
+Open your web browser and go to `http://localhost:3000` to access the application.
+
+## Admin Access
+
+By default, the first user in the admin panel will have to setup the admin account at `http://localhost:3000/admin`

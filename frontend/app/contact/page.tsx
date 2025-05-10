@@ -184,13 +184,6 @@ export default function ContactPage() {
                         <p className="text-muted-foreground">{settings.contactPhone || t('contact.phone.value')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <MapPin className="h-5 w-5 text-primary" />
-                      <div>
-                        <p className="font-medium">{t('contact.address.title')}</p>
-                        <p className="text-muted-foreground">{settings.address || `${t('contact.address.line1')}, ${t('contact.address.line2')}`}</p>
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
 

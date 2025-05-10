@@ -13,6 +13,8 @@ import { Header } from "@/app/components/header"
 import { Footer } from "@/app/components/footer"
 import { useState } from "react"
 import { toast } from "sonner"
+import { loadStripe } from '@stripe/stripe-js'
+import { getApiUrl } from '../config/api'
 
 export default function DonatePage() {
   const { t } = useLanguage();
@@ -34,6 +36,97 @@ export default function DonatePage() {
 
   const handleDonation = async () => {
     if (!amount || parseFloat(amount) <= 0) {
+      toast.error(t('donate.contact.invalidAmount'));
+      return;
+    }
+
+    if (!name.trim()) {
+      toast.error(t('donate.contact.invalidName'));
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error(t('donate.contact.invalidEmail'));
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error(t('donate.contact.invalidEmail'));
+      return;
+    }
+
+    if (parseFloat(amount) < 0.01) {
+      toast.error(t('donate.contact.minimumAmount'));
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const userResponse = await fetch(getApiUrl('/users/find-or-create'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          FirstName: name.split(' ')[0],
+          LastName: name.split(' ').slice(1).join(' ') || name.split(' ')[0],
+          Email: email,
+          PhoneNumber: null
+        }),
+      });
+
+      const userData = await userResponse.json();
+      
+      if (!userResponse.ok) {
+        throw new Error(userData.message);
+      }
+
+      const userId = userData.UserID;
+
+      const donationData = {
+        UserID: userId,
+        Amount: parseFloat(amount),
+        DonationDate: new Date().toISOString().split('T')[0],
+        ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'One-time donation'
+      };
+
+      const response = await fetch(getApiUrl('/donations'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(donationData),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 422 && responseData.errors) {
+          const errorMessages = Object.entries(responseData.errors)
+            .map(([field, messages]) => `${field}: ${messages}`)
+            .join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(responseData.message || 'Failed to process donation');
+      }
+
+      toast.success(`Thank you for your donation of $${amount}! Your confirmation ID is ${donationData.ConfirmationID}`);
+      setAmount("");
+      setName("");
+      setEmail("");
+    } catch (error) {
+      console.error('Donation error:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStripeDonation = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
       toast.error("Please enter a valid donation amount");
       return;
     }
@@ -51,39 +144,46 @@ export default function DonatePage() {
     setLoading(true);
 
     try {
-      const donationData = {
+      console.log('Sending request with data:', {
+        amount: parseFloat(amount),
         name,
         email,
-        Amount: parseFloat(amount),
-        DonationDate: new Date().toISOString(),
-        type: 'One-time donation',
-        ConfirmationID: Math.random().toString(36).substring(2, 15)
-      };
-
-      console.log('Sending donation data:', donationData);
-
-      const response = await fetch('http://localhost:8000/api/donations', {
+      });
+      
+      const response = await fetch(getApiUrl('/create-checkout-session'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(donationData),
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          name,
+          email,
+        }),
       });
 
-      const responseData = await response.json();
-      console.log('Server response:', responseData);
-
+      const data = await response.json();
+      console.log('Response from server:', data);
+      
       if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to process donation');
+        throw new Error(data.error || data.message || 'Failed to create checkout session');
       }
 
-      toast.success("Thank you for your donation!");
-      setAmount("");
-      setName("");
-      setEmail("");
+      const stripe = await loadStripe('pk_test_51RGss0D6lPUkmN5DgD3K2MDsOwMLSxbAd4YwVriFa3G3anxTpi1c9Ogeyrr8uqSMQbVDAejSAe4Xi78PojnZHmou00x7WfQNGy');
+      if (!stripe) {
+        throw new Error('Failed to load Stripe');
+      }
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: data.sessionId
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
     } catch (error) {
-      console.error('Donation error:', error);
+      console.error('Stripe donation error:', error);
       toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
     } finally {
       setLoading(false);
@@ -124,22 +224,34 @@ export default function DonatePage() {
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <Button 
-                      variant={amount === "25" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("25")}
+                      variant={amount === "5" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("5")}
+                      className="relative overflow-hidden"
                     >
-                      $25
+                      <span className={amount === "5" ? "text-white" : ""}>$5</span>
+                      {amount === "5" && (
+                        <span className="absolute inset-0 bg-primary opacity-10"></span>
+                      )}
                     </Button>
                     <Button 
-                      variant={amount === "50" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("50")}
+                      variant={amount === "10" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("10")}
+                      className="relative overflow-hidden"
                     >
-                      $50
+                      <span className={amount === "10" ? "text-white" : ""}>$10</span>
+                      {amount === "10" && (
+                        <span className="absolute inset-0 bg-primary opacity-10"></span>
+                      )}
                     </Button>
                     <Button 
-                      variant={amount === "100" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("100")}
+                      variant={amount === "20" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("20")}
+                      className="relative overflow-hidden"
                     >
-                      $100
+                      <span className={amount === "20" ? "text-white" : ""}>$20</span>
+                      {amount === "20" && (
+                        <span className="absolute inset-0 bg-primary opacity-10"></span>
+                      )}
                     </Button>
                   </div>
                   <div className="space-y-4">
@@ -150,27 +262,33 @@ export default function DonatePage() {
                       >
                         {t('donate.oneTime.customAmount')}
                       </label>
-                      <Input 
-                        id="custom-amount" 
-                        type="text"
-                        value={amount}
-                        onChange={handleCustomAmount}
-                        placeholder={t('donate.oneTime.enterAmount')} 
-                      />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <Input 
+                          id="custom-amount" 
+                          type="text"
+                          value={amount}
+                          onChange={handleCustomAmount}
+                          className="pl-7"
+                          min="0.01"
+                          step="0.01"
+                        />
+                      </div>
                     </div>
                     <div className="grid gap-2">
                       <label
                         htmlFor="name"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Name
+                        {t('donate.contact.name')}
                       </label>
                       <Input 
                         id="name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter your name"
+                        placeholder={t('donate.contact.namePlaceholder')}
+                        required
                       />
                     </div>
                     <div className="grid gap-2">
@@ -178,14 +296,15 @@ export default function DonatePage() {
                         htmlFor="email"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Email
+                        {t('donate.contact.email')}
                       </label>
                       <Input 
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
+                        placeholder={t('donate.contact.emailPlaceholder')}
+                        required
                       />
                     </div>
                   </div>
@@ -193,48 +312,13 @@ export default function DonatePage() {
                 <CardFooter>
                   <Button 
                     className="w-full" 
-                    onClick={handleDonation}
+                    onClick={handleStripeDonation}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : t('donate.oneTime.button')}
+                    {loading ? t('donate.oneTime.buttonLoading') : t('donate.oneTime.buttonWithAmount').replace('{{amount}}', amount || '0')}
                   </Button>
                 </CardFooter>
               </Card>
-
-              <div className="border-t pt-12">
-                <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.impact.title')}</h2>
-                <div className="grid gap-8 md:grid-cols-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$25</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.supplies.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.supplies.description')}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$50</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.research.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.research.description')}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$100</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.equipment.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.equipment.description')}
-                    </p>
-                  </div>
-                </div>
-              </div>
 
               <div className="mt-16 bg-gray-50 p-8 rounded-lg">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.contact.title')}</h2>
@@ -250,7 +334,14 @@ export default function DonatePage() {
                       >
                         {t('donate.contact.name')}
                       </label>
-                      <Input id="name" placeholder={t('donate.contact.namePlaceholder')} />
+                      <Input 
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder={t('donate.contact.namePlaceholder')}
+                        required
+                      />
                     </div>
                     <div className="grid gap-2">
                       <label
@@ -259,7 +350,14 @@ export default function DonatePage() {
                       >
                         {t('donate.contact.email')}
                       </label>
-                      <Input id="email" type="email" placeholder={t('donate.contact.emailPlaceholder')} />
+                      <Input 
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t('donate.contact.emailPlaceholder')}
+                        required
+                      />
                     </div>
                   </div>
                   <div className="grid gap-2">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Download, Search, Filter, ChevronDown } from "lucide-react"
+import { Download, Search, Filter, ChevronDown, Pencil, Trash2, Check } from "lucide-react"
 import { useEffect, useState } from "react"
 import Pusher from 'pusher-js'
 import { toast } from "sonner"
@@ -17,14 +17,19 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { downloadCSV } from "@/lib/utils"
+import { getApiUrl } from '../../config/api'
 
 interface Donation {
   DonationID: number;
-  name: string;
-  email: string;
+  UserID: number;
+  user: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+  };
   Amount: number;
   DonationDate: string;
-  type: string;
+  ConfirmationID: string;
 }
 
 export default function DonationsPage() {
@@ -32,23 +37,18 @@ export default function DonationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [newDonation, setNewDonation] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    Amount: 0,
-    type: 'One-time donation'
+    Amount: 0
   });
+  const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
 
   // Calculate donation statistics
   const totalDonations = donations.reduce((sum, donation) => sum + (donation.Amount || 0), 0);
-  const individualDonations = donations.filter(d => d.type === 'One-time donation');
-  const corporateDonations = donations.filter(d => d.type === 'Corporate');
-  const totalIndividualAmount = individualDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
-  const totalCorporateAmount = corporateDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
-  const goalAmount = 30000; // $30,000 goal
-  const progressPercentage = (totalDonations / goalAmount) * 100;
-
-  // Calculate month-over-month change
   const currentDate = new Date();
   const lastMonthDonations = donations.filter(d => {
     const donationDate = new Date(d.DonationDate);
@@ -63,11 +63,13 @@ export default function DonationsPage() {
   const currentMonthTotal = lastMonthDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
   const previousMonthTotal = previousMonthDonations.reduce((sum, d) => sum + (d.Amount || 0), 0);
   const monthlyChange = currentMonthTotal - previousMonthTotal;
+  const goalAmount = 30000; // $30,000 goal
+  const progressPercentage = (totalDonations / goalAmount) * 100;
 
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/donations');
+        const response = await fetch(getApiUrl('/donations'));
         if (!response.ok) {
           throw new Error('Failed to fetch donations');
         }
@@ -98,9 +100,31 @@ export default function DonationsPage() {
     channel.bind('new-donation', (data: Donation) => {
       setDonations(prev => [data, ...prev]);
       
-      // Show notification
+      // Generate a unique notification ID
+      const notificationId = `donation-${data.DonationID}-${Date.now()}`;
+      
+      // Show notification with mark as read button
+      const donorName = data.user ? `${data.user.FirstName} ${data.user.LastName}` : 'Anonymous';
       toast.success('New donation received!', {
-        description: `${data.name} donated $${data.Amount}`
+        description: (
+          <div className="flex items-center justify-between gap-4">
+            <span>{`${donorName} donated $${data.Amount.toFixed(2)}`}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => {
+                setReadNotifications(prev => new Set([...Array.from(prev), notificationId]));
+                toast.dismiss();
+              }}
+            >
+              <Check className="h-4 w-4" />
+              <span className="ml-2">Mark as read</span>
+            </Button>
+          </div>
+        ),
+        id: notificationId,
+        duration: readNotifications.has(notificationId) ? 0 : 5000,
       });
     });
 
@@ -110,35 +134,84 @@ export default function DonationsPage() {
       channel.unsubscribe();
       pusher.disconnect();
     };
-  }, []);
+  }, [readNotifications]);
 
   const handleAddDonation = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/donations', {
+      // Validate inputs
+      if (!newDonation.firstName.trim()) {
+        throw new Error('First name is required');
+      }
+      if (!newDonation.lastName.trim()) {
+        throw new Error('Last name is required');
+      }
+      if (!newDonation.email.trim()) {
+        throw new Error('Email is required');
+      }
+      if (!newDonation.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        throw new Error('Please enter a valid email address');
+      }
+      if (!newDonation.Amount || newDonation.Amount <= 0) {
+        throw new Error('Please enter a valid donation amount');
+      }
+
+      // First, create or find the user
+      const userResponse = await fetch(getApiUrl('/users'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
-          ...newDonation,
-          DonationDate: new Date().toISOString(),
-          ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+          FirstName: newDonation.firstName.trim(),
+          LastName: newDonation.lastName.trim(),
+          Email: newDonation.email.trim()
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to add donation');
+      const userData = await userResponse.json();
+      
+      if (!userResponse.ok) {
+        throw new Error(userData.message || userData.error || 'Failed to create user');
       }
 
-      const data = await response.json();
-      setDonations(prev => [data, ...prev]);
+      // Now create the donation with the user ID
+      const donationData = {
+        user_id: userData.UserID, // Use the UserID from the created/found user
+        Amount: parseFloat(newDonation.Amount.toString()),
+        DonationDate: new Date().toISOString(),
+        ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+      };
+
+      console.log('Sending donation request:', donationData);
+
+      const donationResponse = await fetch(getApiUrl('/donations'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(donationData),
+      });
+
+      const responseData = await donationResponse.json();
+      console.log('Server response:', responseData);
+
+      if (!donationResponse.ok) {
+        if (responseData.errors) {
+          const errorMessages = Object.values(responseData.errors).flat().join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(responseData.message || responseData.error || 'Failed to add donation');
+      }
+
+      setDonations(prev => [responseData, ...prev]);
       setIsAddDialogOpen(false);
       setNewDonation({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
-        Amount: 0,
-        type: 'One-time donation'
+        Amount: 0
       });
       toast.success('Donation added successfully!');
     } catch (err) {
@@ -150,16 +223,96 @@ export default function DonationsPage() {
   const handleExport = () => {
     // Transform donations data for CSV export
     const exportData = donations.map(donation => ({
-      'Donor Name': donation.name,
-      'Email': donation.email,
+      'Donor Name': `${donation.user?.FirstName} ${donation.user?.LastName}`,
+      'Email': donation.user?.Email,
       'Amount': `$${donation.Amount.toFixed(2)}`,
-      'Type': donation.type,
       'Date': new Date(donation.DonationDate).toLocaleDateString(),
-      'Donation ID': donation.DonationID
+      'Confirmation ID': donation.ConfirmationID
     }));
 
     // Download CSV with current date in filename
     downloadCSV(exportData, `donations-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
+  const handleEditDonation = async () => {
+    if (!selectedDonation) return;
+
+    try {
+      const response = await fetch(getApiUrl(`/donations/${selectedDonation.DonationID}`), {
+        method: 'PUT',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          FirstName: newDonation.firstName,
+          LastName: newDonation.lastName,
+          Email: newDonation.email,
+          Amount: newDonation.Amount,
+          DonationDate: selectedDonation.DonationDate,
+          ConfirmationID: selectedDonation.ConfirmationID
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update donation');
+      }
+
+      setDonations(prev => prev.map(d => 
+        d.DonationID === selectedDonation.DonationID ? data.data : d
+      ));
+      setIsEditDialogOpen(false);
+      setSelectedDonation(null);
+      setNewDonation({
+        firstName: '',
+        lastName: '',
+        email: '',
+        Amount: 0
+      });
+      toast.success(data.message || 'Donation updated successfully!');
+    } catch (err) {
+      console.error('Error updating donation:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to update donation');
+    }
+  };
+
+  const handleDeleteDonation = async (donationId: number) => {
+    if (!window.confirm('Are you sure you want to delete this donation?')) return;
+
+    try {
+      const response = await fetch(getApiUrl(`/donations/${donationId}`), {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete donation');
+      }
+
+      setDonations(prev => prev.filter(d => d.DonationID !== donationId));
+      toast.success(data.message || 'Donation deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting donation:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to delete donation');
+    }
+  };
+
+  const handleEditClick = (donation: Donation) => {
+    setSelectedDonation(donation);
+    setNewDonation({
+      firstName: donation.user.FirstName,
+      lastName: donation.user.LastName,
+      email: donation.user.Email,
+      Amount: donation.Amount
+    });
+    setIsEditDialogOpen(true);
   };
 
   if (loading) {
@@ -199,13 +352,42 @@ export default function DonationsPage() {
                 <DialogTitle>Add New Donation</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      value={newDonation.firstName}
+                      onChange={(e) => setNewDonation(prev => ({ ...prev, firstName: e.target.value }))}
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      value={newDonation.lastName}
+                      onChange={(e) => setNewDonation(prev => ({ ...prev, lastName: e.target.value }))}
+                      placeholder="Enter last name"
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Donor Name</Label>
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
-                    id="name"
-                    value={newDonation.name}
-                    onChange={(e) => setNewDonation(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter donor name"
+                    id="firstName"
+                    value={newDonation.firstName}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, firstName: e.target.value }))}
+                    placeholder="Enter first name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={newDonation.lastName}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, lastName: e.target.value }))}
+                    placeholder="Enter last name"
                   />
                 </div>
                 <div className="space-y-2">
@@ -233,18 +415,6 @@ export default function DonationsPage() {
                     step={0.01}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="type">Donation Type</Label>
-                  <select
-                    id="type"
-                    value={newDonation.type}
-                    onChange={(e) => setNewDonation(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2"
-                  >
-                    <option value="One-time donation">One-time donation</option>
-                    <option value="Corporate">Corporate</option>
-                  </select>
-                </div>
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
@@ -269,26 +439,6 @@ export default function DonationsPage() {
             <p className="text-xs text-muted-foreground">
               {monthlyChange >= 0 ? '+' : '-'}${Math.abs(monthlyChange).toFixed(2)} from last month
             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Individual Donations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalIndividualAmount.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">{individualDonations.length} donations</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Corporate Sponsorships</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalCorporateAmount.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">{corporateDonations.length} sponsors</p>
           </CardContent>
         </Card>
 
@@ -337,26 +487,35 @@ export default function DonationsPage() {
                 <TableRow>
                   <TableHead>Donor</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Type</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead>Confirmation ID</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {donations.map((donation, index) => (
                   <TableRow key={donation.DonationID || `donation-${index}`}>
-                    <TableCell className="font-medium">{donation.name}</TableCell>
-                    <TableCell>{donation.email}</TableCell>
-                    <TableCell>{donation.type}</TableCell>
+                    <TableCell className="font-medium">{`${donation.user?.FirstName} ${donation.user?.LastName}`}</TableCell>
+                    <TableCell>{donation.user?.Email}</TableCell>
                     <TableCell>${donation.Amount?.toFixed(2) || '0.00'}</TableCell>
                     <TableCell>{new Date(donation.DonationDate).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        View
+                    <TableCell>{donation.ConfirmationID}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleEditClick(donation)}
+                      >
+                        <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        Receipt
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                        onClick={() => handleDeleteDonation(donation.DonationID)}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -409,6 +568,67 @@ export default function DonationsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Donation</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="editFirstName">First Name</Label>
+              <Input
+                id="editFirstName"
+                value={newDonation.firstName}
+                onChange={(e) => setNewDonation(prev => ({ ...prev, firstName: e.target.value }))}
+                placeholder="Enter first name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editLastName">Last Name</Label>
+              <Input
+                id="editLastName"
+                value={newDonation.lastName}
+                onChange={(e) => setNewDonation(prev => ({ ...prev, lastName: e.target.value }))}
+                placeholder="Enter last name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editEmail">Email</Label>
+              <Input
+                id="editEmail"
+                type="email"
+                value={newDonation.email}
+                onChange={(e) => setNewDonation(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="Enter donor email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editAmount">Amount</Label>
+              <Input
+                id="editAmount"
+                type="number"
+                value={newDonation.Amount || ''}
+                onChange={(e) => setNewDonation(prev => ({ 
+                  ...prev, 
+                  Amount: e.target.value ? parseFloat(e.target.value) : 0 
+                }))}
+                placeholder="Enter donation amount"
+                min={0}
+                step={0.01}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditDonation}>
+              Update Donation
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

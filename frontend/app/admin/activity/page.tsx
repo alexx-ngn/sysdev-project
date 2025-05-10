@@ -43,7 +43,7 @@ export default function ActivityPage() {
           id: `registration-${r.RegistrationID}`,
           type: 'registration' as const,
           title: 'New Registration',
-          description: `${r.participant.FirstName} ${r.participant.LastName} registered`,
+          description: `${r.user.FirstName} ${r.user.LastName} registered`,
           date: new Date(r.RegistrationDate).toISOString()
         }));
 

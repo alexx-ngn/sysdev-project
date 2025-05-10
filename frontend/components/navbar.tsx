@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { HeartHandshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/mobile-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -21,7 +21,7 @@ export function Navbar() {
             {settings.logo ? (
               <img src={settings.logo} alt={settings.organizationName} className="h-6 w-6 object-contain" />
             ) : (
-              <Heart className="h-6 w-6 text-pink-500" />
+              <HeartHandshake className="h-6 w-6 text-pink-500" />
             )}
             <span className="inline-block font-bold">{settings.organizationName}</span>
           </Link>

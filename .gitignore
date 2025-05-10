@@ -48,3 +48,7 @@ php_errors.log
 # Optional
 public/storage
 public/hot 
+*.db
+docker/data/mailpit.db-shm
+docker/data/mailpit.db-wal
+.vercel

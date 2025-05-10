@@ -23,11 +23,9 @@ class Donation extends Model
      * @var array<string, mixed>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'UserID',
         'Amount',
         'DonationDate',
-        'type',
         'ConfirmationID'
     ];
 
@@ -38,7 +36,7 @@ class Donation extends Model
      */
     protected $casts = [
         'Amount' => 'double',
-        'DonationDate' => 'datetime'
+        'DonationDate' => 'date'
     ];
 
     /**
