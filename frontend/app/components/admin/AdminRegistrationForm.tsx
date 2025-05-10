@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
+import { getApiUrl } from '../../config/api';
 
 interface FormData {
   firstName: string;
@@ -36,14 +37,12 @@ export function AdminRegistrationForm() {
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/admin/register', {
+      const response = await fetch(getApiUrl('/admin/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000',
         },
-        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -65,14 +64,12 @@ export function AdminRegistrationForm() {
   const handle2FAVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/admin/verify-2fa', {
+      const response = await fetch(getApiUrl('/admin/verify-2fa'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000',
         },
-        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           code: verificationCode,

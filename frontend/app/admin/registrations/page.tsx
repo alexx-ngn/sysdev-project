@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { downloadCSV } from "@/lib/utils"
+import { getApiUrl } from '../../config/api'
 
 interface Registration {
   RegistrationID: number;
@@ -193,7 +194,7 @@ export default function RegistrationsPage() {
   useEffect(() => {
     const fetchRegistrations = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/registrations');
+        const response = await fetch(getApiUrl('/registrations'));
         if (!response.ok) {
           throw new Error('Failed to fetch registrations');
         }
@@ -212,18 +213,12 @@ export default function RegistrationsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Format phone number - remove any non-digit characters except +
-      const formattedData = {
-        ...formData,
-        PhoneNumber: formData.PhoneNumber.replace(/[^\d+]/g, '')
-      };
-
-      const response = await fetch('http://localhost:8000/api/registrations', {
+      const response = await fetch(getApiUrl('/registrations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -279,19 +274,12 @@ export default function RegistrationsPage() {
     if (!selectedRegistration) return;
 
     try {
-      const formattedData = {
-        ...data,
-        PhoneNumber: data.PhoneNumber.replace(/[^\d+]/g, '')
-      };
-
-      const response = await fetch(`http://localhost:8000/api/registrations/${selectedRegistration.RegistrationID}`, {
+      const response = await fetch(getApiUrl(`/registrations/${selectedRegistration.RegistrationID}`), {
         method: 'PUT',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -327,13 +315,8 @@ export default function RegistrationsPage() {
     if (!registrationToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/registrations/${registrationToDelete.RegistrationID}`, {
+      const response = await fetch(getApiUrl(`/registrations/${registrationToDelete.RegistrationID}`), {
         method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
       });
 
       if (!response.ok) {

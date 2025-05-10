@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
+import { getApiUrl } from '../app/config/api'
 
 interface Activity {
   id: string;
@@ -21,14 +22,15 @@ interface Activity {
 export function NotificationsPopover() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
 
   useEffect(() => {
-    const fetchActivities = async () => {
+    const fetchData = async () => {
       try {
-        // Fetch both donations and registrations
         const [donationsRes, registrationsRes] = await Promise.all([
-          fetch('http://localhost:8000/api/donations'),
-          fetch('http://localhost:8000/api/registrations')
+          fetch(getApiUrl('/donations')),
+          fetch(getApiUrl('/registrations'))
         ]);
 
         const donations = await donationsRes.json();
@@ -64,7 +66,7 @@ export function NotificationsPopover() {
       }
     };
 
-    fetchActivities();
+    fetchData();
   }, []);
 
   const recentActivities = activities.slice(0, 5);

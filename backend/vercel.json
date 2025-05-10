@@ -29,6 +29,11 @@
 
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "cookie"
+        "SESSION_DRIVER": "cookie"   
+    },
+    "build": {
+        "env": {
+            "DB_SSL_CA": "/var/task/storage/certs/DigiCertGlobalRootCA.crt.pem"
+        }
     }
 }

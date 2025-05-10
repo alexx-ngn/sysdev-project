@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { downloadCSV } from "@/lib/utils"
+import { getApiUrl } from '../../config/api'
 
 interface Donation {
   DonationID: number;
@@ -68,7 +69,7 @@ export default function DonationsPage() {
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/donations');
+        const response = await fetch(getApiUrl('/donations'));
         if (!response.ok) {
           throw new Error('Failed to fetch donations');
         }
@@ -155,7 +156,7 @@ export default function DonationsPage() {
       }
 
       // First, create or find the user
-      const userResponse = await fetch('http://localhost:8000/api/users', {
+      const userResponse = await fetch(getApiUrl('/users'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +185,7 @@ export default function DonationsPage() {
 
       console.log('Sending donation request:', donationData);
 
-      const donationResponse = await fetch('http://localhost:8000/api/donations', {
+      const donationResponse = await fetch(getApiUrl('/donations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -237,7 +238,7 @@ export default function DonationsPage() {
     if (!selectedDonation) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/donations/${selectedDonation.DonationID}`, {
+      const response = await fetch(getApiUrl(`/donations/${selectedDonation.DonationID}`), {
         method: 'PUT',
         headers: {
           'Accept': 'application/json',
@@ -281,7 +282,7 @@ export default function DonationsPage() {
     if (!window.confirm('Are you sure you want to delete this donation?')) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/donations/${donationId}`, {
+      const response = await fetch(getApiUrl(`/donations/${donationId}`), {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',

@@ -14,6 +14,7 @@ import { Footer } from "@/app/components/footer"
 import { useState } from "react"
 import { toast } from "sonner"
 import { loadStripe } from '@stripe/stripe-js'
+import { getApiUrl } from '../config/api'
 
 export default function DonatePage() {
   const { t } = useLanguage();
@@ -63,7 +64,7 @@ export default function DonatePage() {
     setLoading(true);
 
     try {
-      const userResponse = await fetch('http://localhost:8000/api/users/find-or-create', {
+      const userResponse = await fetch(getApiUrl('/users/find-or-create'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export default function DonatePage() {
         type: 'One-time donation'
       };
 
-      const response = await fetch('http://localhost:8000/api/donations', {
+      const response = await fetch(getApiUrl('/donations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +150,7 @@ export default function DonatePage() {
         email,
       });
       
-      const response = await fetch('http://localhost:8000/api/create-checkout-session', {
+      const response = await fetch(getApiUrl('/create-checkout-session'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

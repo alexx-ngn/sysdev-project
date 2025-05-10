@@ -6,6 +6,7 @@ import { Users, DollarSign, Calendar, Award } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
 import { getAuthToken, getAuthUser } from '@/app/utils/auth'
+import { getApiUrl } from '../config/api'
 
 interface Registration {
   RegistrationID: number;
@@ -40,7 +41,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkAdminsAndAuth = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/admin/check');
+        const response = await fetch(getApiUrl('/admin/check'));
         const data = await response.json();
         
         if (!data.has_admins) {
@@ -66,8 +67,8 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const [registrationsRes, donationsRes] = await Promise.all([
-          fetch('http://localhost:8000/api/registrations'),
-          fetch('http://localhost:8000/api/donations')
+          fetch(getApiUrl('/registrations')),
+          fetch(getApiUrl('/donations'))
         ]);
 
         if (!registrationsRes.ok) {

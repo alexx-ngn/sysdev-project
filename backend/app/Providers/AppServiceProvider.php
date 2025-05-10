@@ -21,17 +21,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (app()->environment('production')) {
-            $tmpViewPath = '/tmp/storage/views';
-            $tmpCachePath = '/tmp/storage/cache';
-    
-            File::makeDirectory($tmpViewPath, 0755, true, true);
-            File::makeDirectory($tmpCachePath, 0755, true, true);
-    
-            View::addLocation($tmpViewPath);
-            config([
-                'view.compiled' => $tmpCachePath,
-            ]);
+        // Ensure /tmp/framework/views exists
+        $compiledPath = '/tmp/framework/views';
+        if (!file_exists($compiledPath)) {
+            mkdir($compiledPath, 0777, true);
         }
+
+        $this->app->bind('path.storage', function () {
+            return '/tmp';
+        });
+
+        // Laravel uses this binding to find compiled view path
+        $this->app->bind('path.storage.framework.views', function () use ($compiledPath) {
+            return $compiledPath;
+        });
     }
 } 
