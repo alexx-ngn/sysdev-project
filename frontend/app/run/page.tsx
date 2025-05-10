@@ -9,6 +9,7 @@ import { useLanguage } from "@/app/context/language-context"
 import { WebsiteSettings } from "@/app/components/website-settings"
 import { Header } from "@/app/components/header"
 import { Footer } from "@/app/components/footer"
+import CourseMap from "@/app/components/CourseMap"
 
 export default function RunPage() {
   const { t } = useLanguage();
@@ -93,16 +94,14 @@ export default function RunPage() {
                         <span className="mr-2 mt-1">•</span>
                         <span>{t('run.courseInfo.waterStations')}</span>
                       </li>
-                      <li className="flex items-start">
-                        <span className="mr-2 mt-1">•</span>
-                        <span>{t('run.courseInfo.medicalSupport')}</span>
-                      </li>
+     
                     </ul>
                   </div>
-                  <div className="flex items-center justify-center">
-                    <div className="aspect-square w-full max-w-md bg-gray-200 rounded-lg flex items-center justify-center">
-                      <p className="text-gray-500">{t('run.courseInfo.map')}</p>
-                    </div>
+                  <div className="flex items-center justify-center z-10">
+                    <CourseMap 
+                      geojsonPath="/maps/charity-run-route.json"
+                      zoom={13}
+                    />
                   </div>
                 </div>
               </div>
@@ -188,6 +187,10 @@ export default function RunPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-6">{t('run.amenities.title')}</h2>
                   <ul className="space-y-2">
+                    <li className="flex items-start">
+                      <span className="mr-2 mt-1">•</span>
+                      <span>{t('run.amenities.parking')}</span>
+                    </li>
                     <li className="flex items-start">
                       <span className="mr-2 mt-1">•</span>
                       <span>{t('run.amenities.waterStations')}</span>

@@ -207,3 +207,10 @@
 .destructive {
   
 }
+
+.language-switcher {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000; /* or higher than the map */
+  }
