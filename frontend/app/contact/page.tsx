@@ -12,10 +12,68 @@ import Link from "next/link"
 import { WebsiteSettings } from "@/app/components/website-settings"
 import { Header } from "@/app/components/header"
 import { Footer } from "@/app/components/footer"
+import { useState } from "react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ContactPage() {
   const { t } = useLanguage();
   const { settings } = useSettings();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      toast({
+        title: t('contact.success.title'),
+        description: t('contact.success.message'),
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error) {
+      toast({
+        title: t('contact.error.title'),
+        description: t('contact.error.message'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -44,34 +102,61 @@ export default function ContactPage() {
                     <CardDescription>{t('contact.description')}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="name">{t('contact.form.name')}</Label>
-                          <Input id="name" placeholder={t('contact.form.namePlaceholder')} />
+                          <Input 
+                            id="name" 
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder={t('contact.form.namePlaceholder')} 
+                            required
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">{t('contact.form.email')}</Label>
-                          <Input id="email" type="email" placeholder={t('contact.form.emailPlaceholder')} />
+                          <Input 
+                            id="email" 
+                            name="email"
+                            type="email" 
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder={t('contact.form.emailPlaceholder')} 
+                            required
+                          />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="subject">{t('contact.form.subject')}</Label>
-                        <Input id="subject" placeholder={t('contact.form.subjectPlaceholder')} />
+                        <Input 
+                          id="subject" 
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          placeholder={t('contact.form.subjectPlaceholder')} 
+                          required
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="message">{t('contact.form.message')}</Label>
                         <Textarea
                           id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
                           placeholder={t('contact.form.messagePlaceholder')}
                           className="min-h-[150px]"
+                          required
                         />
                       </div>
                       <Button 
                         type="submit" 
                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                        disabled={isSubmitting}
                       >
-                        {t('contact.form.submit')}
+                        {isSubmitting ? t('contact.form.submitting') : t('contact.form.submit')}
                       </Button>
                     </form>
                   </CardContent>

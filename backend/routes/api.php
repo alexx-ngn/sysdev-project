@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Log;
 
 /*
@@ -42,6 +43,9 @@ Route::apiResource('registrations', RegistrationController::class);
 
 // Other routes
 Route::resource('donations', DonationController::class);
+
+// Contact form route
+Route::post('contact', [ContactController::class, 'submit']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
