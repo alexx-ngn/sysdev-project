@@ -223,32 +223,32 @@ export default function DonatePage() {
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <Button 
-                      variant={amount === "25" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("25")}
+                      variant={amount === "5" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("5")}
                       className="relative overflow-hidden"
                     >
-                      <span className={amount === "25" ? "text-white" : ""}>$25</span>
-                      {amount === "25" && (
+                      <span className={amount === "5" ? "text-white" : ""}>$5</span>
+                      {amount === "5" && (
                         <span className="absolute inset-0 bg-primary opacity-10"></span>
                       )}
                     </Button>
                     <Button 
-                      variant={amount === "50" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("50")}
+                      variant={amount === "10" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("10")}
                       className="relative overflow-hidden"
                     >
-                      <span className={amount === "50" ? "text-white" : ""}>$50</span>
-                      {amount === "50" && (
+                      <span className={amount === "10" ? "text-white" : ""}>$10</span>
+                      {amount === "10" && (
                         <span className="absolute inset-0 bg-primary opacity-10"></span>
                       )}
                     </Button>
                     <Button 
-                      variant={amount === "100" ? "default" : "outline"}
-                      onClick={() => handlePresetAmount("100")}
+                      variant={amount === "20" ? "default" : "outline"}
+                      onClick={() => handlePresetAmount("20")}
                       className="relative overflow-hidden"
                     >
-                      <span className={amount === "100" ? "text-white" : ""}>$100</span>
-                      {amount === "100" && (
+                      <span className={amount === "20" ? "text-white" : ""}>$20</span>
+                      {amount === "20" && (
                         <span className="absolute inset-0 bg-primary opacity-10"></span>
                       )}
                     </Button>
@@ -319,41 +319,6 @@ export default function DonatePage() {
                   </Button>
                 </CardFooter>
               </Card>
-
-              <div className="border-t pt-12">
-                <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.impact.title')}</h2>
-                <div className="grid gap-8 md:grid-cols-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$25</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.supplies.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.supplies.description')}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$50</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.research.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.research.description')}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold">$100</span>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">{t('donate.impact.equipment.title')}</h3>
-                    <p className="text-muted-foreground">
-                      {t('donate.impact.equipment.description')}
-                    </p>
-                  </div>
-                </div>
-              </div>
 
               <div className="mt-16 bg-gray-50 p-8 rounded-lg">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donate.contact.title')}</h2>
