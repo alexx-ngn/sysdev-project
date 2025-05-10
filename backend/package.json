@@ -16,5 +16,7 @@
     "dependencies": {
         "@types/axios": "^0.9.36"
     },
-    "engines": { "node": "18.x" }
+    "engines": {
+        "node": "18.x"
+    }
 }
