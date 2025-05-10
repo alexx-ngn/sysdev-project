@@ -14,7 +14,8 @@
         "vite": "^6.3.5"
     },
     "dependencies": {
-        "@types/axios": "^0.9.36"
+        "@types/axios": "^0.9.36",
+        "vercel": "^41.7.4"
     },
     "engines": {
         "node": "18.x"
