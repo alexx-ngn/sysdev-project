@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Heart, Shield, ArrowLeft, Loader2 } from 'lucide-react'
+import { HeartHandshake, Shield, ArrowLeft, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
@@ -150,7 +150,7 @@ export default function AdminRegisterPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center mb-8">
-          <Heart className="h-10 w-10 text-gray-800" />
+          <HeartHandshake className="h-10 w-10 text-gray-800" />
           <span className="ml-2 text-2xl font-bold">MilesForHope</span>
         </div>
 

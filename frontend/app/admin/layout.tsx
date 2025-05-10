@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Heart, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
+import { HeartHandshake, Users, DollarSign, Award, Settings, BarChart, Calendar, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/auth-context"
@@ -124,7 +124,7 @@ export default function AdminLayout({
       >
         <div className="flex h-16 items-center justify-between px-4 border-b border-gray-800">
           <Link href="/admin" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6" />
+            <HeartHandshake className="h-6 w-6" />
             <span className="font-bold text-lg">Admin Panel</span>
           </Link>
           <button className="p-1 rounded-md hover:bg-gray-800 lg:hidden" onClick={() => setSidebarOpen(false)}>
