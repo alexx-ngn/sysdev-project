@@ -86,7 +86,7 @@ export default function AdminRegisterPage() {
     setIsLoading(true)
     
     try {
-      const response = await fetch('http://localhost:8000/api/admin/register', {
+      const response = await fetch(API_ENDPOINTS.ADMIN.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ export default function AdminRegisterPage() {
     setIsLoading(true)
     
     try {
-      const response = await fetch('http://localhost:8000/api/admin/verify-2fa', {
+      const response = await fetch(API_ENDPOINTS.ADMIN.VERIFY_2FA, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
