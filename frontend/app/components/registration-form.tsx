@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useLanguage } from '@/app/context/language-context'
 import { toast } from "sonner"
+import { getApiUrl } from '@/app/config/api'
 
 export function RegistrationForm() {
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ export function RegistrationForm() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/registrations', {
+      const response = await fetch(getApiUrl('/registrations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
