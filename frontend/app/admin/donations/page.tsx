@@ -43,6 +43,7 @@ export default function DonationsPage() {
     firstName: '',
     lastName: '',
     email: '',
+    phoneNumber: '',
     Amount: 0
   });
   const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
@@ -66,22 +67,23 @@ export default function DonationsPage() {
   const goalAmount = 30000; // $30,000 goal
   const progressPercentage = (totalDonations / goalAmount) * 100;
 
-  useEffect(() => {
-    const fetchDonations = async () => {
-      try {
-        const response = await fetch(getApiUrl('/donations'));
-        if (!response.ok) {
-          throw new Error('Failed to fetch donations');
-        }
-        const data = await response.json();
-        setDonations(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
+  // Move fetchDonations to component scope so it can be called from anywhere
+  const fetchDonations = async () => {
+    try {
+      const response = await fetch(getApiUrl('/donations'));
+      if (!response.ok) {
+        throw new Error('Failed to fetch donations');
       }
-    };
+      const data = await response.json();
+      setDonations(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDonations();
 
     // Initialize Pusher
@@ -165,7 +167,8 @@ export default function DonationsPage() {
         body: JSON.stringify({
           FirstName: newDonation.firstName.trim(),
           LastName: newDonation.lastName.trim(),
-          Email: newDonation.email.trim()
+          Email: newDonation.email.trim(),
+          PhoneNumber: newDonation.phoneNumber.trim()
         }),
       });
 
@@ -177,7 +180,7 @@ export default function DonationsPage() {
 
       // Now create the donation with the user ID
       const donationData = {
-        user_id: userData.UserID, // Use the UserID from the created/found user
+        UserID: userData.UserID,
         Amount: parseFloat(newDonation.Amount.toString()),
         DonationDate: new Date().toISOString(),
         ConfirmationID: `DON-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
@@ -205,12 +208,14 @@ export default function DonationsPage() {
         throw new Error(responseData.message || responseData.error || 'Failed to add donation');
       }
 
-      setDonations(prev => [responseData, ...prev]);
+      // Fetch the updated donations list to ensure all fields are correct
+      await fetchDonations();
       setIsAddDialogOpen(false);
       setNewDonation({
         firstName: '',
         lastName: '',
         email: '',
+        phoneNumber: '',
         Amount: 0
       });
       toast.success('Donation added successfully!');
@@ -269,6 +274,7 @@ export default function DonationsPage() {
         firstName: '',
         lastName: '',
         email: '',
+        phoneNumber: '',
         Amount: 0
       });
       toast.success(data.message || 'Donation updated successfully!');
@@ -310,6 +316,7 @@ export default function DonationsPage() {
       firstName: donation.user.FirstName,
       lastName: donation.user.LastName,
       email: donation.user.Email,
+      phoneNumber: '',
       Amount: donation.Amount
     });
     setIsEditDialogOpen(true);
@@ -373,24 +380,6 @@ export default function DonationsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={newDonation.firstName}
-                    onChange={(e) => setNewDonation(prev => ({ ...prev, firstName: e.target.value }))}
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={newDonation.lastName}
-                    onChange={(e) => setNewDonation(prev => ({ ...prev, lastName: e.target.value }))}
-                    placeholder="Enter last name"
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
@@ -398,6 +387,16 @@ export default function DonationsPage() {
                     value={newDonation.email}
                     onChange={(e) => setNewDonation(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter donor email"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={newDonation.phoneNumber}
+                    onChange={(e) => setNewDonation(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    placeholder="Enter phone number"
                   />
                 </div>
                 <div className="space-y-2">
@@ -601,6 +600,16 @@ export default function DonationsPage() {
                 value={newDonation.email}
                 onChange={(e) => setNewDonation(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="Enter donor email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editPhoneNumber">Phone Number</Label>
+              <Input
+                id="editPhoneNumber"
+                type="tel"
+                value={newDonation.phoneNumber}
+                onChange={(e) => setNewDonation(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                placeholder="Enter phone number"
               />
             </div>
             <div className="space-y-2">

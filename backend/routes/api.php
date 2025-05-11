@@ -68,6 +68,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('users/find-or-create', [UserController::class, 'findOrCreate']);
 
+// Add this route for user creation/finding
+Route::post('users', [UserController::class, 'findOrCreate']);
+
 Route::get('test', function () {
     return [
         'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
