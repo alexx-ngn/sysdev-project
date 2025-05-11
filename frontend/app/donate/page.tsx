@@ -323,7 +323,7 @@ export default function DonatePage() {
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="Your Phone Number"
+                        placeholder={t('donate.contact.phone.placeholder')}
                         required
                       />
                     </div>

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class DonationController extends Controller
 {
@@ -55,6 +56,23 @@ class DonationController extends Controller
 
             // Load the user relationship
             $donation->load('user');
+
+            // Send confirmation email
+            try {
+                Mail::send('emails.donation-confirmation', ['donation' => $donation], function ($message) use ($donation) {
+                    $message->to($donation->user->Email)
+                           ->subject('Thank You for Your Donation - Miles for Hope');
+                });
+                Log::info('Donation confirmation email sent successfully', [
+                    'donation_id' => $donation->DonationID,
+                    'user_email' => $donation->user->Email
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to send donation confirmation email:', [
+                    'error' => $e->getMessage(),
+                    'donation_id' => $donation->DonationID
+                ]);
+            }
 
             // Try to broadcast the event, but don't let it fail the donation
             try {

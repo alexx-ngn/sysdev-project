@@ -9,7 +9,7 @@ return new class extends Migration {
             $table->id('DonationID');
             $table->foreignId('UserID')->constrained('users', 'UserID');
             $table->double('Amount');
-            $table->date('DonationDate');
+            $table->timestamp('DonationDate');
             $table->string('ConfirmationID');
             $table->timestamps();
         });

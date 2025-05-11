@@ -267,6 +267,8 @@ const translations: Record<Language, Translations> = {
     'donate.contact.message': 'Message',
     'donate.contact.messagePlaceholder': 'Your Message',
     'donate.contact.button': 'Send Message',
+    'donate.contact.phone.title': 'Phone',
+    'donate.contact.phone.placeholder': 'Your Phone',
 
     // Donation Success Page
     'donate.success.title': 'Donation Successful!',
@@ -638,6 +640,8 @@ const translations: Record<Language, Translations> = {
     'donate.contact.message': 'Message',
     'donate.contact.messagePlaceholder': 'Votre Message',
     'donate.contact.button': 'Envoyer le Message',
+    'donate.contact.phone.title': 'Téléphone',
+    'donate.contact.phone.placeholder': 'Votre Téléphone',
 
     // Donation Success Page
     'donate.success.title': 'Don réussi !',

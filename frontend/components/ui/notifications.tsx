@@ -41,7 +41,7 @@ export function NotificationsPopover() {
           id: `donation-${d.DonationID}`,
           type: 'donation' as const,
           title: 'New Donation',
-          description: `${d.name} donated $${d.Amount}`,
+          description: `${d.user?.FirstName || ''} ${d.user?.LastName || ''} donated $${d.Amount}`.trim(),
           date: new Date(d.DonationDate).toISOString()
         }));
 
