@@ -57,8 +57,8 @@ class StripeController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => 'http://localhost:3000/donate/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => 'http://localhost:3000/donate/cancel',
+                'success_url' => env('FRONTEND_URL') . '/donate/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => env('FRONTEND_URL') . '/donate/cancel',
                 'customer_email' => $request->email,
                 'metadata' => [
                     'donor_name' => $request->name,

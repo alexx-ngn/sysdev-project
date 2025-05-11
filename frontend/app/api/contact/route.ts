@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
+import { API_BASE_URL } from '@/app/config/api';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     
     // Forward the request to the backend API
-    const response = await fetch('http://localhost:8000/api/contact', {
+    const response = await fetch(`${API_BASE_URL}/api/contact`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

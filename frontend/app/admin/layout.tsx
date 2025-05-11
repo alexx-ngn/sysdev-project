@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/auth-context"
 import { getAuthToken } from "@/app/utils/auth"
 import { NotificationsPopover } from "@/components/ui/notifications"
+import { API_BASE_URL } from '@/app/config/api'
 
 export default function AdminLayout({
   children,
@@ -39,7 +40,7 @@ export default function AdminLayout({
         }
 
         // First check if any admins exist
-        const response = await fetch('http://localhost:8000/api/admin/check')
+        const response = await fetch(`${API_BASE_URL}/api/admin/check`)
         const data = await response.json()
         
         if (!response.ok) {
