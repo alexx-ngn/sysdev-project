@@ -68,7 +68,7 @@ class RegistrationController extends Controller
             ]);
 
             // Send confirmation email
-            $confirmationUrl = env('FRONTEND_URL', 'http://localhost:3000') . "/registration/confirm/{$confirmationToken}";
+            $confirmationUrl = env('FRONTEND_URL') . "/registration/confirm/{$confirmationToken}";
             Mail::send('emails.registration-confirmation', [
                 'user' => $user,
                 'confirmationUrl' => $confirmationUrl

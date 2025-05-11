@@ -10,6 +10,7 @@ import { useLanguage } from "@/app/context/language-context";
 import { Header } from "@/app/components/header";
 import { Footer } from "@/app/components/footer";
 import { WebsiteSettings } from "@/app/components/website-settings";
+import { API_BASE_URL } from '@/app/config/api';
 
 function LoadingFallback() {
   const { t } = useLanguage();
@@ -46,7 +47,7 @@ function DonationSuccessContent() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/api/verify-payment?session_id=${sessionId}`);
+        const response = await fetch(`${API_BASE_URL}/api/verify-payment?session_id=${sessionId}`);
         const data = await response.json();
 
         if (!response.ok) {

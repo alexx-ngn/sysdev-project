@@ -1,5 +1,5 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-export const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+export const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
 // Helper function to get full API URL
 export const getApiUrl = (path: string) => `${API_BASE_URL}/api${path}`;

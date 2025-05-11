@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, Filter, ChevronDown } from "lucide-react"
+import { API_BASE_URL } from '@/app/config/api'
 
 interface Activity {
   id: string;
@@ -24,8 +25,8 @@ export default function ActivityPage() {
     const fetchActivities = async () => {
       try {
         const [donationsRes, registrationsRes] = await Promise.all([
-          fetch('http://localhost:8000/api/donations'),
-          fetch('http://localhost:8000/api/registrations')
+          fetch(`${API_BASE_URL}/api/donations`),
+          fetch(`${API_BASE_URL}/api/registrations`)
         ]);
 
         const donations = await donationsRes.json();

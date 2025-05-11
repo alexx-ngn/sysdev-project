@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lock, AlertCircle, Heart, Check, X } from 'lucide-react';
+import { API_BASE_URL } from '@/app/config/api';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function ResetPasswordPage() {
 
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/admin/verify-reset-token', {
+        const response = await fetch(`${API_BASE_URL}/api/admin/verify-reset-token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

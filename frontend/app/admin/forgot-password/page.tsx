@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { API_BASE_URL } from '@/app/config/api'
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,7 +20,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/admin/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
