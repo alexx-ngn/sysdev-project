@@ -22,6 +22,7 @@ export default function DonatePage() {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handlePresetAmount = (value: string) => {
     setAmount(value);
@@ -73,7 +74,7 @@ export default function DonatePage() {
           FirstName: name.split(' ')[0],
           LastName: name.split(' ').slice(1).join(' ') || name.split(' ')[0],
           Email: email,
-          PhoneNumber: null
+          PhoneNumber: phoneNumber.trim()
         }),
       });
 
@@ -117,6 +118,7 @@ export default function DonatePage() {
       setAmount("");
       setName("");
       setEmail("");
+      setPhoneNumber("");
     } catch (error) {
       console.error('Donation error:', error);
       toast.error(error instanceof Error ? error.message : "Failed to process donation. Please try again.");
@@ -148,6 +150,7 @@ export default function DonatePage() {
         amount: parseFloat(amount),
         name,
         email,
+        phoneNumber: phoneNumber.trim(),
       });
       
       const response = await fetch(getApiUrl('/create-checkout-session'), {
@@ -160,6 +163,7 @@ export default function DonatePage() {
           amount: parseFloat(amount),
           name,
           email,
+          phoneNumber: phoneNumber.trim(),
         }),
       });
 
@@ -307,6 +311,22 @@ export default function DonatePage() {
                         required
                       />
                     </div>
+                    <div className="grid gap-2">
+                      <label
+                        htmlFor="phoneNumber"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {t('donate.contact.phone.title')}
+                      </label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Your Phone Number"
+                        required
+                      />
+                    </div>
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -359,6 +379,22 @@ export default function DonatePage() {
                         required
                       />
                     </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="phoneNumber"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {t('donate.contact.phone.title')}
+                    </label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="Your Phone Number"
+                      required
+                    />
                   </div>
                   <div className="grid gap-2">
                     <label

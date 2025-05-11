@@ -61,8 +61,9 @@ class StripeController extends Controller
                 'cancel_url' => env('FRONTEND_URL') . '/donate/cancel',
                 'customer_email' => $request->email,
                 'metadata' => [
-                    'donor_name' => $request->name,
                     'donor_email' => $request->email,
+                    'donor_name' => $request->name,
+                    'donor_phone' => $request->phoneNumber,
                 ],
             ]);
 
@@ -127,7 +128,7 @@ class StripeController extends Controller
                     [
                         'FirstName' => explode(' ', $session->metadata->donor_name)[0],
                         'LastName' => explode(' ', $session->metadata->donor_name)[1] ?? '',
-                        'PhoneNumber' => null,
+                        'PhoneNumber' => $session->metadata->donor_phone ?? '0000000000',
                     ]
                 );
 
