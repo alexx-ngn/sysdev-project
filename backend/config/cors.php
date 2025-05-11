@@ -18,7 +18,11 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['http://localhost:3000', 'https://milesforhope-demo.vercel.app'],
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'https://milesforhope-demo.vercel.app',
+        'https://2psdfiecoruwramhi23av7dnpi0agyla.lambda-url.us-east-1.on.aws'
+    ],
 
     'allowed_origins_patterns' => [],
 

@@ -10,7 +10,7 @@ import { HeartHandshake, Shield, ArrowLeft, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
-import { API_ENDPOINTS } from '@/app/config/api'
+import { api, API_ENDPOINTS } from '@/lib/api'
 
 interface FormData {
   firstName: string
@@ -86,22 +86,7 @@ export default function AdminRegisterPage() {
     setIsLoading(true)
     
     try {
-      const response = await fetch('http://localhost:8000/api/admin/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
-      }
-
+      const data = await api.post(API_ENDPOINTS.ADMIN.REGISTER, formData)
       setQrCodeUrl(data.qr_code_url)
       setSecret(data.secret)
       setStep('2fa')
@@ -118,24 +103,10 @@ export default function AdminRegisterPage() {
     setIsLoading(true)
     
     try {
-      const response = await fetch('http://localhost:8000/api/admin/verify-2fa', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: formData.email,
-          code: verificationCode,
-        }),
+      const data = await api.post(API_ENDPOINTS.ADMIN.VERIFY_2FA, {
+        email: formData.email,
+        code: verificationCode,
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || '2FA verification failed')
-      }
 
       toast.success('2FA setup complete! You can now log in')
       router.push('/admin/login')
