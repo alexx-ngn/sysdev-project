@@ -21,7 +21,7 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'https://milesforhope-demo.vercel.app',
-        'https://2psdfiecoruwramhi23av7dnpi0agyla.lambda-url.us-east-1.on.aws'
+        'https://mfh.noyr.dev'
     ],
 
     'allowed_origins_patterns' => [],

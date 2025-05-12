@@ -8,7 +8,7 @@ import { HeartHandshake, Users, DollarSign, Award, Settings, BarChart, Calendar,
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/auth-context"
-import { getAuthToken } from "@/app/utils/auth"
+import { getAuthToken, getAuthUser } from "@/app/utils/auth"
 import { NotificationsPopover } from "@/components/ui/notifications"
 import { API_BASE_URL } from '@/app/config/api'
 
@@ -22,6 +22,7 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
   const { isAuthenticated, checkAuth, logout } = useAuth()
+  const adminUser = getAuthUser()
 
   // Check if we're on the login page, register page, or forgot password page
   const isAuthPage = pathname === "/admin/login" || 
@@ -205,9 +206,9 @@ export default function AdminLayout({
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-600">A</span>
+                <span className="text-sm font-medium text-gray-600">{adminUser?.name?.[0] || 'A'}</span>
               </div>
-              <span className="text-sm font-medium hidden sm:inline">Admin User</span>
+              <span className="text-sm font-medium hidden sm:inline">{adminUser?.name || 'Admin User'}</span>
             </div>
           </div>
         </header>

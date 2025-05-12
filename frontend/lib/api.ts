@@ -14,12 +14,15 @@ export const API_ENDPOINTS = {
   CREATE_CHECKOUT_SESSION: `${baseURL}/api/create-checkout-session`,
 };
 
+const defaultHeaders = {
+  'Accept': 'application/json',
+  'ngrok-skip-browser-warning': 'true'
+};
+
 export const api = {
   get: async (url: string) => {
     const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: defaultHeaders,
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -31,8 +34,8 @@ export const api = {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
+        ...defaultHeaders,
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
       },
       body: JSON.stringify(data),
     });
@@ -46,8 +49,8 @@ export const api = {
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
+        ...defaultHeaders,
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
       },
       body: JSON.stringify(data),
     });
@@ -60,9 +63,7 @@ export const api = {
   delete: async (url: string) => {
     const response = await fetch(url, {
       method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: defaultHeaders,
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

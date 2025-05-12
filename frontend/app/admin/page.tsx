@@ -154,7 +154,6 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{registrations.length}</div>
-            <p className="text-xs text-muted-foreground">+{Math.floor(registrations.length * 0.12)}% from last week</p>
           </CardContent>
         </Card>
 
@@ -165,7 +164,6 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${totalDonations.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-            <p className="text-xs text-muted-foreground">{monthlyChange >= 0 ? '+' : ''}{monthlyChange.toFixed(0)}% from last month</p>
           </CardContent>
         </Card>
       </div>
