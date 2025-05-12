@@ -13,5 +13,8 @@ export const API_ENDPOINTS = {
     LOGIN_2FA: `${API_BASE_URL}/api/admin/login/verify-2fa`,
     VERIFY_2FA: `${API_BASE_URL}/api/admin/verify-2fa`,
     LIST: `${API_BASE_URL}/api/admin`,
+    DELETE: `${API_BASE_URL}/api/admin`,
+    UPDATE: `${API_BASE_URL}/api/admin`,
+    CREATE: `${API_BASE_URL}/api/admin`,
   },
 }; 

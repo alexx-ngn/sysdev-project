@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { HeartHandshake, Shield, ArrowLeft, Loader2 } from 'lucide-react'
+import { HeartHandshake, Shield, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
@@ -37,6 +37,14 @@ export default function AdminRegisterPage() {
   const [verificationCode, setVerificationCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+    match: false
+  })
 
   useEffect(() => {
     const checkAdmins = async () => {
@@ -83,8 +91,14 @@ export default function AdminRegisterPage() {
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     
+    // Check if all password requirements are met
+    if (!Object.values(passwordChecks).every(check => check)) {
+      toast.error('Please meet all password requirements')
+      return
+    }
+
+    setIsLoading(true)
     try {
       const data = await api.post(API_ENDPOINTS.ADMIN.REGISTER, formData)
       setQrCodeUrl(data.qr_code_url)
@@ -114,6 +128,30 @@ export default function AdminRegisterPage() {
       toast.error(error instanceof Error ? error.message : '2FA verification failed')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // Handle form changes
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+
+    // Update password validation checks
+    if (name === 'password') {
+      setPasswordChecks(prev => ({
+        ...prev,
+        length: value.length >= 12,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        match: value === formData.password_confirmation
+      }))
+    } else if (name === 'password_confirmation') {
+      setPasswordChecks(prev => ({
+        ...prev,
+        match: value === formData.password
+      }))
     }
   }
 
@@ -197,24 +235,64 @@ export default function AdminRegisterPage() {
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={handleFormChange}
                     required
                     disabled={isLoading}
                   />
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className={`h-4 w-4 ${passwordChecks.length ? 'text-green-500' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${passwordChecks.length ? 'text-green-500' : 'text-gray-500'}`}>
+                        At least 12 characters long
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className={`h-4 w-4 ${passwordChecks.uppercase ? 'text-green-500' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${passwordChecks.uppercase ? 'text-green-500' : 'text-gray-500'}`}>
+                        Contains uppercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className={`h-4 w-4 ${passwordChecks.lowercase ? 'text-green-500' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${passwordChecks.lowercase ? 'text-green-500' : 'text-gray-500'}`}>
+                        Contains lowercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className={`h-4 w-4 ${passwordChecks.number ? 'text-green-500' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${passwordChecks.number ? 'text-green-500' : 'text-gray-500'}`}>
+                        Contains number
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className={`h-4 w-4 ${passwordChecks.special ? 'text-green-500' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${passwordChecks.special ? 'text-green-500' : 'text-gray-500'}`}>
+                        Contains special character
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="password_confirmation">Confirm Password</Label>
                   <Input
                     id="password_confirmation"
+                    name="password_confirmation"
                     type="password"
                     value={formData.password_confirmation}
-                    onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                    onChange={handleFormChange}
                     required
                     disabled={isLoading}
                   />
+                  <div className="flex items-center space-x-2 mt-2">
+                    <CheckCircle className={`h-4 w-4 ${passwordChecks.match ? 'text-green-500' : 'text-gray-400'}`} />
+                    <span className={`text-sm ${passwordChecks.match ? 'text-green-500' : 'text-gray-500'}`}>
+                      Passwords match
+                    </span>
+                  </div>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>

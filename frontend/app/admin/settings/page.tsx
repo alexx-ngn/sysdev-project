@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Heart, Plus, CheckCircle, X, Upload, Loader2 } from "lucide-react"
+import { Heart, Plus, CheckCircle, X, Upload, Loader2, QrCode } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useSettings } from "@/app/context/settings-context"
 import { useState, useEffect, useRef } from "react"
@@ -16,6 +16,8 @@ import { handleFileUpload } from "@/lib/upload-utils"
 import { HexColorPicker } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { API_ENDPOINTS } from "@/app/config/api"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { QRCodeSVG } from 'qrcode.react'
 
 interface AdminUser {
   AdminID: number;
@@ -35,8 +37,38 @@ export default function SettingsPage() {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
   const [isLoadingAdmins, setIsLoadingAdmins] = useState(false)
   const [adminError, setAdminError] = useState<string | null>(null)
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editFormData, setEditFormData] = useState<Partial<AdminUser>>({})
+  const [isUpdating, setIsUpdating] = useState(false)
   const logoInputRef = useRef<HTMLInputElement>(null)
   const faviconInputRef = useRef<HTMLInputElement>(null)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [addFormData, setAddFormData] = useState({
+    FirstName: '',
+    LastName: '',
+    Email: '',
+    PhoneNumber: '',
+    Password: '',
+    Password_confirmation: '',
+  })
+  const [isAdding, setIsAdding] = useState(false)
+  const [show2FAModal, setShow2FAModal] = useState(false)
+  const [qrCodeData, setQrCodeData] = useState<{
+    qr_code_url: string;
+    secret: string;
+    admin: AdminUser;
+  } | null>(null)
+  const [verificationCode, setVerificationCode] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+    match: false
+  })
 
   // Fetch admin users
   const fetchAdminUsers = async () => {
@@ -219,6 +251,202 @@ export default function SettingsPage() {
       })
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  // Handle edit admin user
+  const handleEditUser = (user: AdminUser) => {
+    setEditingUser(user)
+    setEditFormData({
+      FirstName: user.FirstName,
+      LastName: user.LastName,
+      Email: user.Email,
+      PhoneNumber: user.PhoneNumber,
+    })
+    setIsEditModalOpen(true)
+  }
+
+  // Handle edit form changes
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setEditFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  // Handle edit form submission
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingUser) return
+
+    setIsUpdating(true)
+    try {
+      const response = await fetch(`${API_ENDPOINTS.ADMIN.UPDATE}/${editingUser.AdminID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+        body: JSON.stringify(editFormData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update admin user')
+      }
+
+      await fetchAdminUsers()
+      setIsEditModalOpen(false)
+      toast.success('Admin user updated successfully')
+    } catch (error) {
+      toast.error('Failed to update admin user')
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  // Handle remove admin user
+  const handleRemoveUser = async (userId: number) => {
+    if (!confirm('Are you sure you want to remove this admin user?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_ENDPOINTS.ADMIN.DELETE}/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to remove admin user')
+      }
+
+      // Refresh the admin users list
+      await fetchAdminUsers()
+      toast.success('Admin user removed successfully')
+    } catch (error) {
+      toast.error('Failed to remove admin user')
+    }
+  }
+
+  // Handle add form changes
+  const handleAddFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setAddFormData(prev => ({ ...prev, [name]: value }))
+
+    // Update password validation checks
+    if (name === 'Password') {
+      setPasswordChecks(prev => ({
+        ...prev,
+        length: value.length >= 12,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        match: value === addFormData.Password_confirmation
+      }))
+    } else if (name === 'Password_confirmation') {
+      setPasswordChecks(prev => ({
+        ...prev,
+        match: value === addFormData.Password
+      }))
+    }
+  }
+
+  // Handle add form submission
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Check if all password requirements are met
+    if (!Object.values(passwordChecks).every(check => check)) {
+      toast.error('Please meet all password requirements')
+      return
+    }
+
+    setIsAdding(true)
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN.CREATE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+        body: JSON.stringify(addFormData),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Failed to add admin user')
+      }
+
+      const responseData = await response.json()
+      
+      // Show QR code for 2FA setup if provided
+      if (responseData.qr_code_url) {
+        setQrCodeData({
+          qr_code_url: responseData.qr_code_url,
+          secret: responseData.secret,
+          admin: responseData.admin,
+        })
+        setShow2FAModal(true)
+      }
+
+      await fetchAdminUsers()
+      setIsAddModalOpen(false)
+      setAddFormData({
+        FirstName: '',
+        LastName: '',
+        Email: '',
+        PhoneNumber: '',
+        Password: '',
+        Password_confirmation: '',
+      })
+      setPasswordChecks({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false,
+        match: false
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to add admin user')
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
+  // Handle 2FA verification
+  const handle2FAVerification = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!qrCodeData) return
+
+    setIsVerifying(true)
+    try {
+      const response = await fetch(`${API_ENDPOINTS.ADMIN.VERIFY_2FA}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+        body: JSON.stringify({
+          email: qrCodeData.admin.Email,
+          code: verificationCode,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Failed to verify 2FA code')
+      }
+
+      setShow2FAModal(false)
+      setQrCodeData(null)
+      setVerificationCode('')
+      toast.success('Admin user added successfully')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to verify 2FA code')
+    } finally {
+      setIsVerifying(false)
     }
   }
 
@@ -721,11 +949,19 @@ export default function SettingsPage() {
                           <TableCell>{user.PhoneNumber}</TableCell>
                           <TableCell>{formatDate(user.updated_at)}</TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditUser(user)}
+                            >
                               Edit
                             </Button>
                             {user.Email !== "dev@milesforhope.org" && (
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleRemoveUser(user.AdminID)}
+                              >
                                 Remove
                               </Button>
                             )}
@@ -738,7 +974,10 @@ export default function SettingsPage() {
               </div>
 
               <div className="mt-4 flex justify-end">
-                <Button className="flex items-center gap-2">
+                <Button 
+                  className="flex items-center gap-2"
+                  onClick={() => setIsAddModalOpen(true)}
+                >
                   <Plus className="h-4 w-4" />
                   Add User
                 </Button>
@@ -747,7 +986,248 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Admin User</DialogTitle>
+            <DialogDescription>
+              Update the admin user's information.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="FirstName">First Name</Label>
+              <Input
+                id="FirstName"
+                name="FirstName"
+                value={editFormData.FirstName || ''}
+                onChange={handleEditFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="LastName">Last Name</Label>
+              <Input
+                id="LastName"
+                name="LastName"
+                value={editFormData.LastName || ''}
+                onChange={handleEditFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="Email">Email</Label>
+              <Input
+                id="Email"
+                name="Email"
+                type="email"
+                value={editFormData.Email || ''}
+                onChange={handleEditFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="PhoneNumber">Phone Number</Label>
+              <Input
+                id="PhoneNumber"
+                name="PhoneNumber"
+                value={editFormData.PhoneNumber || ''}
+                onChange={handleEditFormChange}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditModalOpen(false)}
+                disabled={isUpdating}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isUpdating}>
+                {isUpdating ? 'Updating...' : 'Save Changes'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Modal */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Admin User</DialogTitle>
+            <DialogDescription>
+              Create a new admin user account.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="addFirstName">First Name</Label>
+              <Input
+                id="addFirstName"
+                name="FirstName"
+                value={addFormData.FirstName}
+                onChange={handleAddFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addLastName">Last Name</Label>
+              <Input
+                id="addLastName"
+                name="LastName"
+                value={addFormData.LastName}
+                onChange={handleAddFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addEmail">Email</Label>
+              <Input
+                id="addEmail"
+                name="Email"
+                type="email"
+                value={addFormData.Email}
+                onChange={handleAddFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addPhoneNumber">Phone Number</Label>
+              <Input
+                id="addPhoneNumber"
+                name="PhoneNumber"
+                value={addFormData.PhoneNumber}
+                onChange={handleAddFormChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addPassword">Password</Label>
+              <Input
+                id="addPassword"
+                name="Password"
+                type="password"
+                value={addFormData.Password}
+                onChange={handleAddFormChange}
+                required
+                minLength={12}
+              />
+              <div className="space-y-2 mt-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className={`h-4 w-4 ${passwordChecks.length ? 'text-green-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm ${passwordChecks.length ? 'text-green-500' : 'text-gray-500'}`}>
+                    At least 12 characters long
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className={`h-4 w-4 ${passwordChecks.uppercase ? 'text-green-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm ${passwordChecks.uppercase ? 'text-green-500' : 'text-gray-500'}`}>
+                    Contains uppercase letter
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className={`h-4 w-4 ${passwordChecks.lowercase ? 'text-green-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm ${passwordChecks.lowercase ? 'text-green-500' : 'text-gray-500'}`}>
+                    Contains lowercase letter
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className={`h-4 w-4 ${passwordChecks.number ? 'text-green-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm ${passwordChecks.number ? 'text-green-500' : 'text-gray-500'}`}>
+                    Contains number
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className={`h-4 w-4 ${passwordChecks.special ? 'text-green-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm ${passwordChecks.special ? 'text-green-500' : 'text-gray-500'}`}>
+                    Contains special character
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addPasswordConfirmation">Confirm Password</Label>
+              <Input
+                id="addPasswordConfirmation"
+                name="Password_confirmation"
+                type="password"
+                value={addFormData.Password_confirmation}
+                onChange={handleAddFormChange}
+                required
+              />
+              <div className="flex items-center space-x-2 mt-2">
+                <CheckCircle className={`h-4 w-4 ${passwordChecks.match ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={`text-sm ${passwordChecks.match ? 'text-green-500' : 'text-gray-500'}`}>
+                  Passwords match
+                </span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddModalOpen(false)}
+                disabled={isAdding}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isAdding}>
+                {isAdding ? 'Adding...' : 'Add User'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 2FA Setup Modal */}
+      <Dialog open={show2FAModal} onOpenChange={setShow2FAModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Set Up Two-Factor Authentication</DialogTitle>
+            <DialogDescription>
+              Scan the QR code with your authenticator app to set up 2FA for {qrCodeData?.admin.FirstName} {qrCodeData?.admin.LastName}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              {qrCodeData?.qr_code_url ? (
+                <QRCodeSVG value={qrCodeData.qr_code_url} size={200} />
+              ) : (
+                <QrCode className="w-48 h-48 text-gray-300" />
+              )}
+            </div>
+            
+            <div className="text-center text-sm text-muted-foreground">
+              <p>Or enter this code manually:</p>
+              <p className="font-mono bg-muted p-2 rounded-md mt-2">{qrCodeData?.secret}</p>
+            </div>
+
+            <form onSubmit={handle2FAVerification} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="verificationCode">Verification Code</Label>
+                <Input
+                  id="verificationCode"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  placeholder="Enter 6-digit code"
+                  maxLength={6}
+                  required
+                  disabled={isVerifying}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isVerifying}>
+                {isVerifying ? 'Verifying...' : 'Verify'}
+              </Button>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
