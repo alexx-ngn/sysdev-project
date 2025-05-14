@@ -323,6 +323,10 @@ const translations: Record<Language, Translations> = {
     'contact.social.description': 'Stay connected with us on social media for updates, stories, and more.',
     'contact.social.facebook': 'Facebook',
     'contact.social.twitter': 'Twitter',
+    'contact.success.title': 'Message sent successfully',
+    'contact.success.message': 'Your message has been sent successfully. We will get back to you as soon as possible.',
+    'contact.error.title': 'Error sending message',
+    'contact.error.message': 'An error occurred while sending your message.',
     
     // Register Page
     'register.title': 'Register',
@@ -697,6 +701,10 @@ const translations: Record<Language, Translations> = {
     'contact.social.description': 'Restez connecté avec nous sur les réseaux sociaux pour les mises à jour, les histoires et plus encore.',
     'contact.social.facebook': 'Facebook',
     'contact.social.twitter': 'Twitter',
+    'contact.success.title': 'Message envoyé avec succès',
+    'contact.success.message': 'Votre message a été envoyé avec succès. Nous reviendrons vers vous dès que possible.',
+    'contact.error.title': 'Erreur lors de l\'envoi du message',
+    'contact.error.message': 'Une erreur est survenue lors de l\'envoi de votre message.',
     
     // Register Page
     'register.title': 'S\'inscrire',
