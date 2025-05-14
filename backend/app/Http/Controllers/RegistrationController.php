@@ -25,17 +25,15 @@ class RegistrationController extends Controller
         $validator = Validator::make($request->all(), [
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
-            'Email' => 'required|email|unique:users,Email',
+            'Email' => 'required|email',
             'PhoneNumber' => [
                 'required',
                 'string',
-                'regex:/^(\+1)?\d{10}$/',
-                'unique:users,PhoneNumber'
+                'regex:/^(\+1)?\d{10}$/'
             ],
             'RegistrationStatus' => 'required|in:pending,confirmed,cancelled'
         ], [
-            'PhoneNumber.regex' => 'Please enter a valid 10-digit phone number (e.g., 1234567890 or +11234567890)',
-            'PhoneNumber.unique' => 'This phone number is already registered'
+            'PhoneNumber.regex' => 'Please enter a valid 10-digit phone number (e.g., 1234567890 or +11234567890)'
         ]);
 
         if ($validator->fails()) {
@@ -48,13 +46,39 @@ class RegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create user
-            $user = User::create([
-                'FirstName' => $request->FirstName,
-                'LastName' => $request->LastName,
-                'Email' => $request->Email,
-                'PhoneNumber' => $request->PhoneNumber,
-            ]);
+            // Check for existing registration by email
+            $existingUserByEmail = User::where('Email', $request->Email)->first();
+            if ($existingUserByEmail) {
+                $existingRegistration = Registration::where('UserID', $existingUserByEmail->UserID)->first();
+                if ($existingRegistration) {
+                    return response()->json([
+                        'error' => 'This email is already registered for the event',
+                        'registration' => $existingRegistration
+                    ], 422);
+                }
+            }
+
+            // Check for existing registration by phone
+            $existingUserByPhone = User::where('PhoneNumber', $request->PhoneNumber)->first();
+            if ($existingUserByPhone) {
+                $existingRegistration = Registration::where('UserID', $existingUserByPhone->UserID)->first();
+                if ($existingRegistration) {
+                    return response()->json([
+                        'error' => 'This phone number is already registered for the event',
+                        'registration' => $existingRegistration
+                    ], 422);
+                }
+            }
+
+            // Find existing user or create new one
+            $user = User::firstOrCreate(
+                ['Email' => $request->Email],
+                [
+                    'FirstName' => $request->FirstName,
+                    'LastName' => $request->LastName,
+                    'PhoneNumber' => $request->PhoneNumber,
+                ]
+            );
 
             // Generate confirmation token
             $confirmationToken = Str::random(32);
