@@ -17,4 +17,10 @@ export const API_ENDPOINTS = {
     UPDATE: `${API_BASE_URL}/api/admin`,
     CREATE: `${API_BASE_URL}/api/admin`,
   },
+  SETTINGS: {
+    GET_ALL: `${API_BASE_URL}/api/settings`,
+    UPDATE: `${API_BASE_URL}/api/settings`,
+    GET_GROUP: `${API_BASE_URL}/api/settings`,
+    GET_VALUE: `${API_BASE_URL}/api/settings/value`,
+  },
 }; 

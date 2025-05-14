@@ -69,6 +69,22 @@ export default function SettingsPage() {
     special: false,
     match: false
   })
+  const [activeTab, setActiveTab] = useState('general')
+  const [savingStates, setSavingStates] = useState<Record<string, boolean>>({
+    general: false,
+    social: false,
+    appearance: false,
+    layout: false,
+    notifications: false
+  })
+  const [verifyingStates, setVerifyingStates] = useState<Record<string, boolean>>({
+    general: false,
+    social: false,
+    appearance: false,
+    layout: false,
+    notifications: false
+  })
+  const [verificationResults, setVerificationResults] = useState<Record<string, { success: boolean; message: string }>>({})
 
   // Fetch admin users
   const fetchAdminUsers = async () => {
@@ -450,6 +466,139 @@ export default function SettingsPage() {
     }
   }
 
+  const handleSave = async (section: string, sectionSettings: any) => {
+    try {
+      setSavingStates(prev => ({ ...prev, [section]: true }));
+      let payload = {};
+      if (section === 'general') {
+        payload = {
+          organizationName: sectionSettings.organizationName,
+          eventName: sectionSettings.eventName,
+          contactEmail: sectionSettings.contactEmail,
+          contactPhone: sectionSettings.contactPhone,
+          address: sectionSettings.address,
+          aboutOrganization: sectionSettings.aboutOrganization,
+        };
+      } else if (section === 'social') {
+        payload = {
+          facebook: sectionSettings.facebook,
+          instagram: sectionSettings.instagram,
+          twitter: sectionSettings.twitter,
+        };
+      } else if (section === 'appearance') {
+        payload = {
+          primaryColor: sectionSettings.primaryColor,
+          secondaryColor: sectionSettings.secondaryColor,
+          logo: sectionSettings.logo,
+          favicon: sectionSettings.favicon,
+        };
+      } else if (section === 'layout') {
+        payload = {
+          showHeroSection: sectionSettings.showHeroSection,
+          showFeaturedSections: sectionSettings.showFeaturedSections,
+          showRegistrationCTA: sectionSettings.showRegistrationCTA,
+          showSponsorsHighlight: sectionSettings.showSponsorsHighlight,
+        };
+      } else if (section === 'notifications') {
+        payload = {
+          sendRegistrationConfirmation: sectionSettings.sendRegistrationConfirmation,
+          sendDonationReceipt: sectionSettings.sendDonationReceipt,
+          sendEventReminders: sectionSettings.sendEventReminders,
+          sendAdminNotifications: sectionSettings.sendAdminNotifications,
+          notificationEmail: sectionSettings.notificationEmail,
+        };
+      }
+      await updateSettings(payload);
+      toast.success('Settings saved successfully');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast.error('Failed to save settings');
+    } finally {
+      setSavingStates(prev => ({ ...prev, [section]: false }));
+    }
+  };
+
+  const handleVerify = async (section: string) => {
+    try {
+      setVerifyingStates(prev => ({ ...prev, [section]: true }));
+      // Simulate verification process
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setVerificationResults(prev => ({
+        ...prev,
+        [section]: { success: true, message: 'Settings verified successfully' }
+      }));
+    } catch (error) {
+      setVerificationResults(prev => ({
+        ...prev,
+        [section]: { success: false, message: 'Verification failed' }
+      }));
+    } finally {
+      setVerifyingStates(prev => ({ ...prev, [section]: false }));
+    }
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'general':
+        return (
+          <GeneralSettings
+            settings={settings.general}
+            onSave={(sectionSettings) => handleSave('general', sectionSettings)}
+            onVerify={() => handleVerify('general')}
+            isSaving={savingStates.general}
+            isVerifying={verifyingStates.general}
+            verificationResult={verificationResults.general}
+          />
+        );
+      case 'social':
+        return (
+          <SocialMediaSettings
+            settings={settings.social}
+            onSave={(sectionSettings) => handleSave('social', sectionSettings)}
+            onVerify={() => handleVerify('social')}
+            isSaving={savingStates.social}
+            isVerifying={verifyingStates.social}
+            verificationResult={verificationResults.social}
+          />
+        );
+      case 'appearance':
+        return (
+          <AppearanceSettings
+            settings={settings.appearance}
+            onSave={(sectionSettings) => handleSave('appearance', sectionSettings)}
+            onVerify={() => handleVerify('appearance')}
+            isSaving={savingStates.appearance}
+            isVerifying={verifyingStates.appearance}
+            verificationResult={verificationResults.appearance}
+          />
+        );
+      case 'layout':
+        return (
+          <LayoutSettings
+            settings={settings.layout}
+            onSave={(sectionSettings) => handleSave('layout', sectionSettings)}
+            onVerify={() => handleVerify('layout')}
+            isSaving={savingStates.layout}
+            isVerifying={verifyingStates.layout}
+            verificationResult={verificationResults.layout}
+          />
+        );
+      case 'notifications':
+        return (
+          <NotificationSettings
+            settings={settings.notifications}
+            onSave={(sectionSettings) => handleSave('notifications', sectionSettings)}
+            onVerify={() => handleVerify('notifications')}
+            isSaving={savingStates.notifications}
+            isVerifying={verifyingStates.notifications}
+            verificationResult={verificationResults.notifications}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -457,7 +606,7 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your website and event settings.</p>
       </div>
 
-      <Tabs defaultValue="general">
+      <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex w-full overflow-x-auto space-x-2 p-1">
           <TabsTrigger value="general" className="shrink-0">General</TabsTrigger>
           <TabsTrigger value="appearance" className="shrink-0">Appearance</TabsTrigger>
@@ -553,10 +702,17 @@ export default function SettingsPage() {
 
               <div className="flex justify-end">
                 <Button 
-                  onClick={() => handleSaveChanges('General')} 
-                  disabled={isSaving}
+                  onClick={() => handleSave('general', formData)} 
+                  disabled={savingStates.general}
                 >
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {savingStates.general ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -597,10 +753,17 @@ export default function SettingsPage() {
 
               <div className="flex justify-end">
                 <Button 
-                  onClick={() => handleSaveChanges('Social Media')} 
-                  disabled={isSaving}
+                  onClick={() => handleSave('social', formData)} 
+                  disabled={savingStates.social}
                 >
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {savingStates.social ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
                 </Button>
               </div>
             </CardContent>

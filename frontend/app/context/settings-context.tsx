@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { applyColorToVariable } from '@/lib/color-utils'
+import { API_ENDPOINTS } from '@/app/config/api'
 
 // Define the types for our settings
 export interface WebsiteSettings {
@@ -84,26 +85,41 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Load settings from localStorage on initial render
+  // Load settings from API on initial render
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // In a real app, you would fetch from an API
-        // For now, we'll use localStorage
-        const savedSettings = localStorage.getItem('websiteSettings')
+        const response = await fetch(API_ENDPOINTS.SETTINGS.GET_ALL, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+          },
+        })
         
-        if (savedSettings) {
-          const parsedSettings = JSON.parse(savedSettings)
-          setSettings(parsedSettings)
-          
-          // Apply saved colors to CSS variables
-          if (parsedSettings.primaryColor) {
-            applyColorToVariable('--primary', parsedSettings.primaryColor)
-          }
-          
-          if (parsedSettings.secondaryColor) {
-            applyColorToVariable('--secondary', parsedSettings.secondaryColor)
-          }
+        if (!response.ok) {
+          throw new Error('Failed to load settings')
+        }
+
+        const data = await response.json()
+        
+        // Merge API settings with defaults
+        const mergedSettings = {
+          ...defaultSettings,
+          ...data.general,
+          ...data.social,
+          ...data.appearance,
+          ...data.layout,
+          ...data.notifications,
+        }
+        
+        setSettings(mergedSettings)
+        
+        // Apply saved colors to CSS variables
+        if (mergedSettings.primaryColor) {
+          applyColorToVariable('--primary', mergedSettings.primaryColor)
+        }
+        
+        if (mergedSettings.secondaryColor) {
+          applyColorToVariable('--secondary', mergedSettings.secondaryColor)
         }
         
         setIsLoading(false)
@@ -121,25 +137,77 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true)
       
-      // In a real app, you would send to an API
-      // For now, we'll update localStorage
-      const updatedSettings = { ...settings, ...newSettings }
-      setSettings(updatedSettings)
-      localStorage.setItem('websiteSettings', JSON.stringify(updatedSettings))
-      
-      // Apply CSS variables for colors
-      if (newSettings.primaryColor) {
-        applyColorToVariable('--primary', newSettings.primaryColor)
+      // Group settings by their category
+      const groupedSettings: Record<string, Record<string, any>> = {
+        general: {},
+        social: {},
+        appearance: {},
+        layout: {},
+        notifications: {},
       }
-      
-      if (newSettings.secondaryColor) {
-        applyColorToVariable('--secondary', newSettings.secondaryColor)
+
+      // Categorize settings
+      Object.entries(newSettings).forEach(([key, value]) => {
+        if ([
+          'organizationName', 'eventName', 'contactEmail', 'contactPhone', 'address', 'aboutOrganization'
+        ].includes(key)) {
+          groupedSettings.general[key] = value
+        } else if ([
+          'facebook', 'instagram', 'twitter'
+        ].includes(key)) {
+          groupedSettings.social[key] = value
+        } else if ([
+          'primaryColor', 'secondaryColor', 'logo', 'favicon'
+        ].includes(key)) {
+          groupedSettings.appearance[key] = value
+        } else if ([
+          'showHeroSection', 'showFeaturedSections', 'showRegistrationCTA', 'showSponsorsHighlight'
+        ].includes(key)) {
+          groupedSettings.layout[key] = value
+        } else if ([
+          'sendRegistrationConfirmation', 'sendDonationReceipt', 'sendEventReminders', 'sendAdminNotifications', 'notificationEmail'
+        ].includes(key)) {
+          groupedSettings.notifications[key] = value
+        }
+      })
+
+      // Only send non-empty groups
+      const filteredSettings: Record<string, any> = {}
+      Object.entries(groupedSettings).forEach(([group, values]) => {
+        if (Object.keys(values).length > 0) {
+          filteredSettings[group] = values
+        }
+      })
+
+      // Wrap in { settings: ... }
+      const response = await fetch(API_ENDPOINTS.SETTINGS.UPDATE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('milesforhope-admin-token')}`,
+        },
+        body: JSON.stringify({ settings: filteredSettings }),
+      })
+
+      if (!response.ok) {
+        let message = 'Failed to update settings'
+        try {
+          const data = await response.json()
+          if (data && data.errors) {
+            message = JSON.stringify(data.errors)
+          } else if (data && data.message) {
+            message = data.message
+          }
+        } catch {}
+        throw new Error(message)
       }
-      
+
+      // Merge updated settings into current settings
+      setSettings(prev => ({ ...prev, ...newSettings }))
       setIsLoading(false)
     } catch (err) {
-      setError('Failed to update settings')
       setIsLoading(false)
+      throw err
     }
   }
 

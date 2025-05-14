@@ -10,6 +10,7 @@ use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -135,4 +136,12 @@ Route::get('test-db', function () {
 
 Route::get('/', function () {
     return response()->json(['status' => 'ok']);
+});
+
+// Settings routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/settings', [SettingsController::class, 'index']);
+    Route::post('/settings', [SettingsController::class, 'update']);
+    Route::get('/settings/{group}', [SettingsController::class, 'getGroup']);
+    Route::get('/settings/value/{key}', [SettingsController::class, 'getValue']);
 });
