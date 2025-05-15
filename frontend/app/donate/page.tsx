@@ -30,7 +30,11 @@ export default function DonatePage() {
   const [contactLoading, setContactLoading] = useState(false);
 
   const handlePresetAmount = (value: string) => {
-    setDonationAmount(value);
+    const input = document.getElementById('custom-amount') as HTMLInputElement;
+    if (input) {
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   };
 
   const handleCustomAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
