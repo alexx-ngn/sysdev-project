@@ -364,7 +364,7 @@ export default function DonatePage() {
                         type="text"
                         value={donationName}
                         onChange={handleDonationNameChange}
-                        placeholder={t('donate.contact.namePlaceholder')}
+                        placeholder={t('donate.form.namePlaceholder')}
                         required
                       />
                     </div>
