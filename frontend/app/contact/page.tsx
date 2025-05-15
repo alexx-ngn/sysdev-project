@@ -75,6 +75,21 @@ export default function ContactPage() {
     }));
   };
 
+  const handleContactNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (!/\d/.test(value)) {
+      setFormData(prev => ({
+        ...prev,
+        name: value
+      }));
+    } else {
+      toast({
+        title: 'Name cannot contain numbers',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <WebsiteSettings />
@@ -110,7 +125,7 @@ export default function ContactPage() {
                             id="name" 
                             name="name"
                             value={formData.name}
-                            onChange={handleChange}
+                            onChange={handleContactNameChange}
                             placeholder={t('contact.form.namePlaceholder')} 
                             required
                           />
