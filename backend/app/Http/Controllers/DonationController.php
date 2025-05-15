@@ -29,7 +29,7 @@ class DonationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'UserID' => 'required|exists:users,UserID',
-            'Amount' => 'required|numeric|min:0.01',
+            'Amount' => 'required|numeric|min:0.01|max:25000',
             'DonationDate' => 'required|date',
             'ConfirmationID' => 'required|string'
         ]);

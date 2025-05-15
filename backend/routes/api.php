@@ -9,6 +9,8 @@ use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StripeController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactFormSubmission;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,3 +68,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('users/find-or-create', [UserController::class, 'findOrCreate']);
+
+// Test email route (remove this in production)
+Route::get('/test-email', function () {
+    $testData = [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'subject' => 'Test Email',
+        'message' => 'This is a test email from the API.'
+    ];
+
+    Mail::to(config('mail.from.address'))
+        ->send(new ContactFormSubmission($testData));
+
+    return response()->json(['message' => 'Test email sent!']);
+});

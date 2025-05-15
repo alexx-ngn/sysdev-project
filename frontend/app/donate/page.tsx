@@ -30,13 +30,23 @@ export default function DonatePage() {
   const handleCustomAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === "" || /^\d+(\.\d{0,2})?$/.test(value)) {
-      setAmount(value);
+      const numValue = parseFloat(value);
+      if (numValue <= 25000) {
+        setAmount(value);
+      } else {
+        toast.error('Maximum donation amount is $25,000');
+      }
     }
   };
 
   const handleDonation = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast.error(t('donate.contact.invalidAmount'));
+      return;
+    }
+
+    if (parseFloat(amount) > 25000) {
+      toast.error('Maximum donation amount is $25,000');
       return;
     }
 
