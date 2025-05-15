@@ -53,6 +53,15 @@ export default function DonatePage() {
     }
   };
 
+  const handleDonationNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (!/\d/.test(value)) {
+      setDonationName(value);
+    } else {
+      toast.error('Name cannot contain numbers');
+    }
+  };
+
   const handleDonation = async () => {
     if (!donationAmount || parseFloat(donationAmount) <= 0) {
       toast.error(t('donate.contact.invalidAmount'));
@@ -354,7 +363,7 @@ export default function DonatePage() {
                         id="donation-name"
                         type="text"
                         value={donationName}
-                        onChange={(e) => setDonationName(e.target.value)}
+                        onChange={handleDonationNameChange}
                         placeholder={t('donate.contact.namePlaceholder')}
                         required
                       />
