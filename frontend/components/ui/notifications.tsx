@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import { getApiUrl } from '../app/config/api'
+import { getApiUrl } from '../../app/config/api'
 
 interface Activity {
   id: string;
@@ -41,7 +41,7 @@ export function NotificationsPopover() {
           id: `donation-${d.DonationID}`,
           type: 'donation' as const,
           title: 'New Donation',
-          description: `${d.name} donated $${d.Amount}`,
+          description: `${d.user?.FirstName || ''} ${d.user?.LastName || ''} donated $${d.Amount}`.trim(),
           date: new Date(d.DonationDate).toISOString()
         }));
 

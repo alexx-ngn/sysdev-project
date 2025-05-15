@@ -11,7 +11,7 @@ return new class extends Migration {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id('RegistrationID');
             $table->foreignId('UserID')->constrained('users', 'UserID');
-            $table->date('RegistrationDate');
+            $table->timestamp('RegistrationDate');
             $table->string('RegistrationStatus');
             $table->timestamps();
         });

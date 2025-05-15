@@ -21,11 +21,14 @@ interface Registration {
 
 interface Donation {
   DonationID: number;
-  name: string;
-  email: string;
+  UserID: number;
+  user: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+  };
   Amount: number;
   DonationDate: string;
-  type: string;
   ConfirmationID: string;
 }
 
@@ -151,7 +154,6 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{registrations.length}</div>
-            <p className="text-xs text-muted-foreground">+{Math.floor(registrations.length * 0.12)}% from last week</p>
           </CardContent>
         </Card>
 
@@ -162,18 +164,6 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${totalDonations.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-            <p className="text-xs text-muted-foreground">{monthlyChange >= 0 ? '+' : ''}{monthlyChange.toFixed(0)}% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">Next event in 5 days</p>
           </CardContent>
         </Card>
       </div>
@@ -223,8 +213,8 @@ export default function AdminDashboard() {
                 {recentDonations.map((donation) => (
                   <div key={donation.DonationID} className="flex items-center">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{donation.name}</p>
-                      <p className="text-sm text-muted-foreground">{donation.email}</p>
+                      <p className="text-sm font-medium leading-none">{donation.user.FirstName} {donation.user.LastName}</p>
+                      <p className="text-sm text-muted-foreground">{donation.user.Email}</p>
                     </div>
                     <div className="ml-auto font-medium">
                       ${donation.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -246,29 +236,33 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                {[...recentRegistrations.map(reg => ({
-                  type: 'registration',
-                  date: new Date(reg.RegistrationDate),
-                  text: `${reg.user.FirstName} ${reg.user.LastName} registered for the event`
-                })), ...recentDonations.map(don => ({
-                  type: 'donation',
-                  date: new Date(don.DonationDate),
-                  text: `${don.name} donated $${don.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                }))].sort((a, b) => b.date.getTime() - a.date.getTime())
-                .slice(0, 3)
-                .map((activity, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {activity.type === 'registration' ? 'New registration' : 'Donation received'}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{activity.text}</p>
+                {[
+                  ...recentRegistrations.map(reg => ({
+                    type: 'registration',
+                    date: new Date(reg.RegistrationDate),
+                    text: `${reg.user.FirstName} ${reg.user.LastName} registered for the event`
+                  })),
+                  ...recentDonations.map(don => ({
+                    type: 'donation',
+                    date: new Date(don.DonationDate),
+                    text: `${don.user.FirstName} ${don.user.LastName} donated $${don.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  }))
+                ]
+                  .sort((a, b) => b.date.getTime() - a.date.getTime())
+                  .slice(0, 3)
+                  .map((activity, index) => (
+                    <div key={index} className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {activity.type === 'registration' ? 'New registration' : 'Donation received'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{activity.text}</p>
+                      </div>
+                      <div className="ml-auto font-medium">
+                        {activity.date.toLocaleString()}
+                      </div>
                     </div>
-                    <div className="ml-auto font-medium">
-                      {activity.date.toLocaleString()}
-                    </div>
-                  </div>
-                ))}
+                  ))}
                 {recentRegistrations.length === 0 && recentDonations.length === 0 && (
                   <div className="text-sm text-muted-foreground">No recent activity</div>
                 )}

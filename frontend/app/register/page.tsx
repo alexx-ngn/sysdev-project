@@ -141,7 +141,7 @@ export default function RegisterPage() {
                       <Link href="/faq">{t('register.faq.viewAll')}</Link>
                     </Button>
                     <Button asChild>
-                      <Link href="/#contact">{t('register.faq.contact')}</Link>
+                      <Link href="/contact">{t('register.faq.contact')}</Link>
                     </Button>
                   </div>
                 </div>

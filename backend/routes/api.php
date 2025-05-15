@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\AdminAuthController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StripeController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormSubmission;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,4 +84,78 @@ Route::get('/test-email', function () {
         ->send(new ContactFormSubmission($testData));
 
     return response()->json(['message' => 'Test email sent!']);
+});
+
+Route::get('test', function () {
+    return [
+        'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
+        'route' => $_GET['route'] ?? null,
+        'API is working!'
+    ];
+});
+
+Route::get('test-db', function () {
+    try {
+        $db_config = config('database.connections.mysql');
+        $ssl_ca = env('DB_SSL_CA');
+        $ssl_ca_path = $db_config['options'][PDO::MYSQL_ATTR_SSL_CA] ?? null;
+        
+        // Try to get PDO connection
+        $pdo = DB::connection()->getPdo();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database connection successful',
+            'database' => DB::connection()->getDatabaseName(),
+            'debug_info' => [
+                'db_config' => [
+                    'host' => $db_config['host'],
+                    'port' => $db_config['port'],
+                    'database' => $db_config['database'],
+                    'username' => $db_config['username'],
+                    'ssl_options' => array_map(function($value) {
+                        return is_string($value) ? '***' : $value;
+                    }, $db_config['options']),
+                ],
+                'ssl_ca_length' => $ssl_ca ? strlen($ssl_ca) : 0,
+                'ssl_ca_path' => $ssl_ca_path,
+                'ssl_ca_path_exists' => $ssl_ca_path ? file_exists($ssl_ca_path) : false,
+                'ssl_ca_path_readable' => $ssl_ca_path ? is_readable($ssl_ca_path) : false,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Database connection failed',
+            'error' => $e->getMessage(),
+            'debug_info' => [
+                'db_config' => [
+                    'host' => $db_config['host'] ?? null,
+                    'port' => $db_config['port'] ?? null,
+                    'database' => $db_config['database'] ?? null,
+                    'username' => $db_config['username'] ?? null,
+                    'ssl_options' => isset($db_config['options']) ? array_map(function($value) {
+                        return is_string($value) ? '***' : $value;
+                    }, $db_config['options']) : null,
+                ],
+                'ssl_ca_length' => $ssl_ca ? strlen($ssl_ca) : 0,
+                'ssl_ca_path' => $ssl_ca_path ?? null,
+                'ssl_ca_path_exists' => $ssl_ca_path ? file_exists($ssl_ca_path) : false,
+                'ssl_ca_path_readable' => $ssl_ca_path ? is_readable($ssl_ca_path) : false,
+                'trace' => $e->getTraceAsString()
+            ]
+        ], 500);
+    }
+});
+
+Route::get('/', function () {
+    return response()->json(['status' => 'ok']);
+});
+
+// Settings routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/settings', [SettingsController::class, 'index']);
+    Route::post('/settings', [SettingsController::class, 'update']);
+    Route::get('/settings/{group}', [SettingsController::class, 'getGroup']);
+    Route::get('/settings/value/{key}', [SettingsController::class, 'getValue']);
 });

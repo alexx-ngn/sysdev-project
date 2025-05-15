@@ -8,6 +8,7 @@ use Stripe\Checkout\Session;
 use App\Models\Donation;
 use App\Events\NewDonationEvent;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 
 class StripeController extends Controller
@@ -57,12 +58,13 @@ class StripeController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => 'http://localhost:3000/donate/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => 'http://localhost:3000/donate/cancel',
+                'success_url' => env('FRONTEND_URL') . '/donate/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => env('FRONTEND_URL') . '/donate/cancel',
                 'customer_email' => $request->email,
                 'metadata' => [
-                    'donor_name' => $request->name,
                     'donor_email' => $request->email,
+                    'donor_name' => $request->name,
+                    'donor_phone' => $request->phoneNumber,
                 ],
             ]);
 
@@ -85,29 +87,18 @@ class StripeController extends Controller
     public function handleWebhook(Request $request)
     {
         $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('services.stripe.webhook_secret');
-
-        Log::info('Received webhook request:', [
-            'signature' => $sigHeader,
-            'has_secret' => !empty($endpointSecret),
-            'payload' => json_decode($payload, true)
-        ]);
+        $sig_header = $request->header('Stripe-Signature');
+        $endpoint_secret = config('services.stripe.webhook_secret');
 
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $payload, $sigHeader, $endpointSecret
+                $payload, $sig_header, $endpoint_secret
             );
-
-            Log::info('Webhook event constructed successfully:', [
-                'event_type' => $event->type,
-                'event_id' => $event->id
-            ]);
         } catch (\UnexpectedValueException $e) {
-            Log::error('Invalid webhook payload:', ['error' => $e->getMessage()]);
+            Log::error('Invalid payload:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Invalid payload'], 400);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            Log::error('Invalid webhook signature:', ['error' => $e->getMessage()]);
+            Log::error('Invalid signature:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
@@ -127,7 +118,7 @@ class StripeController extends Controller
                     [
                         'FirstName' => explode(' ', $session->metadata->donor_name)[0],
                         'LastName' => explode(' ', $session->metadata->donor_name)[1] ?? '',
-                        'PhoneNumber' => null,
+                        'PhoneNumber' => $session->metadata->donor_phone ?? '0000000000',
                     ]
                 );
 
@@ -149,6 +140,23 @@ class StripeController extends Controller
                     'amount' => $donation->Amount,
                     'user_id' => $user->UserID
                 ]);
+
+                // Send confirmation email
+                try {
+                    Mail::send('emails.donation-confirmation', ['donation' => $donation], function ($message) use ($donation) {
+                        $message->to($donation->user->Email)
+                               ->subject('Thank You for Your Donation - Miles for Hope');
+                    });
+                    Log::info('Donation confirmation email sent successfully', [
+                        'donation_id' => $donation->DonationID,
+                        'user_email' => $donation->user->Email
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send donation confirmation email:', [
+                        'error' => $e->getMessage(),
+                        'donation_id' => $donation->DonationID
+                    ]);
+                }
 
                 event(new NewDonationEvent($donation));
             } catch (\Exception $e) {

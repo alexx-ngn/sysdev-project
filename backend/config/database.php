@@ -30,7 +30,27 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('DB_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => (function() {
+                    $ssl_ca = env('DB_SSL_CA');
+                    if (empty($ssl_ca)) {
+                        return null;
+                    }
+                    
+                    // Create a temporary file
+                    $temp_file = tempnam(sys_get_temp_dir(), 'ssl_ca_');
+                    if ($temp_file === false) {
+                        return null;
+                    }
+                    
+                    // Write the certificate to the file
+                    if (file_put_contents($temp_file, $ssl_ca) === false) {
+                        unlink($temp_file);
+                        return null;
+                    }
+                    
+                    return $temp_file;
+                })(),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
             ]) : [],
         ],
     ],

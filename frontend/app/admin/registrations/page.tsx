@@ -540,37 +540,6 @@ export default function RegistrationsPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Registration Statistics</CardTitle>
-          <CardDescription>Overview of registration trends and demographics.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Registration by Day</p>
-              <div className="h-[180px] bg-gray-100 rounded-md flex items-center justify-center">
-                <p className="text-sm text-muted-foreground">Chart Placeholder</p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Age Distribution</p>
-              <div className="h-[180px] bg-gray-100 rounded-md flex items-center justify-center">
-                <p className="text-sm text-muted-foreground">Chart Placeholder</p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Gender Distribution</p>
-              <div className="h-[180px] bg-gray-100 rounded-md flex items-center justify-center">
-                <p className="text-sm text-muted-foreground">Chart Placeholder</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       <ViewEditModal
         registration={selectedRegistration}
         isOpen={isDialogOpen && !!selectedRegistration}

@@ -52,3 +52,7 @@ public/hot
 docker/data/mailpit.db-shm
 docker/data/mailpit.db-wal
 .vercel
+docker/data/mailpit.db-shm
+docker/data/mailpit.db
+docker/data/mailpit.db-shm
+docker/data/mailpit.db-wal
