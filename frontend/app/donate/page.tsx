@@ -39,7 +39,11 @@ export default function DonatePage() {
 
   const handleCustomAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^\d+(\.\d{0,2})?$/.test(value)) {
+    if (value === "") {
+      setDonationAmount(""); // allow clearing the input
+      return;
+    }
+    if (/^\d+(\.\d{0,2})?$/.test(value)) {
       const numValue = parseFloat(value);
       if (numValue <= 25000) {
         setDonationAmount(value);
