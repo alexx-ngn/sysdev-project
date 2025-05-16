@@ -15,8 +15,8 @@
 - Exporting Donations Data ✅
 - Password Recovery ✅
 - Viewing Registered Runners ✅
-- Live Donation Feed
-- Calendar Export
+- Live Donation Feed ✅
+- Calendar Export ✅
 
 ## Gideon
 - Social Media Sharing ✅
