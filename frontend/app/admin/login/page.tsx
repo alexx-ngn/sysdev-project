@@ -156,19 +156,6 @@ export default function AdminLoginPage() {
     }
   }
 
-  const handleSkipAuth = () => {
-    // Create mock admin data for development
-    const mockToken = 'dev-mode-token';
-    const mockAdmin = {
-      id: 0,
-      email: 'dev@milesforhope.org',
-      name: 'Developer Mode'
-    };
-
-    // Use the same auth mechanism as regular login
-    handleSuccessfulLogin(mockToken, mockAdmin);
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-md">
@@ -286,12 +273,6 @@ export default function AdminLoginPage() {
             )}
           </CardContent>
         </Card>
-
-        <div className="mt-4 text-center">
-          <Button onClick={handleSkipAuth} variant="outline">
-            Skip Authentication (Dev Mode)
-          </Button>
-        </div>
 
         <div className="mt-6 text-center">
           <div className="text-sm text-muted-foreground mb-2">
