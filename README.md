@@ -1,3 +1,6 @@
+# DISCLAIMER
+This project was used purely for academic purposes and for proof of concept of a charity website.
+
 # Installation Guide
 
 ## Prerequisites
